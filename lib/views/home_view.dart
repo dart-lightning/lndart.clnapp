@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 
 class HomeView extends StatefulWidget {
+  const HomeView({Key? key}) : super(key: key);
+
   @override
   State<HomeView> createState() => _HomeViewState();
 }
@@ -34,8 +33,8 @@ class _HomeViewState extends State<HomeView> {
     final double categoryHeight = MediaQuery.of(context).size.height * 0.48;
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Color(0xFFBCD51C),
-        body: Container(
+        backgroundColor: const Color(0xFFBCD51C),
+        body: SizedBox(
           height: MediaQuery.of(context).size.height,
           child: Column(
             children: <Widget>[
@@ -50,7 +49,7 @@ class _HomeViewState extends State<HomeView> {
                     child: Container(
                       padding: EdgeInsets.only(
                           left: MediaQuery.of(context).size.width * 0.05),
-                      color: Color(0xFFBCD51C),
+                      color: const Color(0xFFBCD51C),
                       width: MediaQuery.of(context).size.width,
                       child: Column(
                         children: [
@@ -59,29 +58,29 @@ class _HomeViewState extends State<HomeView> {
                           ),
                           Container(
                               alignment: Alignment.centerLeft,
-                              child: Text(
+                              child: const Text(
                                 "Hi Cartez,",
                                 style: TextStyle(fontSize: 28),
                               )),
                           Container(
                             alignment: Alignment.centerLeft,
-                            child: Text(
+                            child: const Text(
                               "Welcome back",
                               style: TextStyle(
                                   fontSize: 28, fontWeight: FontWeight.bold),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 20,
                           ),
-                          Text(
+                          const Text(
                             "Available balance",
                             style: TextStyle(fontSize: 14),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 18,
                           ),
-                          Text(
+                          const Text(
                             "\$3,100,",
                             style: TextStyle(
                                 fontSize: 45, fontWeight: FontWeight.bold),
@@ -92,29 +91,29 @@ class _HomeViewState extends State<HomeView> {
                               Container(
                                 height: 3,
                                 width: 3,
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: Colors.black,
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 7,
                               ),
                               Container(
                                 height: 5,
                                 width: 5,
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: Colors.black,
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 width: 7,
                               ),
                               Container(
                                 height: 3,
                                 width: 3,
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: Colors.black,
                                 ),
@@ -132,21 +131,21 @@ class _HomeViewState extends State<HomeView> {
                                   Container(
                                     height: 55,
                                     width: 55,
-                                    decoration: BoxDecoration(
+                                    decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: Colors.black,
                                     ),
-                                    child: Icon(
+                                    alignment: Alignment.center,
+                                    child: const Icon(
                                       Icons.add_box_rounded,
                                       color: Colors.white,
                                       size: 32,
                                     ),
-                                    alignment: Alignment.center,
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 10,
                                   ),
-                                  Text(
+                                  const Text(
                                     "Top Up",
                                     style: TextStyle(
                                         fontSize: 13,
@@ -159,21 +158,21 @@ class _HomeViewState extends State<HomeView> {
                                   Container(
                                     height: 50,
                                     width: 50,
-                                    decoration: BoxDecoration(
+                                    decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: Colors.black,
                                     ),
-                                    child: Icon(
+                                    alignment: Alignment.center,
+                                    child: const Icon(
                                       Icons.send_outlined,
                                       color: Colors.white,
                                       size: 32,
                                     ),
-                                    alignment: Alignment.center,
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 10,
                                   ),
-                                  Text(
+                                  const Text(
                                     "Send",
                                     style: TextStyle(
                                         fontSize: 13,
@@ -186,21 +185,21 @@ class _HomeViewState extends State<HomeView> {
                                   Container(
                                     height: 50,
                                     width: 50,
-                                    decoration: BoxDecoration(
+                                    decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: Colors.black,
                                     ),
-                                    child: Icon(
+                                    alignment: Alignment.center,
+                                    child: const Icon(
                                       Icons.call_received_outlined,
                                       color: Colors.white,
                                       size: 32,
                                     ),
-                                    alignment: Alignment.center,
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 10,
                                   ),
-                                  Text(
+                                  const Text(
                                     "Request",
                                     style: TextStyle(
                                         fontSize: 13,
@@ -215,7 +214,7 @@ class _HomeViewState extends State<HomeView> {
                     )),
               ),
               Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(20),
@@ -229,7 +228,7 @@ class _HomeViewState extends State<HomeView> {
                       MediaQuery.of(context).size.height * 0.01,
                       0,
                       0),
-                  child: Text(
+                  child: const Text(
                     "Last Transaction",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
@@ -267,24 +266,24 @@ class _HomeViewState extends State<HomeView> {
                                     Container(
                                       height: 46,
                                       width: 46,
-                                      decoration: BoxDecoration(
+                                      decoration: const BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: Color(0xFFEDEDE6),
                                       ),
-                                      child: Icon(
+                                      alignment: Alignment.center,
+                                      child: const Icon(
                                         Icons.shopping_bag_outlined,
                                         color: Colors.black,
                                       ),
-                                      alignment: Alignment.center,
                                     ),
                                     Padding(
-                                      padding:
-                                          EdgeInsets.only(left: 20, top: 20),
+                                      padding: const EdgeInsets.only(
+                                          left: 20, top: 20),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Text(
+                                          const Text(
                                             "Gold",
                                             style: TextStyle(
                                                 fontSize: 20,
@@ -292,7 +291,7 @@ class _HomeViewState extends State<HomeView> {
                                           ),
                                           Text(
                                             "Transaction ID $index",
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.w500),
                                           ),
@@ -313,7 +312,7 @@ class _HomeViewState extends State<HomeView> {
           backgroundColor: Colors.white,
           type: BottomNavigationBarType.fixed,
           onTap: (int index) {},
-          items: [
+          items: const [
             BottomNavigationBarItem(
               icon: Icon(
                 Icons.home_filled,
