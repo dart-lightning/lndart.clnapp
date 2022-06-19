@@ -1,4 +1,4 @@
-import 'package:clnapp/home.dart';
+import 'package:clnapp/views/home_view.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -53,9 +53,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => home()));
+        onPressed: () {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => HomeView()));
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
