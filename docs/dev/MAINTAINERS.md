@@ -1,4 +1,4 @@
-# graphql-flutter HACKING guide
+# clnapp-flutter HACKING guide
 
 ## Table of Content
 
@@ -9,7 +9,7 @@
 
 ## Introduction
 
-Welcome in the HACKING guide and how a day in a graphql-flutter maintainer looks like.
+Welcome in the HACKING guide and how a day in a clnapp-flutter maintainer looks like.
 
 After this reading you should be ready to contribute to the repository and also be one of
 the next maintainer in the future if you would like!
@@ -90,8 +90,8 @@ The version in our package.json gets copied to the one we publish, and users nee
 
 ### Scopes
 
-- **graphql**: Changes related to the graphql client
-- **graphql_flutter**: Changes related to the graphql_flutter package
+- **clnapp**: Changes related to the cln client
+- **clnapp_flutter**: Changes related to the clnapp_flutter package
 
 
 ### Subject
@@ -131,7 +131,7 @@ Signed-off-by: Vincenzo Palazzo <vincenzopalazzodev@gmail.com>
 
 This is the most funny part, and also is the most difficult one in a monorepo repository.
 
-In particular, graphql-flutter has the possibility to release one single package at the time, or
+In particular, clnapp-flutter has the possibility to release one single package at the time, or
 all together.
 
 To prepare the release the following steps are required:
@@ -140,8 +140,8 @@ To prepare the release the following steps are required:
 - Generate the changelog related to the package:
   - `export GITHUB_TOKEN="your_token"`
   - `make {changelog_client|changelog_flutter|changelog}`, where
-      - `changelog_client`: generate the changelog for graphql;
-      - `changelog_flutter`: generate the changelog for graphql_flutter;
+      - `changelog_client`: generate the changelog for clnapp_client;
+      - `changelog_flutter`: generate the changelog for clnapp_flutter;
       - `changelog`: generate both changelos.   
 - Make the Github release: To release a single package we need to create a release with the following tag `{package_name}-v{version_number}`, and 
 if we make a release with the tag `v{version_number}` this will release all the packages (useful for a major release of the package).
