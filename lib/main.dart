@@ -2,21 +2,18 @@ import 'package:clnapp/views/home_view.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const HomeView());
+  runApp(const CLNApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class CLNApp extends StatelessWidget {
+  const CLNApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
+    return const MaterialApp(
+      title: 'CLN App',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const HomeView(),
+      home: HomeView(),
     );
   }
 }
