@@ -1,6 +1,7 @@
 import 'package:cln_grpc/cln_grpc.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 
 class HomeView extends StatefulWidget {
   final AppProvider provider;
@@ -12,16 +13,18 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  // final CategoriesScroller categoriesScroller = CategoriesScroller();
   ScrollController controller = ScrollController();
 
   bool closeTopContainer = false;
 
   double topContainer = 0;
 
+  int _currentIndex = 0;
+
   @override
   void initState() {
     super.initState();
+    _currentIndex = 1;
     controller.addListener(() {
       double value = controller.offset / 300;
       setState(() {
@@ -317,54 +320,43 @@ class _HomeViewState extends State<HomeView> {
         });
   }
 
+  Widget _buildBottomNavigation() {
+    return BottomNavyBar(
+      selectedIndex: _currentIndex,
+      showElevation: true,
+      itemCornerRadius: 24,
+      curve: Curves.easeIn,
+      onItemSelected: (index) => setState(() => _currentIndex = index),
+      items: <BottomNavyBarItem>[
+        BottomNavyBarItem(
+          icon: const Icon(Icons.data_usage_outlined),
+          title: const Text('Info'),
+          activeColor: Colors.red,
+          textAlign: TextAlign.center,
+        ),
+        BottomNavyBarItem(
+          icon: const Icon(Icons.home_filled),
+          title: const Text('Home'),
+          activeColor: Colors.purpleAccent,
+          textAlign: TextAlign.center,
+        ),
+        BottomNavyBarItem(
+          icon: const Icon(Icons.perm_identity),
+          title: const Text('Profile'),
+          activeColor: Colors.pink,
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor:
+          closeTopContainer ? Colors.white : const Color(0xFFBCD51C),
       body: _buildMainView(context: context),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        selectedItemColor: Colors.black,
-        backgroundColor: Colors.white,
-        type: BottomNavigationBarType.fixed,
-        onTap: (int index) {},
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.home_filled,
-              color: Colors.black,
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.account_balance_wallet_outlined,
-              color: Colors.black,
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.qr_code_scanner,
-              color: Colors.black,
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.bar_chart,
-              color: Colors.black,
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.perm_identity,
-              color: Colors.black,
-            ),
-            label: '',
-          ),
-        ],
-      ),
+      bottomNavigationBar: _buildBottomNavigation(),
     );
   }
 }
