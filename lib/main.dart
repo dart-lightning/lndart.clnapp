@@ -4,6 +4,7 @@ import 'package:clnapp/utils/app_provider.dart';
 import 'package:clnapp/views/app_view.dart';
 import 'package:clnapp/views/home/home_view.dart';
 import 'package:flutter/material.dart';
+import 'package:trash_themes/themes.dart';
 
 Future<void> main() async {
   var provider = await AppProvider().init();
@@ -28,6 +29,8 @@ class CLNApp extends AppView {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'CLN App',
+      themeMode: ThemeMode.dark,
+      darkTheme: DraculaTheme().makeDarkTheme(context: context),
       debugShowCheckedModeBanner: false,
       home: HomeView(provider: provider),
     );

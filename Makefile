@@ -19,5 +19,8 @@ check:
 clean:
 	$(CC) clean
 
+run:
+	flutter run -d linux
+
 dep_upgrade:
 	$(CC) pub upgrade --major-versions
