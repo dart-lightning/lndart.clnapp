@@ -20,6 +20,8 @@ Future<void> main() async {
           'certificatePath': certificateDir,
           'host': 'localhost',
           'port': 8001,
+          // include the path if you want use the unix socket. N.B it is broken!
+          //'path': "/media/vincent/VincentSSD/.lightning/testnet/lightning-rpc"
         }));
   });
   runApp(CLNApp(provider: provider));
@@ -34,7 +36,7 @@ class CLNApp extends AppView {
     return MaterialApp(
       title: 'CLN App',
       themeMode: ThemeMode.dark,
-      darkTheme: DraculaTheme().makeDarkTheme(context: context),
+      theme: DraculaTheme().makeDarkTheme(context: context),
       debugShowCheckedModeBanner: false,
       home: HomeView(provider: provider),
     );

@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 class MainCircleButton extends StatelessWidget {
   final IconData icon;
@@ -6,39 +6,38 @@ class MainCircleButton extends StatelessWidget {
   final double height;
   final double width;
   final String label;
+  final Function onPress;
 
   const MainCircleButton(
       {Key? key,
       required this.icon,
       required this.label,
+      required this.onPress,
       this.iconSize = 32,
       this.height = 55,
-      this.width = 55})
+      this.width = 130})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          height: height,
-          width: width,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-          ),
-          alignment: Alignment.center,
-          child: Icon(
-            icon,
-            size: iconSize,
-          ),
-        ),
-        const SizedBox(
-          height: 10,
-        ),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-        )
+        ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              primary: Theme.of(context).primaryColor,
+              maximumSize: Size(width, height),
+              minimumSize: Size(width, height),
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30)),
+            ),
+            onPressed: () => onPress(),
+            icon: Icon(icon,
+                size: iconSize, color: Theme.of(context).colorScheme.primary),
+            label: Text(
+              label,
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            )),
       ],
     );
   }

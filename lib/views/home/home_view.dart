@@ -90,24 +90,94 @@ class _HomeViewState extends State<HomeView> {
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.05,
           ),
-          Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: const [
-                MainCircleButton(icon: Icons.add_box_rounded, label: "Top Up"),
-                MainCircleButton(icon: Icons.send_outlined, label: "Send"),
-                MainCircleButton(
-                    icon: Icons.call_received_outlined, label: "Request"),
-              ])
+          Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+            MainCircleButton(
+              icon: Icons.send_outlined,
+              label: "Send",
+              onPress: () => {},
+            ),
+            MainCircleButton(
+                icon: Icons.call_received_outlined,
+                label: "Request",
+                onPress: () {}),
+          ])
         ]));
+  }
+
+  Widget _buildPaymentListView({required BuildContext context}) {
+    return FutureBuilder<AppListTransactions>(
+        future: widget.provider.get<AppApi>().listTransaction(),
+        builder: (context, AsyncSnapshot<AppListTransactions> snapshot) {
+          _checkIfThereAreError(context: context, snapshot: snapshot);
+          if (snapshot.hasData) {
+            List<AppTransaction> transaction = snapshot.data!.transactions;
+            return ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: transaction.length,
+                itemBuilder: (context, index) {
+                  double scale = 1.0;
+                  return Opacity(
+                      opacity: scale,
+                      child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                            padding: EdgeInsets.only(
+                                left:
+                                    MediaQuery.of(context).size.width * 0.053),
+                            height: MediaQuery.of(context).size.height * 0.1,
+                            width: MediaQuery.of(context).size.width,
+                            child: Row(
+                              children: [
+                                Container(
+                                  height: 46,
+                                  width: 46,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: const Icon(
+                                    Icons.shopping_bag_outlined,
+                                  ),
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 20, top: 20),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        snapshot.data!.transactions[index].txId,
+                                        style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w900),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )));
+                });
+          } else {
+            return const Text("Loading");
+          }
+        });
+  }
+
+  void _checkIfThereAreError<T>(
+      {required BuildContext context, required AsyncSnapshot<T> snapshot}) {
+    if (snapshot.hasError) {
+      throw Exception(snapshot.error);
+    }
   }
 
   Widget _buildMainView({required BuildContext context}) {
     return FutureBuilder<AppGetInfo>(
         future: widget.provider.get<AppApi>().getInfo(),
         builder: (context, AsyncSnapshot<AppGetInfo> snapshot) {
-          if (snapshot.hasError) {
-            throw Exception(snapshot.error);
-          }
+          _checkIfThereAreError(context: context, snapshot: snapshot);
           if (snapshot.hasData) {
             var getInfo = snapshot.data!;
             return SingleChildScrollView(
@@ -119,7 +189,6 @@ class _HomeViewState extends State<HomeView> {
                   ),
                   Container(
                     decoration: const BoxDecoration(
-                      color: Colors.white,
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(20),
                           topRight: Radius.circular(20)),
@@ -139,120 +208,45 @@ class _HomeViewState extends State<HomeView> {
                       ),
                     ),
                   ),
-                  Container(
-                      color: Colors.white,
-                      child: FutureBuilder<AppListTransactions>(
-                          future:
-                              widget.provider.get<AppApi>().listTransaction(),
-                          builder: (context,
-                              AsyncSnapshot<AppListTransactions> snapshot) {
-                            if (snapshot.hasData) {
-                              List<AppTransaction> transaction =
-                                  snapshot.data!.transactions;
-                              return ListView.builder(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemCount: transaction.length,
-                                  itemBuilder: (context, index) {
-                                    double scale = 1.0;
-                                    return Opacity(
-                                        opacity: scale,
-                                        child: Align(
-                                            alignment: Alignment.topCenter,
-                                            child: Container(
-                                              padding: EdgeInsets.only(
-                                                  left: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.053),
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.1,
-                                              width: MediaQuery.of(context)
-                                                  .size
-                                                  .width,
-                                              child: Row(
-                                                children: [
-                                                  Container(
-                                                    height: 46,
-                                                    width: 46,
-                                                    decoration:
-                                                        const BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      color: Color(0xFFEDEDE6),
-                                                    ),
-                                                    alignment: Alignment.center,
-                                                    child: const Icon(
-                                                      Icons
-                                                          .shopping_bag_outlined,
-                                                      color: Colors.black,
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 20, top: 20),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          snapshot
-                                                              .data!
-                                                              .transactions[
-                                                                  index]
-                                                              .txId,
-                                                          style: const TextStyle(
-                                                              fontSize: 15,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w900),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            )));
-                                  });
-                            } else {
-                              return Container();
-                            }
-                          }))
+                  _buildPaymentListView(context: context)
                 ]));
           } else {
-            return Container();
+            return const Text("Loading");
           }
         });
   }
 
   Widget _buildBottomNavigation() {
     return BottomNavyBar(
+      backgroundColor: Theme.of(context).backgroundColor,
       selectedIndex: _currentIndex,
       showElevation: true,
+      containerHeight: 68,
       itemCornerRadius: 24,
       curve: Curves.easeIn,
       onItemSelected: (index) => setState(() => _currentIndex = index),
       items: <BottomNavyBarItem>[
+        // FIXME: move this inside an Item view
         BottomNavyBarItem(
           icon: const Icon(Icons.data_usage_outlined),
           title: const Text('Info'),
-          activeColor: Colors.red,
           textAlign: TextAlign.center,
+          activeColor: Theme.of(context).toggleableActiveColor,
+          inactiveColor: Theme.of(context).highlightColor,
         ),
         BottomNavyBarItem(
           icon: const Icon(Icons.home_filled),
           title: const Text('Home'),
-          activeColor: Colors.purpleAccent,
           textAlign: TextAlign.center,
+          activeColor: Theme.of(context).toggleableActiveColor,
+          inactiveColor: Theme.of(context).highlightColor,
         ),
         BottomNavyBarItem(
           icon: const Icon(Icons.perm_identity),
           title: const Text('Profile'),
-          activeColor: Colors.pink,
           textAlign: TextAlign.center,
+          activeColor: Theme.of(context).toggleableActiveColor,
+          inactiveColor: Theme.of(context).highlightColor,
         ),
       ],
     );
@@ -261,7 +255,6 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFBCD51C),
       body: _buildMainView(context: context),
       bottomNavigationBar: _buildBottomNavigation(),
     );
