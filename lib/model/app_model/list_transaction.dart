@@ -5,7 +5,7 @@ class AppListTransactions {
 
   factory AppListTransactions.fromJSON(Map<String, dynamic> json) {
     var transactions = json["transactions"] as List;
-    if (!transactions.isNotEmpty) {
+    if (transactions.isNotEmpty) {
       var appTransactions = transactions
           .map((transaction) => AppTransaction.fromJSON(transaction))
           .toList();
@@ -22,5 +22,5 @@ class AppTransaction {
   AppTransaction(this.txId);
 
   factory AppTransaction.fromJSON(Map<String, dynamic> json) =>
-      AppTransaction(json["txId"]);
+      AppTransaction(json["hash"]);
 }

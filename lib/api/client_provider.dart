@@ -4,6 +4,7 @@
 /// FIXME: This provided need to take some user choise on what the user want
 /// to use.
 import 'dart:io' show Platform;
+import 'package:clightning_rpc/clightning_rpc.dart';
 import 'package:cln_common/cln_common.dart';
 import 'package:cln_grpc/cln_grpc.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -36,7 +37,7 @@ class ClientProvider {
       {required ClientMode mode, Map<String, dynamic> opts = const {}}) {
     switch (mode) {
       case ClientMode.unixSocket:
-        throw Exception("Unix RPC not supported");
+        return RPCClient().connect(opts["path"]);
       case ClientMode.grpc:
         return GRPCClient(
             rootPath: opts['certificatePath'],
