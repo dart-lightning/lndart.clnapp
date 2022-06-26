@@ -1,5 +1,6 @@
-import 'package:cln_grpc/cln_grpc.dart';
-import 'package:clnapp/api/cln_provider.dart';
+import 'package:clnapp/api/api.dart';
+import 'package:clnapp/api/client_provider.dart';
+import 'package:clnapp/api/cln/cln_client.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:clnapp/views/app_view.dart';
 import 'package:clnapp/views/home/home_view.dart';
@@ -12,12 +13,15 @@ Future<void> main() async {
   /// TODO just for now we insert by hand GRPC information, but in the future
   /// we need to have a Setting UI!
   var certificateDir = "/media/vincent/VincentSSD/.lightning/testnet";
-  provider.registerLazyDependence<GRPCClient>(
-      () => CLNProvider.getClient(mode: ClientMode.grpc, opts: {
-            'certificatePath': certificateDir,
-            'host': 'localhost',
-            'port': 8001,
-          }));
+  provider.registerLazyDependence<AppApi>(() {
+    return CLNApi(
+        mode: ClientMode.grpc,
+        client: ClientProvider.getClient(mode: ClientMode.grpc, opts: {
+          'certificatePath': certificateDir,
+          'host': 'localhost',
+          'port': 8001,
+        }));
+  });
   runApp(CLNApp(provider: provider));
 }
 

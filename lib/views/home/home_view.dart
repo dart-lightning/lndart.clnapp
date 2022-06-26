@@ -1,4 +1,7 @@
-import 'package:cln_grpc/cln_grpc.dart';
+import 'package:clnapp/api/api.dart';
+import 'package:clnapp/components/buttons.dart';
+import 'package:clnapp/model/app_model/get_info.dart';
+import 'package:clnapp/model/app_model/list_transaction.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
@@ -21,172 +24,96 @@ class _HomeViewState extends State<HomeView> {
     _currentIndex = 1;
   }
 
+  Widget _buildInfoView(
+      {required BuildContext context, required AppGetInfo getInfo}) {
+    return Container(
+        padding:
+            EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.05),
+        width: MediaQuery.of(context).size.width,
+        child: Column(children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.1,
+          ),
+          Container(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              getInfo.alias,
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          const Text(
+            "Available balance",
+            style: TextStyle(fontSize: 14),
+          ),
+          const SizedBox(
+            height: 18,
+          ),
+          const Text(
+            "\$3,100,",
+            style: TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                height: 3,
+                width: 3,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(
+                width: 7,
+              ),
+              Container(
+                height: 5,
+                width: 5,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(
+                width: 7,
+              ),
+              Container(
+                height: 3,
+                width: 3,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.05,
+          ),
+          Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: const [
+                MainCircleButton(icon: Icons.add_box_rounded, label: "Top Up"),
+                MainCircleButton(icon: Icons.send_outlined, label: "Send"),
+                MainCircleButton(
+                    icon: Icons.call_received_outlined, label: "Request"),
+              ])
+        ]));
+  }
+
   Widget _buildMainView({required BuildContext context}) {
-    return FutureBuilder<GetinfoResponse>(
-        future: widget.provider
-            .get<GRPCClient>()
-            .call(method: "getinfo", payload: GetinfoRequest()),
-        builder: (context, AsyncSnapshot<GetinfoResponse> snapshot) {
+    return FutureBuilder<AppGetInfo>(
+        future: widget.provider.get<AppApi>().getInfo(),
+        builder: (context, AsyncSnapshot<AppGetInfo> snapshot) {
+          if (snapshot.hasError) {
+            throw Exception(snapshot.error);
+          }
           if (snapshot.hasData) {
+            var getInfo = snapshot.data!;
             return SingleChildScrollView(
                 physics: const ScrollPhysics(),
                 child: Column(children: <Widget>[
-                  Container(
-                      padding: EdgeInsets.only(
-                          left: MediaQuery.of(context).size.width * 0.05),
-                      color: const Color(0xFFBCD51C),
-                      width: MediaQuery.of(context).size.width,
-                      child: Column(children: [
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.1,
-                        ),
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            snapshot.data!.alias,
-                            style: const TextStyle(
-                                fontSize: 28, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        const Text(
-                          "Available balance",
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        const SizedBox(
-                          height: 18,
-                        ),
-                        const Text(
-                          "\$3,100,",
-                          style: TextStyle(
-                              fontSize: 45, fontWeight: FontWeight.bold),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              height: 3,
-                              width: 3,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 7,
-                            ),
-                            Container(
-                              height: 5,
-                              width: 5,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 7,
-                            ),
-                            Container(
-                              height: 3,
-                              width: 3,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.05,
-                        ),
-                        Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Column(
-                                children: [
-                                  Container(
-                                    height: 55,
-                                    width: 55,
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.black,
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: const Icon(
-                                      Icons.add_box_rounded,
-                                      color: Colors.white,
-                                      size: 32,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  const Text(
-                                    "Top Up",
-                                    style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  Container(
-                                    height: 50,
-                                    width: 50,
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.black,
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: const Icon(
-                                      Icons.send_outlined,
-                                      color: Colors.white,
-                                      size: 32,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  const Text(
-                                    "Send",
-                                    style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  Container(
-                                    height: 50,
-                                    width: 50,
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.black,
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: const Icon(
-                                      Icons.call_received_outlined,
-                                      color: Colors.white,
-                                      size: 32,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  const Text(
-                                    "Request",
-                                    style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                            ])
-                      ])),
+                  _buildInfoView(context: context, getInfo: getInfo),
                   const SizedBox(
                     height: 20,
                   ),
@@ -214,18 +141,18 @@ class _HomeViewState extends State<HomeView> {
                   ),
                   Container(
                       color: Colors.white,
-                      child: FutureBuilder<ListtransactionsResponse>(
-                          future: widget.provider.get<GRPCClient>().call(
-                              method: "listtransactions",
-                              payload: ListtransactionsRequest()),
+                      child: FutureBuilder<AppListTransactions>(
+                          future:
+                              widget.provider.get<AppApi>().listTransaction(),
                           builder: (context,
-                              AsyncSnapshot<ListtransactionsResponse>
-                                  snapshot) {
+                              AsyncSnapshot<AppListTransactions> snapshot) {
                             if (snapshot.hasData) {
+                              List<AppTransaction> transaction =
+                                  snapshot.data!.transactions;
                               return ListView.builder(
                                   physics: const NeverScrollableScrollPhysics(),
                                   shrinkWrap: true,
-                                  itemCount: snapshot.data!.transactions.length,
+                                  itemCount: transaction.length,
                                   itemBuilder: (context, index) {
                                     double scale = 1.0;
                                     return Opacity(
@@ -276,28 +203,12 @@ class _HomeViewState extends State<HomeView> {
                                                               .data!
                                                               .transactions[
                                                                   index]
-                                                              .inputs[0]
-                                                              .txid
-                                                              .toString(),
+                                                              .txId,
                                                           style: const TextStyle(
                                                               fontSize: 15,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w900),
-                                                        ),
-                                                        Text(
-                                                          snapshot
-                                                              .data!
-                                                              .transactions[
-                                                                  index]
-                                                              .outputs[0]
-                                                              .msat
-                                                              .toString(),
-                                                          style: const TextStyle(
-                                                              fontSize: 15,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500),
                                                         ),
                                                       ],
                                                     ),
