@@ -6,15 +6,17 @@ import 'package:clnapp/api/cln/request/get_info_request.dart';
 import 'package:clnapp/api/cln/request/list_transaction_request.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/model/app_model/list_transaction.dart';
+import 'package:clnapp/utils/app_provider.dart';
 
 class CLNApi extends AppApi {
   ClientMode mode;
   LightningClient client;
+  AppProvider provider;
 
-  CLNApi({required this.mode, required this.client});
+  CLNApi({required this.mode, required this.client, required this.provider});
 
   @override
-  Future<AppGetInfo> getInfo() async {
+  Future<AppGetInfo> getInfo(provider) async {
     dynamic params;
     switch (mode) {
       case ClientMode.grpc:
@@ -32,7 +34,7 @@ class CLNApi extends AppApi {
   }
 
   @override
-  Future<AppListTransactions> listTransaction() {
+  Future<AppListTransactions> listTransaction(provider) {
     dynamic params;
     switch (mode) {
       case ClientMode.grpc:

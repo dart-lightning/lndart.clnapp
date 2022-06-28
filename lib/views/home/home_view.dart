@@ -106,7 +106,7 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _buildPaymentListView({required BuildContext context}) {
     return FutureBuilder<AppListTransactions>(
-        future: widget.provider.get<AppApi>().listTransaction(),
+        future: widget.provider.get<AppApi>().listTransaction(widget.provider),
         builder: (context, AsyncSnapshot<AppListTransactions> snapshot) {
           _checkIfThereAreError(context: context, snapshot: snapshot);
           if (snapshot.hasData) {
@@ -175,7 +175,7 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _buildMainView({required BuildContext context}) {
     return FutureBuilder<AppGetInfo>(
-        future: widget.provider.get<AppApi>().getInfo(),
+        future: widget.provider.get<AppApi>().getInfo(widget.provider),
         builder: (context, AsyncSnapshot<AppGetInfo> snapshot) {
           _checkIfThereAreError(context: context, snapshot: snapshot);
           if (snapshot.hasData) {
@@ -188,8 +188,9 @@ class _HomeViewState extends State<HomeView> {
                     height: 20,
                   ),
                   Container(
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).backgroundColor,
+                      borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(20),
                           topRight: Radius.circular(20)),
                     ),
