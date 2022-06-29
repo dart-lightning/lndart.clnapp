@@ -1,7 +1,7 @@
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
-import 'package:clnapp/model/app_model/list_transaction.dart';
+import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
@@ -105,16 +105,16 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _buildPaymentListView({required BuildContext context}) {
-    return FutureBuilder<AppListTransactions>(
-        future: widget.provider.get<AppApi>().listTransaction(),
-        builder: (context, AsyncSnapshot<AppListTransactions> snapshot) {
+    return FutureBuilder<AppListFunds>(
+        future: widget.provider.get<AppApi>().listFunds(),
+        builder: (context, AsyncSnapshot<AppListFunds> snapshot) {
           _checkIfThereAreError(context: context, snapshot: snapshot);
           if (snapshot.hasData) {
-            List<AppTransaction> transaction = snapshot.data!.transactions;
+            List<AppFund> funds = snapshot.data!.fund;
             return ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: transaction.length,
+                itemCount: funds.length,
                 itemBuilder: (context, index) {
                   double scale = 1.0;
                   return Opacity(
@@ -148,7 +148,7 @@ class _HomeViewState extends State<HomeView> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        snapshot.data!.transactions[index].txId,
+                                        snapshot.data!.fund[index].txId,
                                         style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w900),
