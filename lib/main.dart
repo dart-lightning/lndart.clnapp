@@ -6,13 +6,17 @@ import 'package:clnapp/views/app_view.dart';
 import 'package:clnapp/views/home/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:trash_themes/themes.dart';
+import 'dart:io' show Platform;
 
 Future<void> main() async {
   var provider = await AppProvider().init();
 
   /// TODO just for now we insert by hand GRPC information, but in the future
   /// we need to have a Setting UI!
-  var certificateDir = "/root/.lightning/testnet";
+  var certificateDir = Platform.environment['CLN_CERT_PATH'];
+  if (certificateDir == null) {
+    throw Exception("Please export the CLN_CERT_PATH for your system");
+  }
   provider.registerLazyDependence<AppApi>(() {
     return CLNApi(
         mode: ClientMode.grpc,

@@ -1,6 +1,6 @@
 CC=flutter
 FMT=format
-
+PATH=
 default: get fmt check fmt
 
 get:
@@ -20,7 +20,7 @@ clean:
 	$(CC) clean
 
 run:
-	flutter run -d linux
+	$(CC) run -d linux
 
 dep_upgrade:
 	$(CC) pub upgrade --major-versions
