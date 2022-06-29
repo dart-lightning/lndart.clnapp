@@ -12,7 +12,7 @@ Future<void> main() async {
 
   /// TODO just for now we insert by hand GRPC information, but in the future
   /// we need to have a Setting UI!
-  var certificateDir = "/media/vincent/VincentSSD/.lightning/testnet";
+  var certificateDir = "/root/.lightning/testnet";
   provider.registerLazyDependence<AppApi>(() {
     return CLNApi(
         mode: ClientMode.grpc,

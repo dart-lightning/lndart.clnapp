@@ -3,8 +3,10 @@ import 'package:cln_grpc/cln_grpc.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/api/client_provider.dart';
 import 'package:clnapp/api/cln/request/get_info_request.dart';
+import 'package:clnapp/api/cln/request/list_funds_request.dart';
 import 'package:clnapp/api/cln/request/list_transaction_request.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
+import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/model/app_model/list_transaction.dart';
 
 class CLNApi extends AppApi {
@@ -48,5 +50,23 @@ class CLNApi extends AppApi {
         params: params,
         onDecode: (jsonResponse) =>
             AppListTransactions.fromJSON(jsonResponse as Map<String, dynamic>));
+  }
+
+  @override
+  Future<AppListFunds> listFunds() {
+    dynamic params;
+    switch (mode) {
+      case ClientMode.grpc:
+        params = CLNListFundsRequest(grpcRequest: ListfundsRequest());
+        break;
+      case ClientMode.unixSocket:
+        params = CLNListFundsRequest(unixRequest: <String, dynamic>{});
+        break;
+    }
+    return client.call<CLNListFundsRequest, AppListFunds>(
+        method: "listfunds",
+        params: params,
+        onDecode: (jsonResponse) =>
+            AppListFunds.fromJSON(jsonResponse as Map<String, dynamic>));
   }
 }

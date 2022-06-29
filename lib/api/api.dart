@@ -1,4 +1,5 @@
 import 'package:clnapp/model/app_model/get_info.dart';
+import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/model/app_model/list_transaction.dart';
 
 /// App API implementation, the class contains all the information
@@ -18,4 +19,7 @@ abstract class AppApi {
 
   /// Return the list of transaction from lightning node.
   Future<AppListTransactions> listTransaction();
+
+  /// Return the list of funds from lightning node.
+  Future<AppListFunds> listFunds();
 }
