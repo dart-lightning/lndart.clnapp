@@ -5,6 +5,7 @@ import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
+import 'package:trash_component/components/expandable_card.dart';
 
 class HomeView extends StatefulWidget {
   final AppProvider provider;
@@ -116,49 +117,52 @@ class _HomeViewState extends State<HomeView> {
                 shrinkWrap: true,
                 itemCount: funds.length,
                 itemBuilder: (context, index) {
-                  double scale = 1.0;
-                  return Opacity(
-                      opacity: scale,
-                      child: Align(
-                          alignment: Alignment.topCenter,
-                          child: Container(
-                            padding: EdgeInsets.only(
-                                left:
-                                    MediaQuery.of(context).size.width * 0.053),
-                            height: MediaQuery.of(context).size.height * 0.1,
-                            width: MediaQuery.of(context).size.width,
-                            child: Row(
+                  return ExpandableCard(
+                    expandedAlignment: Alignment.topLeft,
+                    expandableChild: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Amount: ${snapshot.data!.fund[index].amount}"),
+                        Text(
+                            "Confirmed: ${snapshot.data!.fund[index].confirmed}"),
+                        Text(
+                            "Reserved: ${snapshot.data!.fund[index].reserved}"),
+                      ],
+                    ),
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.1,
+                      width: MediaQuery.of(context).size.width,
+                      child: Row(
+                        children: [
+                          Container(
+                            height: 46,
+                            width: 46,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: const Icon(
+                              Icons.shopping_bag_outlined,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20, top: 20),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  height: 46,
-                                  width: 46,
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: const Icon(
-                                    Icons.shopping_bag_outlined,
-                                  ),
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.only(left: 20, top: 20),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        snapshot.data!.fund[index].txId,
-                                        style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w900),
-                                      ),
-                                    ],
-                                  ),
+                                Text(
+                                  snapshot.data!.fund[index].txId,
+                                  style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500),
                                 ),
                               ],
                             ),
-                          )));
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
                 });
           } else {
             return const Text("Loading");
