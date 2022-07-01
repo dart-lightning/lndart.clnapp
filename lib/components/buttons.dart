@@ -7,16 +7,18 @@ class MainCircleButton extends StatelessWidget {
   final double width;
   final String label;
   final Function onPress;
+  final double textSize;
 
-  const MainCircleButton(
-      {Key? key,
-      required this.icon,
-      required this.label,
-      required this.onPress,
-      this.iconSize = 32,
-      this.height = 55,
-      this.width = 130})
-      : super(key: key);
+  const MainCircleButton({
+    Key? key,
+    required this.icon,
+    required this.label,
+    required this.onPress,
+    this.iconSize = 32,
+    this.height = 55,
+    this.width = 130,
+    this.textSize = 13.5,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +38,9 @@ class MainCircleButton extends StatelessWidget {
                 size: iconSize, color: Theme.of(context).colorScheme.primary),
             label: Text(
               label,
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: textSize),
             )),
       ],
     );
