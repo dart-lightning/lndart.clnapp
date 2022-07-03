@@ -11,6 +11,6 @@ class CLNListFundsRequest extends CLNRequest<ListfundsRequest> {
     if (unixRequest != null) {
       return unixRequest!;
     }
-    return grpcRequest!.writeToJsonMap();
+    return grpcRequest!.toProto3Json() as Map<String, dynamic>;
   }
 }

@@ -29,11 +29,15 @@ class AppFund {
   /// If the transaction is reserved for another
   final bool reserved;
 
+  /// flag to identify funds
+  final String identifier;
+
   AppFund(
       {required this.txId,
       required this.amount,
       required this.confirmed,
-      required this.reserved});
+      required this.reserved,
+      this.identifier = "fund"});
 
   factory AppFund.fromJSON(Map<String, dynamic> json) {
     LogManager.getInstance.debug("$json");
