@@ -1,7 +1,6 @@
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
-import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
@@ -105,30 +104,53 @@ class _HomeViewState extends State<HomeView> {
         ]));
   }
 
+  Future<List<dynamic>> listPayments() async {
+    final invoicesList = await widget.provider.get<AppApi>().listInvoices();
+    final fundsList = await widget.provider.get<AppApi>().listFunds();
+
+    var listPayments = List.from(invoicesList.invoice)..addAll(fundsList.fund);
+
+    /// FIXME: sort the payments list
+    return listPayments;
+  }
+
+  Widget _buildSpecificPaymentView(
+      AsyncSnapshot<List<dynamic>> snapshot, int index) {
+    return snapshot.data![index].identifier == "invoice"
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Amount: ${snapshot.data![index].amount}"),
+              Text("Confirmed: ${snapshot.data![index].status}"),
+              Text("Bolt11: ${snapshot.data![index].bolt11}"),
+              Text("Payment Hash: ${snapshot.data![index].paymentHash}"),
+              Text("Paid time: ${snapshot.data![index].paidTime}"),
+            ],
+          )
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Amount: ${snapshot.data![index].amount}"),
+              Text("Confirmed: ${snapshot.data![index].confirmed}"),
+              Text("Reversed: ${snapshot.data![index].reserved}"),
+            ],
+          );
+  }
+
   Widget _buildPaymentListView({required BuildContext context}) {
-    return FutureBuilder<AppListFunds>(
-        future: widget.provider.get<AppApi>().listFunds(),
-        builder: (context, AsyncSnapshot<AppListFunds> snapshot) {
+    return FutureBuilder<List<dynamic>>(
+        future: listPayments(),
+        builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
           _checkIfThereAreError(context: context, snapshot: snapshot);
           if (snapshot.hasData) {
-            List<AppFund> funds = snapshot.data!.fund;
             return ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: funds.length,
+                itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
                   return ExpandableCard(
                     expandedAlignment: Alignment.topLeft,
-                    expandableChild: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Amount: ${snapshot.data!.fund[index].amount}"),
-                        Text(
-                            "Confirmed: ${snapshot.data!.fund[index].confirmed}"),
-                        Text(
-                            "Reserved: ${snapshot.data!.fund[index].reserved}"),
-                      ],
-                    ),
+                    expandableChild: _buildSpecificPaymentView(snapshot, index),
                     child: SizedBox(
                       height: MediaQuery.of(context).size.height * 0.1,
                       width: MediaQuery.of(context).size.width,
@@ -151,7 +173,9 @@ class _HomeViewState extends State<HomeView> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  snapshot.data!.fund[index].txId,
+                                  snapshot.data![index].identifier == "invoice"
+                                      ? snapshot.data![index].label
+                                      : snapshot.data![index].txId,
                                   style: const TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w500),
