@@ -115,24 +115,26 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _buildSpecificPaymentView(
-      AsyncSnapshot<List<dynamic>> snapshot, int index) {
-    return snapshot.data![index].identifier == "invoice"
+      {required BuildContext context,
+      required List<dynamic> items,
+      required int index}) {
+    return items[index].identifier == "invoice"
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Amount: ${snapshot.data![index].amount}"),
-              Text("Confirmed: ${snapshot.data![index].status}"),
-              Text("Bolt11: ${snapshot.data![index].bolt11}"),
-              Text("Payment Hash: ${snapshot.data![index].paymentHash}"),
-              Text("Paid time: ${snapshot.data![index].paidTime}"),
+              Text("Amount: ${items[index].amount}"),
+              Text("Confirmed: ${items[index].status}"),
+              Text("Bolt11: ${items[index].bolt11}"),
+              Text("Payment Hash: ${items[index].paymentHash}"),
+              Text("Paid time: ${items[index].paidTime}"),
             ],
           )
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Amount: ${snapshot.data![index].amount}"),
-              Text("Confirmed: ${snapshot.data![index].confirmed}"),
-              Text("Reversed: ${snapshot.data![index].reserved}"),
+              Text("Amount: ${items[index].amount}"),
+              Text("Confirmed: ${items[index].confirmed}"),
+              Text("Reversed: ${items[index].reserved}"),
             ],
           );
   }
@@ -150,7 +152,8 @@ class _HomeViewState extends State<HomeView> {
                 itemBuilder: (context, index) {
                   return ExpandableCard(
                     expandedAlignment: Alignment.topLeft,
-                    expandableChild: _buildSpecificPaymentView(snapshot, index),
+                    expandableChild: _buildSpecificPaymentView(
+                        context: context, items: snapshot.data!, index: index),
                     child: SizedBox(
                       height: MediaQuery.of(context).size.height * 0.1,
                       width: MediaQuery.of(context).size.width,
