@@ -25,7 +25,7 @@ class AppInvoice {
   final String bolt11;
 
   /// The quantity of Bitcoin in millisatoshi
-  final int amount;
+  final String amount;
 
   /// If the invoice is paid or not on the blockchain
   final String status;
@@ -58,9 +58,11 @@ class AppInvoice {
     return AppInvoice(
       bolt11: json["bolt11"],
       paymentHash: json["paymentHash"],
-      status: json["status"],
-      amount: int.parse(json["amountReceivedMsat"]["msat"].toString()),
-      paidTime: json["paidAt"].toString(),
+      status: json["status"] ?? "unpaid",
+      amount: json["amountReceivedMsat"] != null
+          ? json["amountReceivedMsat"]["msat"].toString()
+          : "unpaid",
+      paidTime: json["paidAt"] ?? "unpaid",
       description: json["description"],
       label: json["label"],
     );
