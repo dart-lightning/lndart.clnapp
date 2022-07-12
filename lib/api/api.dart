@@ -1,4 +1,5 @@
 import 'package:clnapp/model/app_model/get_info.dart';
+import 'package:clnapp/model/app_model/list_channels.dart';
 import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/model/app_model/list_invoices.dart';
 import 'package:clnapp/model/app_model/list_transaction.dart';
@@ -26,4 +27,7 @@ abstract class AppApi {
 
   /// Return the list of invoices from lightning node.
   Future<AppListInvoices> listInvoices();
+
+  /// Return the list of invoices from lightning node.
+  Future<AppListChannels> listChannels();
 }

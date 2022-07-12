@@ -18,9 +18,12 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   int _currentIndex = 0;
 
+  double amountSat = 0;
+
   @override
   void initState() {
     super.initState();
+    getamountMsat();
     _currentIndex = 1;
   }
 
@@ -51,9 +54,9 @@ class _HomeViewState extends State<HomeView> {
           const SizedBox(
             height: 18,
           ),
-          const Text(
-            "\$3,100,",
-            style: TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
+          Text(
+            amountSat.toString(),
+            style: const TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -112,6 +115,26 @@ class _HomeViewState extends State<HomeView> {
 
     /// FIXME: sort the payments list
     return listPayments;
+  }
+
+  void getamountMsat() async {
+    final channelsList = await widget.provider.get<AppApi>().listChannels();
+    double totalChannelsAmount = 0;
+    for (var num in channelsList.channels) {
+      totalChannelsAmount += num.amount;
+    }
+
+    /// because all the channnels repeat twice in list channels
+    totalChannelsAmount /= 2;
+
+    /// converting it to sat
+    totalChannelsAmount /= 1000;
+
+    /// converting it to Bitcoin
+    totalChannelsAmount *= 0.00000001;
+    setState(() {
+      amountSat = totalChannelsAmount;
+    });
   }
 
   Widget _buildSpecificPaymentView(
