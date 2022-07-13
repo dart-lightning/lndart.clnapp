@@ -23,7 +23,11 @@ class _HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    getamountMsat();
+    getamountMsat().then((amount) => {
+          setState(() {
+            amountSat = amount;
+          }),
+        });
     _currentIndex = 1;
   }
 
@@ -55,7 +59,7 @@ class _HomeViewState extends State<HomeView> {
             height: 18,
           ),
           Text(
-            amountSat.toString(),
+            "${amountSat.toString()} sats",
             style: const TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
           ),
           Row(
@@ -117,24 +121,18 @@ class _HomeViewState extends State<HomeView> {
     return listPayments;
   }
 
-  void getamountMsat() async {
-    final channelsList = await widget.provider.get<AppApi>().listChannels();
+  Future<double> getamountMsat() async {
+    final channelsList = await widget.provider.get<AppApi>().listFunds();
     double totalChannelsAmount = 0;
-    for (var num in channelsList.channels) {
+
+    for (var num in channelsList.fundChannels) {
       totalChannelsAmount += num.amount;
     }
-
-    /// because all the channnels repeat twice in list channels
-    totalChannelsAmount /= 2;
 
     /// converting it to sat
     totalChannelsAmount /= 1000;
 
-    /// converting it to Bitcoin
-    totalChannelsAmount *= 0.00000001;
-    setState(() {
-      amountSat = totalChannelsAmount;
-    });
+    return totalChannelsAmount;
   }
 
   Widget _buildSpecificPaymentView(

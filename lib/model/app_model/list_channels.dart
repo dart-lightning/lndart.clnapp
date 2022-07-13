@@ -18,10 +18,10 @@ class AppListChannels {
 }
 
 class AppChannels {
-  /// Transaction identifier
+  /// Source of the channel
   final String source;
 
-  /// Transaction identifier
+  /// Destination of the channel
   final String destination;
 
   /// The quantity of Bitcoin in millisatoshi
