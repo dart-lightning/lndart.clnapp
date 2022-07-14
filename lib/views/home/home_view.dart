@@ -18,7 +18,7 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   int _currentIndex = 0;
 
-  double amountSat = 0;
+  int amountSat = 0;
 
   @override
   void initState() {
@@ -121,7 +121,7 @@ class _HomeViewState extends State<HomeView> {
     return listPayments;
   }
 
-  Future<double> getamountMsat() async {
+  Future<int> getamountMsat() async {
     final channelsList = await widget.provider.get<AppApi>().listFunds();
     double totalChannelsAmount = 0;
 
@@ -131,8 +131,7 @@ class _HomeViewState extends State<HomeView> {
 
     /// converting it to sat
     totalChannelsAmount /= 1000;
-
-    return totalChannelsAmount;
+    return totalChannelsAmount.toInt();
   }
 
   Widget _buildSpecificPaymentView(
