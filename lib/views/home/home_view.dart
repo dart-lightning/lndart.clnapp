@@ -123,15 +123,8 @@ class _HomeViewState extends State<HomeView> {
 
   Future<int> getamountMsat() async {
     final channelsList = await widget.provider.get<AppApi>().listFunds();
-    double totalChannelsAmount = 0;
 
-    for (var num in channelsList.fundChannels) {
-      totalChannelsAmount += num.amount;
-    }
-
-    /// converting it to sat
-    totalChannelsAmount /= 1000;
-    return totalChannelsAmount.toInt();
+    return channelsList.channelSats.toInt();
   }
 
   Widget _buildSpecificPaymentView(
