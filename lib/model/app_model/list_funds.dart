@@ -5,17 +5,34 @@ class AppListFunds {
 
   List<AppFundChannel> fundChannels;
 
-  AppListFunds({this.fund = const [], this.fundChannels = const []});
+  int channelSats;
+
+  AppListFunds(
+      {this.fund = const [],
+      this.fundChannels = const [],
+      this.channelSats = 0});
 
   factory AppListFunds.fromJSON(Map<String, dynamic> json) {
     var funds = json["outputs"] as List;
     var fundChannels = json["channels"] as List;
+    double totalChannelsAmount = 0;
+
+    for (var channel in fundChannels) {
+      totalChannelsAmount += int.parse(channel["ourAmountMsat"]["msat"] ?? "0");
+    }
+
+    /// converting Msat to sat
+    totalChannelsAmount /= 1000;
+
     if (funds.isNotEmpty) {
       var appFunds = funds.map((fund) => AppFund.fromJSON(fund)).toList();
       var appFundChannels = fundChannels
           .map((channels) => AppFundChannel.fromJSON(channels))
           .toList();
-      return AppListFunds(fund: appFunds, fundChannels: appFundChannels);
+      return AppListFunds(
+          fund: appFunds,
+          fundChannels: appFundChannels,
+          channelSats: totalChannelsAmount.toInt());
     } else {
       return AppListFunds();
     }
