@@ -2,6 +2,7 @@ import 'package:clnapp/api/api.dart';
 import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/utils/app_provider.dart';
+import 'package:clnapp/views/pay/pay_view.dart';
 import 'package:flutter/material.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:trash_component/components/expandable_card.dart';
@@ -101,7 +102,13 @@ class _HomeViewState extends State<HomeView> {
             MainCircleButton(
               icon: Icons.send_outlined,
               label: "Send",
-              onPress: () => {},
+              onPress: () => {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            PayView(provider: widget.provider))),
+              },
             ),
             MainCircleButton(
                 icon: Icons.call_received_outlined,
