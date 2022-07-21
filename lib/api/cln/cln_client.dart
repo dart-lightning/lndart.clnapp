@@ -118,11 +118,11 @@ class CLNApi extends AppApi {
     dynamic params;
     switch (mode) {
       case ClientMode.grpc:
-        if (msat == -1) {
+        if (msat == null) {
           params = CLNPayRequest(grpcRequest: PayRequest(bolt11: invoice));
         } else {
           Amount? amount = Amount();
-          amount.msat = Int64(msat ?? 0);
+          amount.msat = Int64(msat);
           params = CLNPayRequest(
               grpcRequest: PayRequest(bolt11: invoice, msatoshi: amount));
         }

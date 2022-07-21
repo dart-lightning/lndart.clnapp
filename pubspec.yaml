@@ -29,7 +29,7 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 
 dependency_overrides:
-  cln_common: ^0.0.1-beta.1
+#  cln_common: ^0.0.1-beta.1
 
 flutter:
   uses-material-design: true
