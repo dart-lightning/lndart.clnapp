@@ -39,7 +39,7 @@ class _PayViewState extends State<PayView> {
     paymentResponse = null;
   }
 
-  Widget _buildMainView(){
+  Widget _buildMainView() {
     return Padding(
       padding: const EdgeInsets.all(30.0),
       child: Column(
@@ -92,16 +92,16 @@ class _PayViewState extends State<PayView> {
               label: "Pay",
               onPress: () {
                 payInvoice(boltString, amountMsat).then((value) => {
-                  setState(() {
-                    paymentResponse = value;
-                  }),
-                });
+                      setState(() {
+                        paymentResponse = value;
+                      }),
+                    });
               }),
           paymentResponse != null
               ? paymentResponse!.payResponse["Error"] == null
-              ? Text(
-              "Payment Successfully : ${paymentResponse!.payResponse["amountMsat"]["msat"]} msats")
-              : Text("${paymentResponse!.payResponse["Error"]}")
+                  ? Text(
+                      "Payment Successfully : ${paymentResponse!.payResponse["amountMsat"]["msat"]} msats")
+                  : Text("${paymentResponse!.payResponse["Error"]}")
               : Container(),
         ],
       ),
