@@ -39,78 +39,82 @@ class _PayViewState extends State<PayView> {
     paymentResponse = null;
   }
 
+  Widget _buildMainView(){
+    return Padding(
+      padding: const EdgeInsets.all(30.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          TextField(
+            onChanged: (invoiceBolt) {
+              boltString = invoiceBolt;
+            },
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Invoice Bolt11/12',
+              hintText: 'Bolt11/12',
+            ),
+          ),
+          Row(
+            children: [
+              Checkbox(
+                value: amountMsat == -1 ? false : true,
+                onChanged: (value) {
+                  setState(() {
+                    amountMsat = (value == true ? 0 : -1);
+                  });
+                },
+              ),
+              const Text(
+                'Enter milli-satoshi amount?',
+                style: TextStyle(fontSize: 17.0),
+              ), //Text//SizedBox
+            ],
+          ),
+          TextField(
+            keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+            ],
+            onChanged: (amount) {
+              amountMsat = int.parse(amount);
+            },
+            enabled: amountMsat == -1 ? false : true,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              disabledBorder: OutlineInputBorder(),
+              labelText: 'Amount to send in millisatoshi',
+              hintText: 'Eg: 100 msats',
+            ),
+          ),
+          MainCircleButton(
+              icon: Icons.send_outlined,
+              label: "Pay",
+              onPress: () {
+                payInvoice(boltString, amountMsat).then((value) => {
+                  setState(() {
+                    paymentResponse = value;
+                  }),
+                });
+              }),
+          paymentResponse != null
+              ? paymentResponse!.payResponse["Error"] == null
+              ? Text(
+              "Payment Successfully : ${paymentResponse!.payResponse["amountMsat"]["msat"]} msats")
+              : Text("${paymentResponse!.payResponse["Error"]}")
+              : Container(),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Payment"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(30.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            TextField(
-              onChanged: (invoiceBolt) {
-                boltString = invoiceBolt;
-              },
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Invoice Bolt11/12',
-                hintText: 'Bolt11/12',
-              ),
-            ),
-            Row(
-              children: [
-                Checkbox(
-                  value: amountMsat == -1 ? false : true,
-                  onChanged: (value) {
-                    setState(() {
-                      amountMsat = (value == true ? 0 : -1);
-                    });
-                  },
-                ),
-                const Text(
-                  'Enter milli-satoshi amount?',
-                  style: TextStyle(fontSize: 17.0),
-                ), //Text//SizedBox
-              ],
-            ),
-            TextField(
-              keyboardType: TextInputType.number,
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-              ],
-              onChanged: (amount) {
-                amountMsat = int.parse(amount);
-              },
-              enabled: amountMsat == -1 ? false : true,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                disabledBorder: OutlineInputBorder(),
-                labelText: 'Amount to send in millisatoshi',
-                hintText: 'Eg: 100 msats',
-              ),
-            ),
-            MainCircleButton(
-                icon: Icons.send_outlined,
-                label: "Pay",
-                onPress: () {
-                  payInvoice(boltString, amountMsat).then((value) => {
-                        setState(() {
-                          paymentResponse = value;
-                        }),
-                      });
-                }),
-            paymentResponse != null
-                ? paymentResponse!.payResponse["Error"] == null
-                    ? Text(
-                        "Payment Successfully : ${paymentResponse!.payResponse["amountMsat"]["msat"]} msats")
-                    : Text("${paymentResponse!.payResponse["Error"]}")
-                : Container(),
-          ],
-        ),
-      ),
+      body: _buildMainView(),
     );
   }
 }
