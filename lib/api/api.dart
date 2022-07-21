@@ -3,6 +3,7 @@ import 'package:clnapp/model/app_model/list_channels.dart';
 import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/model/app_model/list_invoices.dart';
 import 'package:clnapp/model/app_model/list_transaction.dart';
+import 'package:clnapp/model/app_model/pay_invoice.dart';
 
 /// App API implementation, the class contains all the information
 /// to make a call to core lightning and return the correct type
@@ -30,4 +31,7 @@ abstract class AppApi {
 
   /// Return the list of invoices from lightning node.
   Future<AppListChannels> listChannels();
+
+  /// Return the pay response from lightning node.
+  Future<AppPayInvoice> payInvoice({required String invoice, int? msat});
 }

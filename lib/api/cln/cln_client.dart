@@ -7,11 +7,14 @@ import 'package:clnapp/api/cln/request/list_channels_request.dart';
 import 'package:clnapp/api/cln/request/list_funds_request.dart';
 import 'package:clnapp/api/cln/request/list_invoices_request.dart';
 import 'package:clnapp/api/cln/request/list_transaction_request.dart';
+import 'package:clnapp/api/cln/request/pay_request.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/model/app_model/list_channels.dart';
 import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/model/app_model/list_invoices.dart';
 import 'package:clnapp/model/app_model/list_transaction.dart';
+import 'package:clnapp/model/app_model/pay_invoice.dart';
+import 'package:fixnum/fixnum.dart';
 
 class CLNApi extends AppApi {
   ClientMode mode;
@@ -108,5 +111,30 @@ class CLNApi extends AppApi {
         params: params,
         onDecode: (jsonResponse) =>
             AppListChannels.fromJSON(jsonResponse as Map<String, dynamic>));
+  }
+
+  @override
+  Future<AppPayInvoice> payInvoice({required String invoice, int? msat}) async {
+    dynamic params;
+    switch (mode) {
+      case ClientMode.grpc:
+        if (msat == -1) {
+          params = CLNPayRequest(grpcRequest: PayRequest(bolt11: invoice));
+        } else {
+          Amount? amount = Amount();
+          amount.msat = Int64(msat ?? 0);
+          params = CLNPayRequest(
+              grpcRequest: PayRequest(bolt11: invoice, msatoshi: amount));
+        }
+        break;
+      case ClientMode.unixSocket:
+        params = CLNPayRequest(unixRequest: <String, dynamic>{});
+        break;
+    }
+    return client.call<CLNPayRequest, AppPayInvoice>(
+        method: "pay",
+        params: params,
+        onDecode: (jsonResponse) =>
+            AppPayInvoice.fromJSON(jsonResponse as Map<String, dynamic>));
   }
 }
