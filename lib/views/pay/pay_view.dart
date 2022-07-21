@@ -14,11 +14,11 @@ class PayView extends StatefulWidget {
 }
 
 class _PayViewState extends State<PayView> {
-  late String boltString;
-  late int amountMsat;
+  String? boltString;
+  int? amountMsat;
   AppPayInvoice? paymentResponse;
 
-  Future<AppPayInvoice> payInvoice(String boltString, int amountMsat) async {
+  Future<AppPayInvoice> payInvoice(String boltString, int? amountMsat) async {
     try {
       final response = await widget.provider
           .get<AppApi>()
@@ -34,9 +34,6 @@ class _PayViewState extends State<PayView> {
   @override
   void initState() {
     super.initState();
-    amountMsat = -1;
-    boltString = "";
-    paymentResponse = null;
   }
 
   Widget _buildMainView() {
@@ -58,10 +55,10 @@ class _PayViewState extends State<PayView> {
           Row(
             children: [
               Checkbox(
-                value: amountMsat == -1 ? false : true,
+                value: amountMsat == null ? false : true,
                 onChanged: (value) {
                   setState(() {
-                    amountMsat = (value == true ? 0 : -1);
+                    amountMsat = (value == true ? 0 : null);
                   });
                 },
               ),
@@ -79,7 +76,7 @@ class _PayViewState extends State<PayView> {
             onChanged: (amount) {
               amountMsat = int.parse(amount);
             },
-            enabled: amountMsat == -1 ? false : true,
+            enabled: amountMsat == null ? false : true,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
               disabledBorder: OutlineInputBorder(),
@@ -91,11 +88,20 @@ class _PayViewState extends State<PayView> {
               icon: Icons.send_outlined,
               label: "Pay",
               onPress: () {
-                payInvoice(boltString, amountMsat).then((value) => {
-                      setState(() {
-                        paymentResponse = value;
-                      }),
-                    });
+                if (boltString == null || boltString!.isEmpty) {
+                  AppPayInvoice error = AppPayInvoice(payResponse: {
+                    "Error": "Error: Bolt11/12 Invoice required"
+                  });
+                  setState(() {
+                    paymentResponse = error;
+                  });
+                } else {
+                  payInvoice(boltString!, amountMsat).then((value) => {
+                        setState(() {
+                          paymentResponse = value;
+                        }),
+                      });
+                }
               }),
           paymentResponse != null
               ? paymentResponse!.payResponse["Error"] == null
