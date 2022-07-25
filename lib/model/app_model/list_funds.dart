@@ -1,4 +1,5 @@
 import 'package:cln_common/cln_common.dart';
+import 'package:clnapp/model/app_model/app_utils.dart';
 
 class AppListFunds {
   List<AppFund> fund;
@@ -12,22 +13,31 @@ class AppListFunds {
       this.fundChannels = const [],
       this.channelSats = 0});
 
-  factory AppListFunds.fromJSON(Map<String, dynamic> json) {
-    var funds = json["outputs"] as List;
-    var fundChannels = json["channels"] as List;
+  factory AppListFunds.fromJSON(Map<String, dynamic> json,
+      {bool snackCase = false}) {
+    var funds =
+        witKey(key: "outputs", json: json, snackCase: snackCase) as List;
+    var fundChannels =
+        witKey(key: "channels", json: json, snackCase: snackCase) as List;
     double totalChannelsAmount = 0;
 
     for (var channel in fundChannels) {
-      totalChannelsAmount += int.parse(channel["ourAmountMsat"]["msat"] ?? "0");
+      var ourAmountMsat =
+          witKey(key: "ourAmountMsat", json: channel, snackCase: snackCase)
+              as Map<String, dynamic>;
+      totalChannelsAmount += int.parse(ourAmountMsat["msat"] ?? "0");
     }
 
     /// converting Msat to sat
     totalChannelsAmount /= 1000;
 
     if (funds.isNotEmpty) {
-      var appFunds = funds.map((fund) => AppFund.fromJSON(fund)).toList();
+      var appFunds = funds
+          .map((fund) => AppFund.fromJSON(fund, snackCase: snackCase))
+          .toList();
       var appFundChannels = fundChannels
-          .map((channels) => AppFundChannel.fromJSON(channels))
+          .map((channels) =>
+              AppFundChannel.fromJSON(channels, snackCase: snackCase))
           .toList();
       return AppListFunds(
           fund: appFunds,
@@ -62,14 +72,19 @@ class AppFund {
       required this.reserved,
       this.identifier = "fund"});
 
-  factory AppFund.fromJSON(Map<String, dynamic> json) {
+  factory AppFund.fromJSON(Map<String, dynamic> json,
+      {bool snackCase = false}) {
     LogManager.getInstance.debug("$json");
-    // FIXME: the propriety with in the JSON should follow the convention like the cln docs convention?
+    var txId = witKey(key: "txid", json: json, snackCase: snackCase);
+    var ourAmount = witKey(key: "amountMsat", json: json, snackCase: snackCase)
+        as Map<String, dynamic>;
+    var status = witKey(key: "status", json: json, snackCase: snackCase);
+    var reserved = witKey(key: "reserved", json: json, snackCase: snackCase);
     return AppFund(
-        txId: json["txid"],
-        amount: int.parse(json["amountMsat"]["msat"].toString()),
-        confirmed: json["status"],
-        reserved: json["reserved"] ?? false);
+        txId: txId,
+        amount: int.parse(ourAmount["msat"].toString()),
+        confirmed: status,
+        reserved: reserved ?? false);
   }
 }
 
@@ -96,16 +111,23 @@ class AppFundChannel {
       required this.state,
       required this.fundingTxId});
 
-  factory AppFundChannel.fromJSON(Map<String, dynamic> json) {
+  factory AppFundChannel.fromJSON(Map<String, dynamic> json,
+      {bool snackCase = false}) {
     LogManager.getInstance.debug("$json");
-    // FIXME: the propriety with in the JSON should follow the convention like the cln docs convention?
+    var peerID = witKey(key: "peerId", json: json, snackCase: snackCase);
+    var ourAmount =
+        witKey(key: "ourAmountMsat", json: json, snackCase: snackCase);
+    var connected = witKey(key: "connected", json: json, snackCase: snackCase);
+    var state = witKey(key: "state", json: json, snackCase: snackCase);
+    var fundingTxId =
+        witKey(key: "fundingTxid", json: json, snackCase: snackCase);
     return AppFundChannel(
-        peerId: json["peerId"],
-        amount: json["ourAmountMsat"]["msat"] != null
-            ? int.parse(json["ourAmountMsat"]["msat"].toString())
+        peerId: peerID,
+        amount: ourAmount["msat"] != null
+            ? int.parse(ourAmount["msat"].toString())
             : 0,
-        connected: json["connected"] ?? false,
-        state: json["state"],
-        fundingTxId: json["fundingTxid"]);
+        connected: connected ?? false,
+        state: state,
+        fundingTxId: fundingTxId);
   }
 }

@@ -1,15 +1,19 @@
 import 'package:cln_common/cln_common.dart';
+import 'package:clnapp/model/app_model/app_utils.dart';
 
 class AppListChannels {
   List<AppChannels> channels;
 
   AppListChannels({this.channels = const []});
 
-  factory AppListChannels.fromJSON(Map<String, dynamic> json) {
-    var channels = json["channels"] as List;
+  factory AppListChannels.fromJSON(Map<String, dynamic> json,
+      {bool snackCase = false}) {
+    var channels =
+        witKey(key: "channels", json: json, snackCase: snackCase) as List;
     if (channels.isNotEmpty) {
-      var appChannels =
-          channels.map((channel) => AppChannels.fromJSON(channel)).toList();
+      var appChannels = channels
+          .map((channel) => AppChannels.fromJSON(channel, snackCase: snackCase))
+          .toList();
       return AppListChannels(channels: appChannels);
     } else {
       return AppListChannels();
@@ -30,12 +34,17 @@ class AppChannels {
   AppChannels(
       {required this.source, required this.destination, required this.amount});
 
-  factory AppChannels.fromJSON(Map<String, dynamic> json) {
+  factory AppChannels.fromJSON(Map<String, dynamic> json,
+      {bool snackCase = false}) {
     LogManager.getInstance.debug("$json");
-    // FIXME: the propriety with in the JSON should follow the convention like the cln docs convention?
+    var source = witKey(key: "source", json: json, snackCase: snackCase);
+    var destination =
+        witKey(key: "destination", json: json, snackCase: snackCase);
+    var amount = witKey(key: "amountMsat", json: json, snackCase: snackCase)
+        as Map<String, dynamic>;
     return AppChannels(
-        source: json["source"],
-        destination: json["destination"],
-        amount: int.parse(json["amountMsat"]["msat"].toString()));
+        source: source,
+        destination: destination,
+        amount: int.parse(amount["msat"].toString()));
   }
 }

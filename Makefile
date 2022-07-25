@@ -1,13 +1,10 @@
 CC=flutter
 FMT=format
-PATH=
-default: get fmt check fmt
+
+default: get fmt
 
 get:
 	$(CC) pub get
-
-generate:
-	$(CC) pub run build_runner build --delete-conflicting-outputs;
 
 fmt:
 	$(CC) $(FMT) .
@@ -19,8 +16,8 @@ check:
 clean:
 	$(CC) clean
 
+dep:
+	$(CC) pub upgrade --major-versions
+
 run:
 	$(CC) run -d linux
-
-dep_upgrade:
-	$(CC) pub upgrade --major-versions
