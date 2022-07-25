@@ -19,13 +19,18 @@ Future<void> main() async {
   }
   provider.registerLazyDependence<AppApi>(() {
     return CLNApi(
-        mode: ClientMode.grpc,
-        client: ClientProvider.getClient(mode: ClientMode.grpc, opts: {
-          'certificatePath': certificateDir,
-          'host': 'localhost',
-          'port': 8001,
+        // mode: ClientMode.grpc,
+        // client: ClientProvider.getClient(mode: ClientMode.grpc, opts: {
+        //   'certificatePath': certificateDir,
+        //   'host': 'localhost',
+        //   'port': 8001,
+        //   // include the path if you want use the unix socket. N.B it is broken!
+        //   // 'path': certificateDir
+        // })
+        mode: ClientMode.unixSocket,
+        client: ClientProvider.getClient(mode: ClientMode.unixSocket, opts: {
           // include the path if you want use the unix socket. N.B it is broken!
-          //'path': "/media/vincent/VincentSSD/.lightning/testnet/lightning-rpc"
+          'path': certificateDir,
         }));
   });
   runApp(CLNApp(provider: provider));
