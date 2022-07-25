@@ -36,8 +36,9 @@ class CLNApi extends AppApi {
     return await client.call<CLNGetInfoRequest, AppGetInfo>(
         method: "getinfo",
         params: params,
-        onDecode: (jsonResponse) =>
-            AppGetInfo.fromJSON(jsonResponse as Map<String, dynamic>));
+        onDecode: (jsonResponse) => AppGetInfo.fromJSON(
+            jsonResponse as Map<String, dynamic>,
+            snackCase: mode == ClientMode.unixSocket));
   }
 
   @override
@@ -55,8 +56,9 @@ class CLNApi extends AppApi {
     return client.call<CLNListTransactionRequest, AppListTransactions>(
         method: "listtransactions",
         params: params,
-        onDecode: (jsonResponse) =>
-            AppListTransactions.fromJSON(jsonResponse as Map<String, dynamic>));
+        onDecode: (jsonResponse) => AppListTransactions.fromJSON(
+            jsonResponse as Map<String, dynamic>,
+            snackCase: mode == ClientMode.unixSocket));
   }
 
   @override
@@ -73,8 +75,9 @@ class CLNApi extends AppApi {
     return client.call<CLNListFundsRequest, AppListFunds>(
         method: "listfunds",
         params: params,
-        onDecode: (jsonResponse) =>
-            AppListFunds.fromJSON(jsonResponse as Map<String, dynamic>));
+        onDecode: (jsonResponse) => AppListFunds.fromJSON(
+            jsonResponse as Map<String, dynamic>,
+            snackCase: mode == ClientMode.unixSocket));
   }
 
   @override
@@ -91,8 +94,9 @@ class CLNApi extends AppApi {
     return client.call<CLNListInvoicesRequest, AppListInvoices>(
         method: "listinvoices",
         params: params,
-        onDecode: (jsonResponse) =>
-            AppListInvoices.fromJSON(jsonResponse as Map<String, dynamic>));
+        onDecode: (jsonResponse) => AppListInvoices.fromJSON(
+            jsonResponse as Map<String, dynamic>,
+            snackCase: mode == ClientMode.unixSocket));
   }
 
   @override
@@ -109,8 +113,9 @@ class CLNApi extends AppApi {
     return client.call<CLNListChannelsRequest, AppListChannels>(
         method: "listchannels",
         params: params,
-        onDecode: (jsonResponse) =>
-            AppListChannels.fromJSON(jsonResponse as Map<String, dynamic>));
+        onDecode: (jsonResponse) => AppListChannels.fromJSON(
+            jsonResponse as Map<String, dynamic>,
+            snackCase: mode == ClientMode.unixSocket));
   }
 
   @override
@@ -134,7 +139,8 @@ class CLNApi extends AppApi {
     return client.call<CLNPayRequest, AppPayInvoice>(
         method: "pay",
         params: params,
-        onDecode: (jsonResponse) =>
-            AppPayInvoice.fromJSON(jsonResponse as Map<String, dynamic>));
+        onDecode: (jsonResponse) => AppPayInvoice.fromJSON(
+            jsonResponse as Map<String, dynamic>,
+            snackCase: mode == ClientMode.unixSocket));
   }
 }

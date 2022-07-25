@@ -1,3 +1,5 @@
+import 'package:clnapp/model/app_model/app_utils.dart';
+
 /// GetInfo wrapper that contains all the information that we need
 /// for implementing the the UI feature
 
@@ -10,6 +12,10 @@ class AppGetInfo {
 
   AppGetInfo({required this.nodeId, required this.alias});
 
-  factory AppGetInfo.fromJSON(Map<String, dynamic> json) =>
-      AppGetInfo(nodeId: json["id"] ?? "Bho", alias: json["alias"] ?? "Bho");
+  factory AppGetInfo.fromJSON(Map<String, dynamic> json,
+      {bool snackCase = false}) {
+    var id = json.withKey("id", snackCase: snackCase)!;
+    var alias = json.withKey("alias", snackCase: snackCase)!;
+    return AppGetInfo(nodeId: id, alias: alias);
+  }
 }
