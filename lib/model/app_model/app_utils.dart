@@ -3,7 +3,20 @@ import 'package:recase/recase.dart';
 dynamic witKey(
     {required String key,
     required Map<String, dynamic> json,
-    bool snackCase = false}) {
+    bool snackCase = false,
+    bool msatFlag = false}) {
+  /// FIXME: msatFlag is used to extract millisatoshi value from the client response.
+  if (msatFlag) {
+    if (snackCase) {
+      return json[key.snakeCase]
+          .toString()
+          .substring(0, json[key.snakeCase].toString().length - 4);
+    }
+    if (json[key.camelCase] == null) {
+      return "0";
+    }
+    return json[key.camelCase]["msat"] ?? "0";
+  }
   if (snackCase) {
     return json[key.snakeCase];
   }
@@ -18,7 +31,8 @@ class AppUtil {
   dynamic witKey(
       {required String key,
       required Map<String, dynamic> json,
-      bool snackCase = false}) {
+      bool snackCase = false,
+      bool msatFlag = false}) {
     if (snackCase) {
       return json[key.snakeCase];
     }
@@ -27,6 +41,8 @@ class AppUtil {
 }
 
 extension RecaseMap on Map<String, dynamic> {
-  dynamic withKey(String key, {bool snackCase = false}) =>
-      AppUtil(key).witKey(key: key, json: this, snackCase: snackCase);
+  dynamic withKey(String key,
+          {bool snackCase = false, bool msatFlag = false}) =>
+      AppUtil(key).witKey(
+          key: key, json: this, snackCase: snackCase, msatFlag: msatFlag);
 }

@@ -7,7 +7,7 @@ class AppListInvoices {
   AppListInvoices({this.invoice = const []});
 
   factory AppListInvoices.fromJSON(Map<String, dynamic> json,
-      {bool snackCase = false}) {
+      {bool snackCase = false, bool msatFlag = false}) {
     var invoices = json.withKey("invoices", snackCase: snackCase) as List;
     if (invoices.isNotEmpty) {
       var appInvoices = invoices
@@ -56,14 +56,20 @@ class AppInvoice {
       this.identifier = "invoice"});
 
   factory AppInvoice.fromJSON(Map<String, dynamic> json,
-      {bool snackCase = false}) {
+      {bool snackCase = false, bool msatFlag = false}) {
     LogManager.getInstance.debug("$json");
-    var bolt11 = witKey(key: "bolt11", json: json, snackCase: snackCase);
+    var bolt11 = witKey(key: "bolt11", json: json, snackCase: snackCase) ??
+        witKey(key: "bolt12", json: json, snackCase: snackCase);
     var paymentHash =
         witKey(key: "paymentHash", json: json, snackCase: snackCase);
     var status = witKey(key: "status", json: json, snackCase: snackCase);
-    var received =
-        witKey(key: "amountReceivedMsat", json: json, snackCase: snackCase);
+    var received = witKey(
+            key: "amountReceivedMsat",
+            json: json,
+            snackCase: snackCase,
+            msatFlag: true) ??
+        "unpaid";
+    received.toString();
     var paidAt = witKey(key: "paidAt", json: json, snackCase: snackCase);
     var description =
         witKey(key: "description", json: json, snackCase: snackCase);
@@ -72,8 +78,8 @@ class AppInvoice {
       bolt11: bolt11,
       paymentHash: paymentHash,
       status: status ?? "unpaid",
-      amount: received != null ? received["msat"].toString() : "unpaid",
-      paidTime: paidAt ?? "unpaid",
+      amount: received.toString(),
+      paidTime: paidAt != null ? paidAt.toString() : "unpaid",
       description: description,
       label: label,
     );

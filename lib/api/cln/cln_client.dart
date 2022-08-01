@@ -133,7 +133,9 @@ class CLNApi extends AppApi {
         }
         break;
       case ClientMode.unixSocket:
-        params = CLNPayRequest(unixRequest: <String, dynamic>{});
+        params = CLNPayRequest(unixRequest: <String, dynamic>{
+          'bolt11': invoice,
+        });
         break;
     }
     return client.call<CLNPayRequest, AppPayInvoice>(
