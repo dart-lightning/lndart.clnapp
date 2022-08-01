@@ -14,18 +14,28 @@ class AppListFunds {
       this.channelSats = 0});
 
   factory AppListFunds.fromJSON(Map<String, dynamic> json,
-      {bool snackCase = false}) {
-    var funds =
-        witKey(key: "outputs", json: json, snackCase: snackCase) as List;
-    var fundChannels =
-        witKey(key: "channels", json: json, snackCase: snackCase) as List;
+      {bool snackCase = false, bool msatFlag = false}) {
+    var funds = witKey(
+        key: "outputs",
+        json: json,
+        snackCase: snackCase,
+        msatFlag: msatFlag) as List;
+    var fundChannels = witKey(
+        key: "channels",
+        json: json,
+        snackCase: snackCase,
+        msatFlag: msatFlag) as List;
     double totalChannelsAmount = 0;
 
     for (var channel in fundChannels) {
-      var ourAmountMsat =
-          witKey(key: "ourAmountMsat", json: channel, snackCase: snackCase)
-              as Map<String, dynamic>;
-      totalChannelsAmount += int.parse(ourAmountMsat["msat"] ?? "0");
+      var ourAmountMsat = witKey(
+              key: "ourAmountMsat",
+              json: channel,
+              snackCase: snackCase,
+              msatFlag: true) ??
+          "0";
+      ourAmountMsat.toString();
+      totalChannelsAmount += int.parse(ourAmountMsat ?? "0");
     }
 
     /// converting Msat to sat
@@ -54,7 +64,7 @@ class AppFund {
   final String txId;
 
   /// The quantity of Bitcoin in millisatoshi
-  final int amount;
+  final String amount;
 
   /// If the transaction is confirmed on the blockchain
   final String confirmed;
@@ -73,16 +83,21 @@ class AppFund {
       this.identifier = "fund"});
 
   factory AppFund.fromJSON(Map<String, dynamic> json,
-      {bool snackCase = false}) {
+      {bool snackCase = false, bool msatFlag = false}) {
     LogManager.getInstance.debug("$json");
     var txId = witKey(key: "txid", json: json, snackCase: snackCase);
-    var ourAmount = witKey(key: "amountMsat", json: json, snackCase: snackCase)
-        as Map<String, dynamic>;
+    var ourAmount = witKey(
+            key: "amountMsat",
+            json: json,
+            snackCase: snackCase,
+            msatFlag: true) ??
+        0;
+    ourAmount.toString();
     var status = witKey(key: "status", json: json, snackCase: snackCase);
     var reserved = witKey(key: "reserved", json: json, snackCase: snackCase);
     return AppFund(
         txId: txId,
-        amount: int.parse(ourAmount["msat"].toString()),
+        amount: ourAmount,
         confirmed: status,
         reserved: reserved ?? false);
   }
@@ -93,7 +108,7 @@ class AppFundChannel {
   final String peerId;
 
   /// The quantity of Bitcoin in millisatoshi
-  final int amount;
+  final String amount;
 
   /// If the transaction is confirmed on the blockchain
   final bool connected;
@@ -112,20 +127,23 @@ class AppFundChannel {
       required this.fundingTxId});
 
   factory AppFundChannel.fromJSON(Map<String, dynamic> json,
-      {bool snackCase = false}) {
+      {bool snackCase = false, bool msatFlag = false}) {
     LogManager.getInstance.debug("$json");
     var peerID = witKey(key: "peerId", json: json, snackCase: snackCase);
-    var ourAmount =
-        witKey(key: "ourAmountMsat", json: json, snackCase: snackCase);
+    var ourAmount = witKey(
+            key: "ourAmountMsat",
+            json: json,
+            snackCase: snackCase,
+            msatFlag: true) ??
+        0;
+    ourAmount.toString();
     var connected = witKey(key: "connected", json: json, snackCase: snackCase);
     var state = witKey(key: "state", json: json, snackCase: snackCase);
     var fundingTxId =
         witKey(key: "fundingTxid", json: json, snackCase: snackCase);
     return AppFundChannel(
         peerId: peerID,
-        amount: ourAmount["msat"] != null
-            ? int.parse(ourAmount["msat"].toString())
-            : 0,
+        amount: ourAmount,
         connected: connected ?? false,
         state: state,
         fundingTxId: fundingTxId);
