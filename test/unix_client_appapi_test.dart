@@ -43,11 +43,6 @@ void main() async {
       expect(invoiceList.invoice, isNotNull);
     });
 
-    test('API List Channels', () async {
-      final channelList = await provider.get<AppApi>().listChannels();
-      expect(channelList, isNotNull);
-    });
-
     test('API List Transactions', () async {
       final transactionList = await provider.get<AppApi>().listTransaction();
       expect(transactionList, isNotNull);
