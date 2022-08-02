@@ -24,13 +24,11 @@ Future<void> main() async {
           'certificatePath': certificateDir,
           'host': 'localhost',
           'port': 8001,
-          // include the path if you want use the unix socket. N.B it is broken!
-          // 'path': certificateDir
         })
         // mode: ClientMode.unixSocket,
         // client: ClientProvider.getClient(mode: ClientMode.unixSocket, opts: {
         //   // include the path if you want use the unix socket. N.B it is broken!
-        //   'path': certificateDir+"/lightning-rpc",
+        //   'path': "$certificateDir/lightning-rpc",
         // })
         );
   });
