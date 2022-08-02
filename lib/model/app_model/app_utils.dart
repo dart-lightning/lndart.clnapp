@@ -8,9 +8,10 @@ dynamic witKey(
   /// FIXME: msatFlag is used to extract millisatoshi value from the client response.
   if (msatFlag) {
     if (snackCase) {
-      return json[key.snakeCase]
-          .toString()
-          .substring(0, json[key.snakeCase].toString().length - 4);
+      if (json[key.snakeCase] == null) {
+        return "0";
+      }
+      return json[key.snakeCase].split("msat")[0];
     }
     if (json[key.camelCase] == null) {
       return "0";
