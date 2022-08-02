@@ -3,13 +3,11 @@ import 'package:cln_grpc/cln_grpc.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/api/client_provider.dart';
 import 'package:clnapp/api/cln/request/get_info_request.dart';
-import 'package:clnapp/api/cln/request/list_channels_request.dart';
 import 'package:clnapp/api/cln/request/list_funds_request.dart';
 import 'package:clnapp/api/cln/request/list_invoices_request.dart';
 import 'package:clnapp/api/cln/request/list_transaction_request.dart';
 import 'package:clnapp/api/cln/request/pay_request.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
-import 'package:clnapp/model/app_model/list_channels.dart';
 import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/model/app_model/list_invoices.dart';
 import 'package:clnapp/model/app_model/list_transaction.dart';
@@ -95,25 +93,6 @@ class CLNApi extends AppApi {
         method: "listinvoices",
         params: params,
         onDecode: (jsonResponse) => AppListInvoices.fromJSON(
-            jsonResponse as Map<String, dynamic>,
-            snackCase: mode == ClientMode.unixSocket));
-  }
-
-  @override
-  Future<AppListChannels> listChannels() {
-    dynamic params;
-    switch (mode) {
-      case ClientMode.grpc:
-        params = CLNListChannelsRequest(grpcRequest: ListchannelsRequest());
-        break;
-      case ClientMode.unixSocket:
-        params = CLNListChannelsRequest(unixRequest: <String, dynamic>{});
-        break;
-    }
-    return client.call<CLNListChannelsRequest, AppListChannels>(
-        method: "listchannels",
-        params: params,
-        onDecode: (jsonResponse) => AppListChannels.fromJSON(
             jsonResponse as Map<String, dynamic>,
             snackCase: mode == ClientMode.unixSocket));
   }
