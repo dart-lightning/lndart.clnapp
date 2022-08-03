@@ -1,0 +1,17 @@
+name: Integration testing
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Integration testing
+        run: |
+          cd docker
+          docker-compose up --exit-code-from grpc_test --quiet-pull
