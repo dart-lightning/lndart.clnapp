@@ -15,6 +15,7 @@ class AppListFunds {
 
   factory AppListFunds.fromJSON(Map<String, dynamic> json,
       {bool snackCase = false, bool msatFlag = false}) {
+    LogManager.getInstance.debug("Full listfunds json received: $json");
     var funds = witKey(
         key: "outputs",
         json: json,
