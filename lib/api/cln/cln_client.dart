@@ -73,9 +73,11 @@ class CLNApi extends AppApi {
     return client.call<CLNListFundsRequest, AppListFunds>(
         method: "listfunds",
         params: params,
-        onDecode: (jsonResponse) => AppListFunds.fromJSON(
-            jsonResponse as Map<String, dynamic>,
-            snackCase: mode == ClientMode.unixSocket));
+        onDecode: (jsonResponse) {
+          LogManager.getInstance.debug("$jsonResponse");
+          return AppListFunds.fromJSON(jsonResponse as Map<String, dynamic>,
+              snackCase: mode == ClientMode.unixSocket);
+        });
   }
 
   @override

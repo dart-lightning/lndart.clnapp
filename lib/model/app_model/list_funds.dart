@@ -20,6 +20,7 @@ class AppListFunds {
         json: json,
         snackCase: snackCase,
         msatFlag: msatFlag) as List;
+    LogManager.getInstance.debug("$funds");
     var fundChannels = witKey(
         key: "channels",
         json: json,
