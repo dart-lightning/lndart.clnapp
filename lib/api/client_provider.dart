@@ -8,18 +8,23 @@ import 'package:clightning_rpc/clightning_rpc.dart';
 import 'package:cln_common/cln_common.dart';
 import 'package:cln_grpc/cln_grpc.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:lnlambda/lnlambda.dart';
 
 enum ClientMode {
   unixSocket,
   grpc,
+  lnlambda,
 }
 
 class ClientProvider {
   static LightningClient getClient(
       {required ClientMode mode, Map<String, dynamic> opts = const {}}) {
     if (kIsWeb) {
-      /// check if we can run on the web, for now NO
-      throw Exception("The actual client did not support the web");
+      if (mode != ClientMode.lnlambda) {
+        /// check if we can run on the web
+        throw Exception("The actual client did not support the web");
+      }
+      return ClientProvider._buildClient(mode: mode, opts: opts);
     }
 
     if (Platform.isAndroid || Platform.isIOS) {
@@ -43,6 +48,12 @@ class ClientProvider {
             rootPath: opts['certificatePath'],
             host: opts['host'],
             port: opts['port']);
+      case ClientMode.lnlambda:
+        return LNLambdaClient(
+            nodeID: opts['node_id'],
+            host: opts['host'],
+            rune: opts['rune'],
+            lambdaServer: opts['lambda_server']);
     }
   }
 }

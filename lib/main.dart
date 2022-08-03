@@ -43,8 +43,31 @@ Future<void> main() async {
       }
     });
   }
-
-  runApp(CLNApp(provider: provider, setting: setting));
+  provider.registerLazyDependence<AppApi>(() {
+    return CLNApi(
+        mode: ClientMode.unixSocket, // FIXME the client should be lambda
+        client: ClientProvider.getClient(mode: ClientMode.lnlambda, opts: {
+          'node_id':
+              '028fe59bd7bbe3982699535e7e43b305c69099fbdd9902b1af5875a121fdb9a3dc',
+          'host': '52.55.124.1:19735',
+          'lambda_server':
+              'http://ec2-52-55-124-1.compute-1.amazonaws.com:9002',
+          'rune':
+              "E04R2omgJ091UY5vdpxxmD4xS2LtviRDgm50TfwoY_Y9MTImbWV0aG9kXmxpc3R8bWV0aG9kXmdldHxtZXRob2Q9ZGVjb2RlfG1ldGhvZD1mZXRjaGludm9pY2V8bWV0aG9kPXBheSZtZXRob2QvbGlzdGRhdGFzdG9yZQ==",
+        })
+        /*client: ClientProvider.getClient(mode: ClientMode.grpc, opts: {
+          'certificatePath': certificateDir,
+          'host': 'localhost',
+          'port': 8001,
+        })*/
+        // mode: ClientMode.unixSocket,
+        // client: ClientProvider.getClient(mode: ClientMode.unixSocket, opts: {
+        //   // include the path if you want use the unix socket. N.B it is broken!
+        //   'path': "$certificateDir/lightning-rpc",
+        // })
+        );
+  });
+  runApp(CLNApp(provider: provider));
 }
 
 class CLNApp extends AppView {

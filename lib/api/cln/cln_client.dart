@@ -30,6 +30,9 @@ class CLNApi extends AppApi {
       case ClientMode.unixSocket:
         params = CLNGetInfoRequest(unixRequest: <String, dynamic>{});
         break;
+      case ClientMode.lnlambda:
+        params = CLNGetInfoRequest(unixRequest: <String, dynamic>{});
+        break;
     }
     return await client.call<CLNGetInfoRequest, AppGetInfo>(
         method: "getinfo",
@@ -48,6 +51,9 @@ class CLNApi extends AppApi {
             CLNListTransactionRequest(grpcRequest: ListtransactionsRequest());
         break;
       case ClientMode.unixSocket:
+        params = CLNListTransactionRequest(unixRequest: <String, dynamic>{});
+        break;
+      case ClientMode.lnlambda:
         params = CLNListTransactionRequest(unixRequest: <String, dynamic>{});
         break;
     }
@@ -69,6 +75,9 @@ class CLNApi extends AppApi {
       case ClientMode.unixSocket:
         params = CLNListFundsRequest(unixRequest: <String, dynamic>{});
         break;
+      case ClientMode.lnlambda:
+        params = CLNListFundsRequest(unixRequest: <String, dynamic>{});
+        break;
     }
     return client.call<CLNListFundsRequest, AppListFunds?>(
         method: "listfunds",
@@ -88,6 +97,9 @@ class CLNApi extends AppApi {
         params = CLNListInvoicesRequest(grpcRequest: ListinvoicesRequest());
         break;
       case ClientMode.unixSocket:
+        params = CLNListInvoicesRequest(unixRequest: <String, dynamic>{});
+        break;
+      case ClientMode.lnlambda:
         params = CLNListInvoicesRequest(unixRequest: <String, dynamic>{});
         break;
     }
@@ -114,6 +126,18 @@ class CLNApi extends AppApi {
         }
         break;
       case ClientMode.unixSocket:
+        if (msat != null) {
+          params = CLNPayRequest(unixRequest: <String, dynamic>{
+            'bolt11': invoice,
+            'msatoshi': "${msat}msat"
+          });
+        } else {
+          params = CLNPayRequest(unixRequest: <String, dynamic>{
+            'bolt11': invoice,
+          });
+        }
+        break;
+      case ClientMode.lnlambda:
         if (msat != null) {
           params = CLNPayRequest(unixRequest: <String, dynamic>{
             'bolt11': invoice,
