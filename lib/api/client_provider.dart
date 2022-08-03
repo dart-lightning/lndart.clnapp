@@ -3,11 +3,18 @@
 ///
 /// FIXME: This provided need to take some user choise on what the user want
 /// to use.
-import 'dart:io' show Platform;
-import 'package:clightning_rpc/clightning_rpc.dart';
+import 'package:clightning_rpc/clightning_rpc.dart'
+    // ignore: uri_does_not_exist
+    if (dart.library.html) './cln/mock_clients.dart'
+    // ignore: uri_does_not_exist
+    if (dart.library.io) 'package:clightning_rpc/clightning_rpc.dart';
 import 'package:cln_common/cln_common.dart';
-import 'package:cln_grpc/cln_grpc.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:cln_grpc/cln_grpc.dart'
+    // ignore: uri_does_not_exist
+    if (dart.library.html) './cln/mock_clients.dart'
+    // ignore: uri_does_not_exist
+    if (dart.library.io) 'package:cln_grpc/cln_grpc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:lnlambda/lnlambda.dart';
 
 enum ClientMode {
@@ -19,23 +26,23 @@ enum ClientMode {
 class ClientProvider {
   static LightningClient getClient(
       {required ClientMode mode, Map<String, dynamic> opts = const {}}) {
-    if (kIsWeb) {
+    if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.android) {
+      // Some android/ios specific code
+      throw Exception("The actual client did not support the mobile App");
+    } else if (defaultTargetPlatform == TargetPlatform.linux ||
+        defaultTargetPlatform == TargetPlatform.macOS ||
+        defaultTargetPlatform == TargetPlatform.windows) {
+      // Some desktop specific code there
+      return ClientProvider._buildClient(mode: mode, opts: opts);
+    } else {
+      // Some web specific code there
       if (mode != ClientMode.lnlambda) {
         /// check if we can run on the web
         throw Exception("The actual client did not support the web");
       }
       return ClientProvider._buildClient(mode: mode, opts: opts);
     }
-
-    if (Platform.isAndroid || Platform.isIOS) {
-      throw Exception("The actual client did not support the mobile App");
-    }
-
-    if (Platform.isWindows && mode == ClientMode.unixSocket) {
-      throw Exception(
-          "The unix socket mode is not supported on Windows platform");
-    }
-    return ClientProvider._buildClient(mode: mode, opts: opts);
   }
 
   static LightningClient _buildClient(
