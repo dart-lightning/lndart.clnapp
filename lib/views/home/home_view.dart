@@ -118,7 +118,7 @@ class _HomeViewState extends State<HomeView> {
         ]));
   }
 
-  Future<List<dynamic>> listPayments() async {
+  Future<List<dynamic>?> listPayments() async {
     final invoicesList = await widget.provider.get<AppApi>().listInvoices();
     final fundsList = await widget.provider.get<AppApi>().listFunds();
 
@@ -160,9 +160,9 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _buildPaymentListView({required BuildContext context}) {
-    return FutureBuilder<List<dynamic>>(
+    return FutureBuilder<List<dynamic>?>(
         future: listPayments(),
-        builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+        builder: (context, AsyncSnapshot<List<dynamic>?> snapshot) {
           _checkIfThereAreError(context: context, snapshot: snapshot);
           if (snapshot.hasData) {
             return ListView.builder(
@@ -212,7 +212,7 @@ class _HomeViewState extends State<HomeView> {
                   );
                 });
           } else {
-            return const Text("Loading");
+            return const Text("No Payments found");
           }
         });
   }
