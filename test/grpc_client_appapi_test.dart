@@ -25,29 +25,11 @@ void main() async {
   });
 
   group('clnapp gRPC_client tests', () {
-    test('API Get Info', () async {
-      final getInfo = await provider.get<AppApi>().getInfo();
-      expect(getInfo, isNotNull);
-      expect(getInfo.alias, "clighting4j-node");
-    });
-
     test('API List Funds', () async {
       final fundsList = await provider.get<AppApi>().listFunds();
       expect(fundsList, isNotNull);
       expect(fundsList.fund.isEmpty, isTrue);
       expect(fundsList.fundChannels.isEmpty, isTrue);
-    });
-
-    test('API List Invoices', () async {
-      final invoiceList = await provider.get<AppApi>().listInvoices();
-      expect(invoiceList, isNotNull);
-      expect(invoiceList.invoice.isEmpty, isTrue);
-    });
-
-    test('API List Transactions', () async {
-      final transactionList = await provider.get<AppApi>().listTransaction();
-      expect(transactionList, isNotNull);
-      expect(transactionList.transactions.isEmpty, isTrue);
     });
   });
 }
