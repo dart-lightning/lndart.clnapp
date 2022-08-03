@@ -10,7 +10,7 @@ void main() async {
   var provider = await AppProvider().init();
 
   var env = Platform.environment;
-  var certificateDir = env['CLN_CERT_PATH'];
+  var certificateDir = env['TLS_PATH'];
   if (certificateDir == null) {
     throw Exception("Please export the CLN_CERT_PATH for your system");
   }
