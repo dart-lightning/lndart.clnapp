@@ -34,21 +34,20 @@ void main() async {
     test('API List Funds', () async {
       final fundsList = await provider.get<AppApi>().listFunds();
       expect(fundsList, isNotNull);
-      expect(fundsList.fund, isNotNull);
-      expect(fundsList.channelSats, isNotNull);
-      expect(fundsList.fundChannels, isNotNull);
+      expect(fundsList.fund.isEmpty, isTrue);
+      expect(fundsList.fundChannels.isEmpty, isTrue);
     });
 
     test('API List Invoices', () async {
       final invoiceList = await provider.get<AppApi>().listInvoices();
       expect(invoiceList, isNotNull);
-      expect(invoiceList.invoice, isNotNull);
+      expect(invoiceList.invoice.isEmpty, isTrue);
     });
 
     test('API List Transactions', () async {
       final transactionList = await provider.get<AppApi>().listTransaction();
       expect(transactionList, isNotNull);
-      expect(transactionList.transactions, isNotNull);
+      expect(transactionList.transactions.isEmpty, isTrue);
     });
   });
 }
