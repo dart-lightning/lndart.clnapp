@@ -28,7 +28,6 @@ class AppListFunds {
         snackCase: snackCase,
         msatFlag: msatFlag) as List;
     double totalChannelsAmount = 0;
-
     for (var channel in fundChannels) {
       var ourAmountMsat = witKey(
               key: "ourAmountMsat",

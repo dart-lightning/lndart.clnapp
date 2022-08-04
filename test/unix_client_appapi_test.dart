@@ -32,7 +32,7 @@ void main() async {
     test('API List Funds', () async {
       final fundsList = await provider.get<AppApi>().listFunds();
       expect(fundsList, isNotNull);
-      expect(fundsList.fund, isNotNull);
+      expect(fundsList!.fund, isNotNull);
       expect(fundsList.channelSats, isNotNull);
       expect(fundsList.fundChannels, isNotNull);
     });

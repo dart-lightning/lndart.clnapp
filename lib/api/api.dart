@@ -23,7 +23,7 @@ abstract class AppApi {
   Future<AppListTransactions> listTransaction();
 
   /// Return the list of funds from lightning node.
-  Future<AppListFunds> listFunds();
+  Future<AppListFunds?> listFunds();
 
   /// Return the list of invoices from lightning node.
   Future<AppListInvoices> listInvoices();

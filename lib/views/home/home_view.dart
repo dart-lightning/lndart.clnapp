@@ -122,7 +122,7 @@ class _HomeViewState extends State<HomeView> {
     final invoicesList = await widget.provider.get<AppApi>().listInvoices();
     final fundsList = await widget.provider.get<AppApi>().listFunds();
 
-    var listPayments = List.from(invoicesList.invoice)..addAll(fundsList.fund);
+    var listPayments = List.from(invoicesList.invoice)..addAll(fundsList!.fund);
 
     /// FIXME: sort the payments list
     return listPayments;
@@ -131,7 +131,7 @@ class _HomeViewState extends State<HomeView> {
   Future<int> getamountMsat() async {
     final channelsList = await widget.provider.get<AppApi>().listFunds();
 
-    return channelsList.channelSats.toInt();
+    return channelsList!.channelSats.toInt();
   }
 
   Widget _buildSpecificPaymentView(
