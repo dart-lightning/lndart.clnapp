@@ -28,8 +28,7 @@ void main() async {
     test('API List Funds', () async {
       final fundsList = await provider.get<AppApi>().listFunds();
       expect(fundsList, isNotNull);
-      expect(fundsList.fund.isEmpty, isTrue);
-      expect(fundsList.fundChannels.isEmpty, isTrue);
+      expect(fundsList!.fund.isEmpty, isTrue);
     });
   });
 }
