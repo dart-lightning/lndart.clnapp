@@ -20,15 +20,15 @@ class AppListFunds {
         key: "outputs",
         json: json,
         snackCase: snackCase,
-        msatFlag: msatFlag) as List;
+        msatFlag: msatFlag) as List?;
     LogManager.getInstance.debug("$funds");
     var fundChannels = witKey(
         key: "channels",
         json: json,
         snackCase: snackCase,
-        msatFlag: msatFlag) as List;
+        msatFlag: msatFlag) as List?;
     double totalChannelsAmount = 0;
-    for (var channel in fundChannels) {
+    for (var channel in fundChannels!) {
       var ourAmountMsat = witKey(
               key: "ourAmountMsat",
               json: channel,
@@ -42,7 +42,7 @@ class AppListFunds {
     /// converting Msat to sat
     totalChannelsAmount /= 1000;
 
-    if (funds.isNotEmpty) {
+    if (funds!.isNotEmpty) {
       var appFunds = funds
           .map((fund) => AppFund.fromJSON(fund, snackCase: snackCase))
           .toList();
