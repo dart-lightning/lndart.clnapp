@@ -24,6 +24,7 @@ dependencies:
   fixnum: ^1.0.1
   recase: ^4.0.0
   file_picker: ^5.0.1
+  shared_preferences: ^2.0.15
 
 dev_dependencies:
   flutter_test:
