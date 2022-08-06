@@ -1,6 +1,13 @@
+import 'package:clnapp/api/api.dart';
+import 'package:clnapp/api/client_provider.dart';
+import 'package:clnapp/api/cln/cln_client.dart';
+import 'package:clnapp/constants/user_setting.dart';
+import 'package:clnapp/helper/settings/get_settings.dart';
 import 'package:clnapp/utils/app_provider.dart';
+import 'package:clnapp/views/home/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingView extends StatefulWidget {
   final AppProvider provider;
@@ -12,32 +19,46 @@ class SettingView extends StatefulWidget {
 }
 
 class _SettingViewState extends State<SettingView> {
-  String? nickName;
+  late bool isLoading;
 
-  String connectionClient = 'gRPC connection';
-
-  String selectedPath = "No path found";
-
-  String host = "localhost";
+  Setting setting = Setting();
 
   @override
   void initState() {
     super.initState();
+    isLoading = true;
+    getSettingsInfo().then((value) => {
+          setState(() {
+            isLoading = false;
+            setting = value;
+          }),
+        });
   }
-
-  var clients = [
-    'gRPC connection',
-    'Unix connection',
-    'Lnlambda connection',
-  ];
 
   Future<String> pickDir() async {
     String? path = await FilePicker.platform.getDirectoryPath();
-    path == null ? selectedPath = "No path found" : selectedPath = path;
-    return selectedPath;
+    path == null ? setting.path = "No path found" : setting.path = path;
+    return setting.path;
   }
 
-  saveSettings() {}
+  Future<bool> saveSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    clients.asMap().forEach((index, element) async {
+      if (setting.connectionType == element) {
+        await prefs.setInt('connectionClient', index);
+      }
+    });
+
+    await prefs.setString('selectedPath', setting.path);
+
+    await prefs.setString('host', setting.host);
+
+    await prefs.setString(
+        'nickName', setting.nickName.isEmpty ? "null" : setting.nickName);
+
+    return true;
+  }
 
   Widget _buildMainView({required BuildContext context}) {
     return Padding(
@@ -48,21 +69,11 @@ class _SettingViewState extends State<SettingView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          const Text("Node Nick Name "),
-          TextFormField(
-            onChanged: (name) {
-              name = nickName!;
-            },
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'My lightning node',
-            ),
-          ),
           const Text("Connection type"),
           InputDecorator(
             decoration: const InputDecoration(border: OutlineInputBorder()),
             child: DropdownButton(
-              value: connectionClient,
+              value: setting.connectionType,
               underline: const SizedBox(),
               items: clients.map((String items) {
                 return DropdownMenuItem(
@@ -72,16 +83,29 @@ class _SettingViewState extends State<SettingView> {
               }).toList(),
               onChanged: (String? newValue) {
                 setState(() {
-                  connectionClient = newValue!;
+                  setting.connectionType = newValue!;
                 });
               },
             ),
           ),
+          const Text("Node Nick Name "),
+          TextFormField(
+            onChanged: (name) {
+              setState(() {
+                setting.nickName = name;
+              });
+            },
+            initialValue: setting.nickName == "null" ? "" : setting.nickName,
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              hintText: 'My lightning node',
+            ),
+          ),
           Row(
             children: [
-              connectionClient == clients[0]
+              setting.connectionType == clients[0]
                   ? const Text("TLS certificate directory path")
-                  : connectionClient == clients[1]
+                  : setting.connectionType == clients[1]
                       ? const Text("lightning-rpc file path")
                       : const Text("Lnlambda related file if any?"),
               SizedBox(
@@ -91,7 +115,7 @@ class _SettingViewState extends State<SettingView> {
                   onPressed: () {
                     pickDir().then((value) => {
                           setState(() {
-                            selectedPath = value;
+                            setting.path = value;
                           }),
                         });
                   },
@@ -100,21 +124,57 @@ class _SettingViewState extends State<SettingView> {
           ),
           InputDecorator(
             decoration: const InputDecoration(border: OutlineInputBorder()),
-            child: Text(selectedPath),
+            child: Text(setting.path),
           ),
           const Text("Host"),
           TextFormField(
-            onChanged: (host) {
-              host = host;
+            onChanged: (text) {
+              setState(() {
+                setting.host = text;
+              });
             },
-            initialValue: host,
+            initialValue: setting.host,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
             ),
           ),
           ElevatedButton(
             onPressed: () {
-              saveSettings();
+              setState(() {
+                isLoading = true;
+              });
+              saveSettings().then((value) => {
+                    isLoading = false,
+                  });
+              widget.provider.registerLazyDependence<AppApi>(() {
+                if(setting.connectionType==clients[0]){
+                  return CLNApi(
+                      mode: ClientMode.grpc,
+                      client: ClientProvider.getClient(mode: ClientMode.grpc, opts: {
+                        ///FIXME: make a login page and take some path as input
+                        'certificatePath': setting.path,
+                        'host': setting.host,
+                        'port': 8001,
+                      })
+                  );
+                }
+                else{
+                  return CLNApi(
+                      mode: ClientMode.unixSocket,
+                      ///FIXME: make a login page and take some path as input
+                      client: ClientProvider.getClient(mode: ClientMode.unixSocket, opts: {
+                        // include the path if you want use the unix socket. N.B it is broken!
+                        'path': "${setting.path}/lightning-rpc",
+                      })
+                  );
+                }
+              });
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (context) => HomeView(
+                            provider: widget.provider,
+                          )),
+                  (Route<dynamic> route) => false);
             },
             child: const Text("Save"),
           ),
@@ -126,7 +186,11 @@ class _SettingViewState extends State<SettingView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _buildMainView(context: context),
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : _buildMainView(context: context),
     );
   }
 }
