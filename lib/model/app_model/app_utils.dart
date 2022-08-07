@@ -11,7 +11,7 @@ dynamic witKey(
       if (json[key.snakeCase] == null) {
         return "0";
       }
-      return json[key.snakeCase].toString();
+      return json[key.snakeCase].split("msat")[0];
     }
     if (json[key.camelCase] == null) {
       return "0";
