@@ -4,7 +4,11 @@ class Setting {
   String host;
   String path;
 
-  Setting({this.nickName="null", this.connectionType = "gRPC connection", this.host = "localhost", this.path = "No path found"});
+  Setting(
+      {this.nickName = "null",
+      this.connectionType = "gRPC connection",
+      this.host = "localhost",
+      this.path = "No path found"});
 }
 
 List<String> clients = [
