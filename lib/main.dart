@@ -1,6 +1,3 @@
-import 'package:clnapp/api/api.dart';
-import 'package:clnapp/api/client_provider.dart';
-import 'package:clnapp/api/cln/cln_client.dart';
 import 'package:clnapp/constants/user_setting.dart';
 import 'package:clnapp/helper/settings/get_settings.dart';
 import 'package:clnapp/utils/app_provider.dart';
@@ -9,7 +6,6 @@ import 'package:clnapp/views/home/home_view.dart';
 import 'package:clnapp/views/setting/setting_view.dart';
 import 'package:flutter/material.dart';
 import 'package:trash_themes/themes.dart';
-import 'dart:io' show Platform;
 
 Future<void> main() async {
   var provider = await AppProvider().init();
@@ -22,8 +18,8 @@ Future<void> main() async {
   // }
   Setting setting = Setting();
   await getSettingsInfo().then((value) => {
-    setting=value,
-  });
+        setting = value,
+      });
   // provider.registerLazyDependence<AppApi>(() {
   //   if(setting.connectionType==clients[0]){
   //     return CLNApi(
@@ -47,11 +43,12 @@ Future<void> main() async {
   //     );
   //   }
   // });
-  runApp(CLNApp(provider: provider,setting: setting));
+  runApp(CLNApp(provider: provider, setting: setting));
 }
 
 class CLNApp extends AppView {
-  const CLNApp({Key? key, required AppProvider provider, required Setting setting})
+  const CLNApp(
+      {Key? key, required AppProvider provider, required Setting setting})
       : super(key: key, provider: provider, setting: setting);
 
   @override
@@ -61,7 +58,9 @@ class CLNApp extends AppView {
       themeMode: ThemeMode.dark,
       theme: DraculaTheme().makeDarkTheme(context: context),
       debugShowCheckedModeBanner: false,
-      home: setting.path=="No path found" ? HomeView(provider: provider) : SettingView(provider: provider),
+      home: setting.path != "No path found"
+          ? HomeView(provider: provider)
+          : SettingView(provider: provider),
     );
   }
 }

@@ -140,41 +140,45 @@ class _SettingViewState extends State<SettingView> {
           ),
           ElevatedButton(
             onPressed: () {
-              setState(() {
-                isLoading = true;
-              });
-              saveSettings().then((value) => {
-                    isLoading = false,
-                  });
-              widget.provider.registerLazyDependence<AppApi>(() {
-                if(setting.connectionType==clients[0]){
-                  return CLNApi(
-                      mode: ClientMode.grpc,
-                      client: ClientProvider.getClient(mode: ClientMode.grpc, opts: {
+              if (setting.path != "No path found") {
+                setState(() {
+                  isLoading = true;
+                });
+                saveSettings().then((value) => {
+                      isLoading = false,
+                    });
+                widget.provider.registerLazyDependence<AppApi>(() {
+                  if (setting.connectionType == clients[0]) {
+                    return CLNApi(
+                        mode: ClientMode.grpc,
+                        client: ClientProvider.getClient(
+                            mode: ClientMode.grpc,
+                            opts: {
+                              ///FIXME: make a login page and take some path as input
+                              'certificatePath': setting.path,
+                              'host': setting.host,
+                              'port': 8001,
+                            }));
+                  } else {
+                    return CLNApi(
+                        mode: ClientMode.unixSocket,
+
                         ///FIXME: make a login page and take some path as input
-                        'certificatePath': setting.path,
-                        'host': setting.host,
-                        'port': 8001,
-                      })
-                  );
-                }
-                else{
-                  return CLNApi(
-                      mode: ClientMode.unixSocket,
-                      ///FIXME: make a login page and take some path as input
-                      client: ClientProvider.getClient(mode: ClientMode.unixSocket, opts: {
-                        // include the path if you want use the unix socket. N.B it is broken!
-                        'path': "${setting.path}/lightning-rpc",
-                      })
-                  );
-                }
-              });
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                      builder: (context) => HomeView(
-                            provider: widget.provider,
-                          )),
-                  (Route<dynamic> route) => false);
+                        client: ClientProvider.getClient(
+                            mode: ClientMode.unixSocket,
+                            opts: {
+                              // include the path if you want use the unix socket. N.B it is broken!
+                              'path': "${setting.path}/lightning-rpc",
+                            }));
+                  }
+                });
+                Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                        builder: (context) => HomeView(
+                              provider: widget.provider,
+                            )),
+                    (Route<dynamic> route) => false);
+              }
             },
             child: const Text("Save"),
           ),

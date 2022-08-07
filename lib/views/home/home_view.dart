@@ -42,7 +42,6 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _buildInfoView(
       {required BuildContext context, required AppGetInfo getInfo}) {
-
     return Container(
         padding:
             EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.05),

@@ -7,5 +7,6 @@ abstract class AppView extends StatelessWidget {
 
   final Setting setting;
 
-  const AppView({Key? key, required this.provider, required this.setting}) : super(key: key);
+  const AppView({Key? key, required this.provider, required this.setting})
+      : super(key: key);
 }
