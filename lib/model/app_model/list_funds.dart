@@ -16,27 +16,15 @@ class AppListFunds {
   factory AppListFunds.fromJSON(Map<String, dynamic> json,
       {bool snackCase = false, bool msatFlag = false}) {
     LogManager.getInstance.debug("Full listfunds json received: $json");
-    var funds = witKey(
-        key: "outputs",
-        json: json,
-        snackCase: snackCase,
-        msatFlag: msatFlag) as List;
+    var funds = json.withKey("outputs", snackCase: snackCase) as List;
     LogManager.getInstance.debug("$funds");
-    var fundChannels = witKey(
-        key: "channels",
-        json: json,
-        snackCase: snackCase,
-        msatFlag: msatFlag) as List;
+    var fundChannels = json.withKey("channels", snackCase: snackCase) as List;
     double totalChannelsAmount = 0;
-    for (var channel in fundChannels) {
-      var ourAmountMsat = witKey(
-              key: "ourAmountMsat",
-              json: channel,
-              snackCase: snackCase,
-              msatFlag: true) ??
-          "0";
-      ourAmountMsat.toString();
-      totalChannelsAmount += int.parse(ourAmountMsat ?? "0");
+    for (var rawChannel in fundChannels) {
+      var channel = Map<String, dynamic>.from(rawChannel);
+      var ourAmountMsat =
+          channel.parseMsat(key: "ourAmountMsat", snackCase: snackCase);
+      totalChannelsAmount += int.parse(ourAmountMsat);
     }
 
     /// converting Msat to sat
@@ -86,16 +74,10 @@ class AppFund {
   factory AppFund.fromJSON(Map<String, dynamic> json,
       {bool snackCase = false, bool msatFlag = false}) {
     LogManager.getInstance.debug("$json");
-    var txId = witKey(key: "txid", json: json, snackCase: snackCase);
-    var ourAmount = witKey(
-            key: "amountMsat",
-            json: json,
-            snackCase: snackCase,
-            msatFlag: true) ??
-        0;
-    ourAmount.toString();
-    var status = witKey(key: "status", json: json, snackCase: snackCase);
-    var reserved = witKey(key: "reserved", json: json, snackCase: snackCase);
+    var txId = json.withKey("txid", snackCase: snackCase);
+    var ourAmount = json.parseMsat(key: "amountMsat", snackCase: snackCase);
+    var status = json.withKey("status", snackCase: snackCase);
+    var reserved = json.withKey("reserved", snackCase: snackCase);
     return AppFund(
         txId: txId,
         amount: ourAmount,
@@ -130,18 +112,11 @@ class AppFundChannel {
   factory AppFundChannel.fromJSON(Map<String, dynamic> json,
       {bool snackCase = false, bool msatFlag = false}) {
     LogManager.getInstance.debug("$json");
-    var peerID = witKey(key: "peerId", json: json, snackCase: snackCase);
-    var ourAmount = witKey(
-            key: "ourAmountMsat",
-            json: json,
-            snackCase: snackCase,
-            msatFlag: true) ??
-        0;
-    ourAmount.toString();
-    var connected = witKey(key: "connected", json: json, snackCase: snackCase);
-    var state = witKey(key: "state", json: json, snackCase: snackCase);
-    var fundingTxId =
-        witKey(key: "fundingTxid", json: json, snackCase: snackCase);
+    var peerID = json.withKey("peerId", snackCase: snackCase);
+    var ourAmount = json.parseMsat(key: "ourAmountMsat", snackCase: snackCase);
+    var connected = json.withKey("connected", snackCase: snackCase);
+    var state = json.withKey("state", snackCase: snackCase);
+    var fundingTxId = json.withKey("fundingTxid", snackCase: snackCase);
     return AppFundChannel(
         peerId: peerID,
         amount: ourAmount,
