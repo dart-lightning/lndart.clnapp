@@ -58,22 +58,16 @@ class AppInvoice {
   factory AppInvoice.fromJSON(Map<String, dynamic> json,
       {bool snackCase = false, bool msatFlag = false}) {
     LogManager.getInstance.debug("$json");
-    var bolt11 = witKey(key: "bolt11", json: json, snackCase: snackCase) ??
-        witKey(key: "bolt12", json: json, snackCase: snackCase);
-    var paymentHash =
-        witKey(key: "paymentHash", json: json, snackCase: snackCase);
-    var status = witKey(key: "status", json: json, snackCase: snackCase);
-    var received = witKey(
-            key: "amountReceivedMsat",
-            json: json,
-            snackCase: snackCase,
-            msatFlag: true) ??
-        "unpaid";
+    var bolt11 = json.withKey("bolt11", snackCase: snackCase) ??
+        json.withKey("bolt12", snackCase: snackCase);
+    var paymentHash = json.withKey("paymentHash", snackCase: snackCase);
+    var status = json.withKey("status", snackCase: snackCase);
+    var received =
+        json.parseMsat(key: "amountReceivedMsat", snackCase: snackCase);
     received.toString();
-    var paidAt = witKey(key: "paidAt", json: json, snackCase: snackCase);
-    var description =
-        witKey(key: "description", json: json, snackCase: snackCase);
-    var label = witKey(key: "label", json: json, snackCase: snackCase);
+    var paidAt = json.withKey("paidAt", snackCase: snackCase);
+    var description = json.withKey("description", snackCase: snackCase);
+    var label = json.withKey("label", snackCase: snackCase);
     return AppInvoice(
       bolt11: bolt11,
       paymentHash: paymentHash,

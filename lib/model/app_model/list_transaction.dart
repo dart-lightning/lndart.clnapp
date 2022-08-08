@@ -8,7 +8,7 @@ class AppListTransactions {
   factory AppListTransactions.fromJSON(Map<String, dynamic> json,
       {bool snackCase = false}) {
     var transactions =
-        witKey(key: "transactions", json: json, snackCase: snackCase) as List;
+        json.withKey("transactions", snackCase: snackCase) as List;
     if (transactions.isNotEmpty) {
       var appTransactions = transactions
           .map((transaction) =>
