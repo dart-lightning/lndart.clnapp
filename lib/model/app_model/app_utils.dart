@@ -1,5 +1,6 @@
 import 'package:recase/recase.dart';
 
+@Deprecated("please use the mixing implementation over Map<String, dynamic>")
 dynamic witKey(
     {required String key,
     required Map<String, dynamic> json,
