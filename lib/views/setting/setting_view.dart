@@ -140,6 +140,8 @@ class _SettingViewState extends State<SettingView> {
           ),
           ElevatedButton(
             onPressed: () {
+              // FIXME: the UI is too couple with the Setting, we can do better
+              var goToHome = setting.connectionType == clients[2];
               if (setting.path != "No path found") {
                 setState(() {
                   isLoading = true;
@@ -159,7 +161,7 @@ class _SettingViewState extends State<SettingView> {
                               'host': setting.host,
                               'port': 8001,
                             }));
-                  } else {
+                  } else if (setting.connectionType == clients[1]) {
                     return CLNApi(
                         mode: ClientMode.unixSocket,
 
@@ -170,8 +172,38 @@ class _SettingViewState extends State<SettingView> {
                               // include the path if you want use the unix socket. N.B it is broken!
                               'path': "${setting.path}/lightning-rpc",
                             }));
+                  } else {
+                    return CLNApi(
+                        mode: ClientMode.lnlambda,
+                        client: ClientProvider.getClient(mode: ClientMode.lnlambda, opts: {
+                          'node_id':
+                          '028fe59bd7bbe3982699535e7e43b305c69099fbdd9902b1af5875a121fdb9a3dc',
+                          'host': '52.55.124.1:19735',
+                          'lambda_server':
+                          'http://ec2-52-55-124-1.compute-1.amazonaws.com:9002',
+                          'rune':
+                          "E04R2omgJ091UY5vdpxxmD4xS2LtviRDgm50TfwoY_Y9MTImbWV0aG9kXmxpc3R8bWV0aG9kXmdldHxtZXRob2Q9ZGVjb2RlfG1ldGhvZD1mZXRjaGludm9pY2V8bWV0aG9kPXBheSZtZXRob2QvbGlzdGRhdGFzdG9yZQ==",
+                        }));
                   }
                 });
+                goToHome = true;
+              } else {
+                // FIXME: this in an hack
+                widget.provider.registerLazyDependence<AppApi>(() {
+                  return CLNApi(
+                      mode: ClientMode.lnlambda,
+                      client: ClientProvider.getClient(mode: ClientMode.lnlambda, opts: {
+                        'node_id':
+                        '028fe59bd7bbe3982699535e7e43b305c69099fbdd9902b1af5875a121fdb9a3dc',
+                        'host': '52.55.124.1:19735',
+                        'lambda_server':
+                        'http://ec2-52-55-124-1.compute-1.amazonaws.com:9002',
+                        'rune':
+                        "E04R2omgJ091UY5vdpxxmD4xS2LtviRDgm50TfwoY_Y9MTImbWV0aG9kXmxpc3R8bWV0aG9kXmdldHxtZXRob2Q9ZGVjb2RlfG1ldGhvZD1mZXRjaGludm9pY2V8bWV0aG9kPXBheSZtZXRob2QvbGlzdGRhdGFzdG9yZQ==",
+                      }));
+                });
+              }
+              if (goToHome) {
                 Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
                         builder: (context) => HomeView(

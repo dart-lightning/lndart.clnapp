@@ -23,6 +23,12 @@ enum ClientMode {
   lnlambda,
 }
 
+extension ClientModeClass on ClientMode {
+  bool withCamelCase() {
+    return this == ClientMode.grpc;
+  }
+}
+
 class ClientProvider {
   static LightningClient getClient(
       {required ClientMode mode, Map<String, dynamic> opts = const {}}) {

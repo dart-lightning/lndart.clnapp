@@ -14,5 +14,5 @@ class Setting {
 List<String> clients = [
   'gRPC connection',
   'Unix connection',
-  'Lnlambda connection',
+  'LNlambda connection',
 ];
