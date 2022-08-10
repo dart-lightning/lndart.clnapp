@@ -14,10 +14,7 @@ dependencies:
   cln_grpc: ^0.0.1-beta.2
   cln_common: ^0.0.1-beta.1
   clightning_rpc: 0.0.2-beta.2
-  trash_component:
-    git:
-      url: https://github.com/vincenzopalazzo/trash
-      path: packages/components
+  trash_component: ^0.0.2
   get_it: ^7.2.0
   bottom_navy_bar: ^6.0.0
   trash_themes: ^0.0.1

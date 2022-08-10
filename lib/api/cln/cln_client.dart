@@ -85,7 +85,8 @@ class CLNApi extends AppApi {
         onDecode: (jsonResponse) {
           LogManager.getInstance.debug("Grpc list funds call $jsonResponse");
           return AppListFunds.fromJSON(jsonResponse as Map<String, dynamic>,
-              snackCase: mode == ClientMode.unixSocket);
+              snackCase: mode == ClientMode.unixSocket,
+              isObject: mode.hashMsatAsObj());
         });
   }
 
@@ -108,7 +109,8 @@ class CLNApi extends AppApi {
         params: params,
         onDecode: (jsonResponse) => AppListInvoices.fromJSON(
             jsonResponse as Map<String, dynamic>,
-            snackCase: mode == ClientMode.unixSocket));
+            snackCase: mode == ClientMode.unixSocket,
+            isObject: mode.hashMsatAsObj()));
   }
 
   @override

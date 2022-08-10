@@ -14,10 +14,14 @@ extension RecaseMap on Map<String, dynamic> {
     return this[key.camelCase];
   }
 
-  String parseMsat({required String key, bool snackCase = false}) {
+  String parseMsat(
+      {required String key, bool snackCase = false, bool isObject = false}) {
     var number = withKey(key, snackCase: snackCase);
     if (number == null) {
       return "unpaid";
+    }
+    if (isObject) {
+      return number["msat"]?.toString() ?? "unpaid";
     }
     var numStr = number.toString();
     if (!numStr.contains("msat")) {

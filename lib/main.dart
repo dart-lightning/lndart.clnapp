@@ -47,13 +47,10 @@ Future<void> main() async {
         return CLNApi(
             mode: ClientMode.lnlambda,
             client: ClientProvider.getClient(mode: ClientMode.lnlambda, opts: {
-              'node_id':
-                  '028fe59bd7bbe3982699535e7e43b305c69099fbdd9902b1af5875a121fdb9a3dc',
-              'host': '52.55.124.1:19735',
-              'lambda_server':
-                  'http://ec2-52-55-124-1.compute-1.amazonaws.com:9002',
-              'rune':
-                  "E04R2omgJ091UY5vdpxxmD4xS2LtviRDgm50TfwoY_Y9MTImbWV0aG9kXmxpc3R8bWV0aG9kXmdldHxtZXRob2Q9ZGVjb2RlfG1ldGhvZD1mZXRjaGludm9pY2V8bWV0aG9kPXBheSZtZXRob2QvbGlzdGRhdGFzdG9yZQ==",
+              'node_id': setting.nodeId,
+              'host': setting.host,
+              'lambda_server': setting.lambdaServer,
+              'rune': setting.rune,
             }));
       }
     });

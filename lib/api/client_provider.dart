@@ -27,6 +27,10 @@ extension ClientModeClass on ClientMode {
   bool withCamelCase() {
     return this == ClientMode.grpc;
   }
+
+  bool hashMsatAsObj() {
+    return this == ClientMode.grpc;
+  }
 }
 
 class ClientProvider {
