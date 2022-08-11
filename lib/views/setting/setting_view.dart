@@ -1,15 +1,15 @@
+import 'dart:convert';
+
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/api/client_provider.dart';
 import 'package:clnapp/api/cln/cln_client.dart';
-import 'package:clnapp/constants/user_setting.dart';
+import 'package:clnapp/model/user_setting.dart';
 import 'package:clnapp/helper/settings/get_settings.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:clnapp/views/home/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-enum ValidClient { gRPC, unix, lnlambda, invalid }
 
 class SettingView extends StatefulWidget {
   final AppProvider provider;
@@ -39,23 +39,15 @@ class _SettingViewState extends State<SettingView> {
 
   Future<String> pickDir() async {
     String? path = await FilePicker.platform.getDirectoryPath();
+    // FIXME: migrate the setting to null safety, use the null to avoid
+    // check on string
     path == null ? setting.path = "No path found" : setting.path = path;
     return setting.path;
   }
 
   Future<bool> saveSettings() async {
     final prefs = await SharedPreferences.getInstance();
-
-    await prefs.setInt(
-        'connectionClient', clients.indexOf(setting.connectionType));
-
-    await prefs.setString('selectedPath', setting.path);
-
-    await prefs.setString('host', setting.host);
-
-    await prefs.setString(
-        'nickName', setting.nickName.isEmpty ? "null" : setting.nickName);
-
+    await prefs.setString("setting", json.encode(setting.toJson()));
     return true;
   }
 
@@ -182,22 +174,16 @@ class _SettingViewState extends State<SettingView> {
         ]);
   }
 
-  ValidClient isVaildSettings(Setting setting) {
-    if (setting.connectionType == clients[0] &&
-        setting.host.isNotEmpty &&
-        setting.path != "No path found") {
-      return ValidClient.gRPC;
-    } else if (setting.connectionType == clients[1] &&
-        setting.path != "No path found") {
-      return ValidClient.unix;
-    } else if (setting.connectionType == clients[2] &&
-        setting.nodeId.isNotEmpty &&
-        setting.lambdaServer.isNotEmpty &&
-        setting.rune.isNotEmpty &&
-        setting.host.isNotEmpty) {
-      return ValidClient.lnlambda;
+  Widget _buildCorrectSettingView(
+      {required BuildContext context, required Setting setting}) {
+    switch (setting.clientMode) {
+      case ClientMode.grpc:
+        return _buildGrpcSettingView(context: context);
+      case ClientMode.unixSocket:
+        return _buildUnixSettingView(context: context);
+      case ClientMode.lnlambda:
+        return _buildLnlambdaSettingView(context: context);
     }
-    return ValidClient.invalid;
   }
 
   Widget _buildMainView({required BuildContext context}) {
@@ -213,17 +199,17 @@ class _SettingViewState extends State<SettingView> {
             InputDecorator(
               decoration: const InputDecoration(border: OutlineInputBorder()),
               child: DropdownButton(
-                value: setting.connectionType,
+                value: setting.clientMode,
                 underline: const SizedBox(),
-                items: clients.map((String items) {
+                items: clients.map((ClientMode items) {
                   return DropdownMenuItem(
                     value: items,
-                    child: Text(items),
+                    child: Text(items.toString()),
                   );
                 }).toList(),
-                onChanged: (String? newValue) {
+                onChanged: (ClientMode? newValue) {
                   setState(() {
-                    setting.connectionType = newValue!;
+                    setting.clientMode = newValue!;
                   });
                 },
               ),
@@ -241,69 +227,16 @@ class _SettingViewState extends State<SettingView> {
                 hintText: 'My lightning node',
               ),
             ),
-            setting.connectionType == clients[0]
-                ? _buildGrpcSettingView(context: context)
-                : setting.connectionType == clients[1]
-                    ? _buildUnixSettingView(context: context)
-                    : _buildLnlambdaSettingView(context: context),
+            _buildCorrectSettingView(context: context, setting: setting),
             ElevatedButton(
               onPressed: () {
-                // FIXME: the UI is too couple with the Setting, we can do better
-                ValidClient validSetting = isVaildSettings(setting);
-                bool goToHome = false;
-                switch (validSetting) {
-                  case ValidClient.gRPC:
-                    goToHome = true;
-                    saveSettings();
-                    widget.provider.registerLazyDependence<AppApi>(() {
-                      return CLNApi(
-                          mode: ClientMode.grpc,
-                          client: ClientProvider.getClient(
-                              mode: ClientMode.grpc,
-                              opts: {
-                                ///FIXME: make a login page and take some path as input
-                                'certificatePath': setting.path,
-                                'host': setting.host,
-                                'port': 8001,
-                              }));
-                    });
-                    break;
-                  case ValidClient.unix:
-                    goToHome = true;
-                    saveSettings();
-                    widget.provider.registerLazyDependence<AppApi>(() {
-                      return CLNApi(
-                          mode: ClientMode.unixSocket,
-
-                          ///FIXME: make a login page and take some path as input
-                          client: ClientProvider.getClient(
-                              mode: ClientMode.unixSocket,
-                              opts: {
-                                // include the path if you want use the unix socket. N.B it is broken!
-                                'path': "${setting.path}/lightning-rpc",
-                              }));
-                    });
-                    break;
-                  case ValidClient.lnlambda:
-                    goToHome = true;
-                    saveSettings();
-                    widget.provider.registerLazyDependence<AppApi>(() {
-                      return CLNApi(
-                          mode: ClientMode.lnlambda,
-                          client: ClientProvider.getClient(
-                              mode: ClientMode.lnlambda,
-                              opts: {
-                                'node_id': setting.nodeId,
-                                'host': setting.host,
-                                'lambda_server': setting.lambdaServer,
-                                'rune': setting.rune,
-                              }));
-                    });
-                    break;
-                  case ValidClient.invalid:
-                    throw Exception("Invalid settings ");
-                }
-                if (goToHome) {
+                if (setting.isValid()) {
+                  widget.provider.registerLazyDependence<AppApi>(() {
+                    return CLNApi(
+                        mode: setting.clientMode,
+                        client: ClientProvider.getClient(
+                            mode: setting.clientMode, opts: setting.toOpts()));
+                  });
                   Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
                           builder: (context) => HomeView(

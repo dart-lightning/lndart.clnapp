@@ -1,7 +1,7 @@
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/api/client_provider.dart';
 import 'package:clnapp/api/cln/cln_client.dart';
-import 'package:clnapp/constants/user_setting.dart';
+import 'package:clnapp/model/user_setting.dart';
 import 'package:clnapp/helper/settings/get_settings.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:clnapp/views/app_view.dart';
@@ -22,9 +22,9 @@ Future<void> main() async {
 
   // FIXME: add a method isValid() inside the setting to check if all the configuration are
   // correct, otheriwise throws an error to disply to the user
-  if (setting.path != "No path found" || setting.connectionType == clients[2]) {
+  if (setting.path != "No path found" || setting.clientMode == clients[2]) {
     provider.registerLazyDependence<AppApi>(() {
-      if (setting.connectionType == clients[0]) {
+      if (setting.clientMode == clients[0]) {
         return CLNApi(
             mode: ClientMode.grpc,
             client: ClientProvider.getClient(mode: ClientMode.grpc, opts: {
@@ -33,7 +33,7 @@ Future<void> main() async {
               'host': setting.host,
               'port': 8001,
             }));
-      } else if (setting.connectionType == clients[1]) {
+      } else if (setting.clientMode == clients[1]) {
         return CLNApi(
             mode: ClientMode.unixSocket,
 

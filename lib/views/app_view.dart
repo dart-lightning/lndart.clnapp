@@ -1,4 +1,4 @@
-import 'package:clnapp/constants/user_setting.dart';
+import 'package:clnapp/model/user_setting.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:flutter/material.dart';
 

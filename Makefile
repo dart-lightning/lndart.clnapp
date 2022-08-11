@@ -19,5 +19,8 @@ clean:
 dep:
 	$(CC) pub upgrade --major-versions
 
+gen:
+	$(CC) pub run build_runner build --delete-conflicting-outputs;
+
 run:
 	$(CC) run -d linux
