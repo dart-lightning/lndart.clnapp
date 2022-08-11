@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+enum ValidClient { gRPC, unix, lnlambda, invalid }
+
 class SettingView extends StatefulWidget {
   final AppProvider provider;
 
@@ -44,11 +46,8 @@ class _SettingViewState extends State<SettingView> {
   Future<bool> saveSettings() async {
     final prefs = await SharedPreferences.getInstance();
 
-    clients.asMap().forEach((index, element) async {
-      if (setting.connectionType == element) {
-        await prefs.setInt('connectionClient', index);
-      }
-    });
+    await prefs.setInt(
+        'connectionClient', clients.indexOf(setting.connectionType));
 
     await prefs.setString('selectedPath', setting.path);
 
@@ -183,6 +182,24 @@ class _SettingViewState extends State<SettingView> {
         ]);
   }
 
+  ValidClient isVaildSettings(Setting setting) {
+    if (setting.connectionType == clients[0] &&
+        setting.host.isNotEmpty &&
+        setting.path != "No path found") {
+      return ValidClient.gRPC;
+    } else if (setting.connectionType == clients[1] &&
+        setting.path != "No path found") {
+      return ValidClient.unix;
+    } else if (setting.connectionType == clients[2] &&
+        setting.nodeId.isNotEmpty &&
+        setting.lambdaServer.isNotEmpty &&
+        setting.rune.isNotEmpty &&
+        setting.host.isNotEmpty) {
+      return ValidClient.lnlambda;
+    }
+    return ValidClient.invalid;
+  }
+
   Widget _buildMainView({required BuildContext context}) {
     return SingleChildScrollView(
       child: Padding(
@@ -232,16 +249,13 @@ class _SettingViewState extends State<SettingView> {
             ElevatedButton(
               onPressed: () {
                 // FIXME: the UI is too couple with the Setting, we can do better
-                var goToHome = setting.connectionType == clients[2];
-                if (setting.path != "No path found") {
-                  setState(() {
-                    isLoading = true;
-                  });
-                  saveSettings().then((value) => {
-                        isLoading = false,
-                      });
-                  widget.provider.registerLazyDependence<AppApi>(() {
-                    if (setting.connectionType == clients[0]) {
+                ValidClient validSetting = isVaildSettings(setting);
+                bool goToHome = false;
+                switch (validSetting) {
+                  case ValidClient.gRPC:
+                    goToHome = true;
+                    saveSettings();
+                    widget.provider.registerLazyDependence<AppApi>(() {
                       return CLNApi(
                           mode: ClientMode.grpc,
                           client: ClientProvider.getClient(
@@ -252,7 +266,12 @@ class _SettingViewState extends State<SettingView> {
                                 'host': setting.host,
                                 'port': 8001,
                               }));
-                    } else if (setting.connectionType == clients[1]) {
+                    });
+                    break;
+                  case ValidClient.unix:
+                    goToHome = true;
+                    saveSettings();
+                    widget.provider.registerLazyDependence<AppApi>(() {
                       return CLNApi(
                           mode: ClientMode.unixSocket,
 
@@ -263,7 +282,12 @@ class _SettingViewState extends State<SettingView> {
                                 // include the path if you want use the unix socket. N.B it is broken!
                                 'path': "${setting.path}/lightning-rpc",
                               }));
-                    } else {
+                    });
+                    break;
+                  case ValidClient.lnlambda:
+                    goToHome = true;
+                    saveSettings();
+                    widget.provider.registerLazyDependence<AppApi>(() {
                       return CLNApi(
                           mode: ClientMode.lnlambda,
                           client: ClientProvider.getClient(
@@ -274,23 +298,10 @@ class _SettingViewState extends State<SettingView> {
                                 'lambda_server': setting.lambdaServer,
                                 'rune': setting.rune,
                               }));
-                    }
-                  });
-                  goToHome = true;
-                } else {
-                  // FIXME: this in an hack
-                  widget.provider.registerLazyDependence<AppApi>(() {
-                    return CLNApi(
-                        mode: ClientMode.lnlambda,
-                        client: ClientProvider.getClient(
-                            mode: ClientMode.lnlambda,
-                            opts: {
-                              'node_id': setting.nodeId,
-                              'host': setting.host, //'52.55.124.1:19735',
-                              'lambda_server': setting.lambdaServer,
-                              'rune': setting.rune,
-                            }));
-                  });
+                    });
+                    break;
+                  case ValidClient.invalid:
+                    throw Exception("Invalid settings ");
                 }
                 if (goToHome) {
                   Navigator.of(context).pushAndRemoveUntil(
