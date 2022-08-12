@@ -231,6 +231,7 @@ class _SettingViewState extends State<SettingView> {
             ElevatedButton(
               onPressed: () {
                 if (setting.isValid()) {
+                  saveSettings();
                   widget.provider.registerLazyDependence<AppApi>(() {
                     return CLNApi(
                         mode: setting.clientMode,

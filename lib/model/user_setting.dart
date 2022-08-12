@@ -48,11 +48,18 @@ class Setting {
         }
       case ClientMode.unixSocket:
         {
-          return {};
+          return {
+            "path": "$path/lightning-rpc",
+          };
         }
       case ClientMode.lnlambda:
         {
-          return {};
+          return {
+            'nodeID': nodeId,
+            'host': host,
+            'rune': rune,
+            'lambdaServer': lambdaServer,
+          };
         }
     }
   }
