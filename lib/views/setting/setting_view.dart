@@ -1,11 +1,10 @@
 import 'dart:convert';
 
-import 'package:clnapp/api/api.dart';
 import 'package:clnapp/api/client_provider.dart';
-import 'package:clnapp/api/cln/cln_client.dart';
 import 'package:clnapp/model/user_setting.dart';
 import 'package:clnapp/helper/settings/get_settings.dart';
 import 'package:clnapp/utils/app_provider.dart';
+import 'package:clnapp/utils/register_provider.dart';
 import 'package:clnapp/views/home/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -22,6 +21,11 @@ class SettingView extends StatefulWidget {
 
 class _SettingViewState extends State<SettingView> {
   late bool isLoading;
+
+  TextEditingController nickNameController = TextEditingController()..text = "";
+
+  TextEditingController hostController = TextEditingController()
+    ..text = "localhost";
 
   Setting setting = Setting();
 
@@ -78,12 +82,12 @@ class _SettingViewState extends State<SettingView> {
           ),
           const Text("Host"),
           TextFormField(
+            controller: hostController,
             onChanged: (text) {
               setState(() {
                 setting.host = text;
               });
             },
-            initialValue: setting.host,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
             ),
@@ -216,37 +220,52 @@ class _SettingViewState extends State<SettingView> {
             ),
             const Text("Node Nick Name "),
             TextFormField(
+              controller: nickNameController,
               onChanged: (name) {
                 setState(() {
                   setting.nickName = name;
                 });
               },
-              initialValue: setting.nickName == "null" ? "" : setting.nickName,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 hintText: 'My lightning node',
               ),
             ),
             _buildCorrectSettingView(context: context, setting: setting),
-            ElevatedButton(
-              onPressed: () {
-                if (setting.isValid()) {
-                  saveSettings();
-                  widget.provider.registerLazyDependence<AppApi>(() {
-                    return CLNApi(
-                        mode: setting.clientMode,
-                        client: ClientProvider.getClient(
-                            mode: setting.clientMode, opts: setting.toOpts()));
-                  });
-                  Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                          builder: (context) => HomeView(
-                                provider: widget.provider,
-                              )),
-                      (Route<dynamic> route) => false);
-                }
-              },
-              child: const Text("Save"),
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    if (setting.isValid()) {
+                      saveSettings();
+                      RegisterProvider()
+                          .registerClientFromSetting(setting, widget.provider);
+                      Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (context) => HomeView(
+                                    provider: widget.provider,
+                                  )),
+                          (Route<dynamic> route) => false);
+                    }
+                  },
+                  child: const Text("Save"),
+                ),
+                const Spacer(),
+                ElevatedButton(
+                  onPressed: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    prefs.remove("setting");
+                    getSettingsInfo().then((value) => {
+                          setState(() {
+                            setting = value;
+                            nickNameController.clear();
+                            hostController.text = "localhost";
+                          }),
+                        });
+                  },
+                  child: const Text("Clear"),
+                ),
+              ],
             ),
           ],
         ),
