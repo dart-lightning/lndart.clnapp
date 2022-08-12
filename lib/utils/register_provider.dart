@@ -5,7 +5,7 @@ import 'package:clnapp/model/user_setting.dart';
 import 'package:clnapp/utils/app_provider.dart';
 
 class RegisterProvider {
-  void registerClientFromSetting(Setting setting, AppProvider provider) {
+  static void registerClientFromSetting(Setting setting, AppProvider provider) {
     if (setting.isValid()) {
       provider.registerLazyDependence<AppApi>(() {
         return CLNApi(

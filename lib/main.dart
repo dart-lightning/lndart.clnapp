@@ -18,7 +18,7 @@ Future<void> main() async {
         setting = value,
       });
 
-  RegisterProvider().registerClientFromSetting(setting, provider);
+  RegisterProvider.registerClientFromSetting(setting, provider);
 
   runApp(CLNApp(provider: provider, setting: setting));
 }

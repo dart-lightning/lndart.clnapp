@@ -238,7 +238,7 @@ class _SettingViewState extends State<SettingView> {
                   onPressed: () {
                     if (setting.isValid()) {
                       saveSettings();
-                      RegisterProvider()
+                      RegisterProvider
                           .registerClientFromSetting(setting, widget.provider);
                       Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
