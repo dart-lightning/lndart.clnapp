@@ -36,20 +36,24 @@ extension ClientModeClass on ClientMode {
 class ClientProvider {
   static LightningClient getClient(
       {required ClientMode mode, Map<String, dynamic> opts = const {}}) {
+    var supportedPlatform = ClientProvider.getClientByDefPlatform();
     if (defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.android) {
-      // Some android/ios specific code
-      throw Exception("The actual client did not support the mobile App");
+      if (!supportedPlatform.contains(mode)) {
+        throw Exception("The actual client did not support the mobile App");
+      }
+      return ClientProvider._buildClient(mode: mode, opts: opts);
     } else if (defaultTargetPlatform == TargetPlatform.linux ||
         defaultTargetPlatform == TargetPlatform.macOS ||
         defaultTargetPlatform == TargetPlatform.windows) {
+      if (!supportedPlatform.contains(mode)) {
+        throw Exception("The actual client did not support the desktop App");
+      }
       // Some desktop specific code there
       return ClientProvider._buildClient(mode: mode, opts: opts);
     } else {
-      // Some web specific code there
-      if (mode != ClientMode.lnlambda) {
-        /// check if we can run on the web
-        throw Exception("The actual client did not support the web");
+      if (!supportedPlatform.contains(mode)) {
+        throw Exception("The actual client did not support the web App");
       }
       return ClientProvider._buildClient(mode: mode, opts: opts);
     }
@@ -67,10 +71,24 @@ class ClientProvider {
             port: opts['port']);
       case ClientMode.lnlambda:
         return LNLambdaClient(
-            nodeID: opts['node_id'],
+            nodeID: opts['nodeId'],
             host: opts['host'],
             rune: opts['rune'],
-            lambdaServer: opts['lambda_server']);
+            lambdaServer: opts['lambdaServer']);
+    }
+  }
+
+  static Set<ClientMode> getClientByDefPlatform() {
+    if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.android) {
+      return {ClientMode.lnlambda};
+    } else if (defaultTargetPlatform == TargetPlatform.linux ||
+        defaultTargetPlatform == TargetPlatform.macOS ||
+        defaultTargetPlatform == TargetPlatform.windows) {
+      // Some desktop specific code there
+      return {ClientMode.lnlambda, ClientMode.unixSocket, ClientMode.grpc};
+    } else {
+      return {ClientMode.lnlambda};
     }
   }
 }

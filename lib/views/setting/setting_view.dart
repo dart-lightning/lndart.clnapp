@@ -19,8 +19,6 @@ class SettingView extends StatefulWidget {
 }
 
 class _SettingViewState extends State<SettingView> {
-  bool isLoading = true;
-
   TextEditingController hostController = TextEditingController()
     ..text = "localhost";
 
@@ -28,7 +26,7 @@ class _SettingViewState extends State<SettingView> {
     final setting = widget.provider.get<Setting>();
     String? path = await FilePicker.platform.getDirectoryPath();
     setting.path = path ?? "No path found";
-    return setting.path;
+    return setting.path!;
   }
 
   Future<bool> saveSettings() async {
@@ -38,8 +36,8 @@ class _SettingViewState extends State<SettingView> {
     return true;
   }
 
-  Widget _buildGrpcSettingView({required BuildContext context}) {
-    final setting = widget.provider.get<Setting>();
+  Widget _buildGrpcSettingView(
+      {required BuildContext context, required Setting setting}) {
     return Wrap(
         runSpacing: MediaQuery.of(context).size.height * 0.05,
         children: <Widget>[
@@ -58,15 +56,13 @@ class _SettingViewState extends State<SettingView> {
           ),
           InputDecorator(
             decoration: const InputDecoration(border: OutlineInputBorder()),
-            child: Text(setting.path),
+            child: Text(setting.path ?? "not found"),
           ),
           const Text("Host"),
           TextFormField(
             controller: hostController,
             onChanged: (text) {
-              setState(() {
-                setting.host = text;
-              });
+              setting.host = text;
             },
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
@@ -75,8 +71,8 @@ class _SettingViewState extends State<SettingView> {
         ]);
   }
 
-  Widget _buildUnixSettingView({required BuildContext context}) {
-    final setting = widget.provider.get<Setting>();
+  Widget _buildUnixSettingView(
+      {required BuildContext context, required Setting setting}) {
     return Wrap(
         runSpacing: MediaQuery.of(context).size.height * 0.05,
         children: <Widget>[
@@ -95,22 +91,21 @@ class _SettingViewState extends State<SettingView> {
           ),
           InputDecorator(
             decoration: const InputDecoration(border: OutlineInputBorder()),
-            child: Text(setting.path),
+            child: Text(setting.path ?? "not found"),
           ),
         ]);
   }
 
-  Widget _buildLnlambdaSettingView({required BuildContext context}) {
-    final setting = widget.provider.get<Setting>();
+  Widget _buildLnlambdaSettingView(
+      {required BuildContext context, required Setting setting}) {
     return Wrap(
         runSpacing: MediaQuery.of(context).size.height * 0.05,
         children: <Widget>[
           const Text("Node ID"),
           TextFormField(
+            controller: TextEditingController(text: setting.nodeId ?? ''),
             onChanged: (text) {
-              setState(() {
-                setting.nodeId = text;
-              });
+              setting.nodeId = text;
             },
             decoration: const InputDecoration(
               label: Text("node Id"),
@@ -119,10 +114,9 @@ class _SettingViewState extends State<SettingView> {
           ),
           const Text("Host"),
           TextFormField(
+            controller: TextEditingController(text: setting.host ?? ''),
             onChanged: (text) {
-              setState(() {
-                setting.host = text;
-              });
+              setting.host = text;
             },
             decoration: const InputDecoration(
               label: Text("host"),
@@ -131,10 +125,9 @@ class _SettingViewState extends State<SettingView> {
           ),
           const Text("Lambda Server"),
           TextFormField(
+            controller: TextEditingController(text: setting.lambdaServer ?? ''),
             onChanged: (text) {
-              setState(() {
-                setting.lambdaServer = text;
-              });
+              setting.lambdaServer = text;
             },
             decoration: const InputDecoration(
               label: Text("lnlambda server url"),
@@ -143,10 +136,9 @@ class _SettingViewState extends State<SettingView> {
           ),
           const Text("Rune"),
           TextFormField(
+            controller: TextEditingController(text: setting.rune ?? ''),
             onChanged: (text) {
-              setState(() {
-                setting.rune = text;
-              });
+              setting.rune = text;
             },
             decoration: const InputDecoration(
               label: Text("rune"),
@@ -158,18 +150,19 @@ class _SettingViewState extends State<SettingView> {
 
   Widget _buildCorrectSettingView(
       {required BuildContext context, required Setting setting}) {
-    switch (setting.clientMode) {
+    switch (setting.clientMode!) {
       case ClientMode.grpc:
-        return _buildGrpcSettingView(context: context);
+        return _buildGrpcSettingView(context: context, setting: setting);
       case ClientMode.unixSocket:
-        return _buildUnixSettingView(context: context);
+        return _buildUnixSettingView(context: context, setting: setting);
       case ClientMode.lnlambda:
-        return _buildLnlambdaSettingView(context: context);
+        return _buildLnlambdaSettingView(context: context, setting: setting);
     }
   }
 
   Widget _buildMainView({required BuildContext context}) {
     final setting = widget.provider.get<Setting>();
+    final clients = ClientProvider.getClientByDefPlatform();
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.only(
@@ -191,9 +184,7 @@ class _SettingViewState extends State<SettingView> {
                   );
                 }).toList(),
                 onChanged: (ClientMode? newValue) {
-                  setState(() {
-                    setting.clientMode = newValue!;
-                  });
+                  setting.clientMode = newValue!;
                 },
               ),
             ),
@@ -201,11 +192,13 @@ class _SettingViewState extends State<SettingView> {
             Row(
               children: [
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (setting.isValid()) {
-                      saveSettings();
-                      ManagerAPIProvider.registerClientFromSetting(
+                      await saveSettings();
+                      await ManagerAPIProvider.registerClientFromSetting(
                           setting, widget.provider);
+                      // https://stackoverflow.com/questions/68871880/do-not-use-buildcontexts-across-async-gaps
+                      if (!mounted) return;
                       Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
                               builder: (context) => HomeView(
@@ -234,11 +227,7 @@ class _SettingViewState extends State<SettingView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : _buildMainView(context: context),
+      body: _buildMainView(context: context),
     );
   }
 }
