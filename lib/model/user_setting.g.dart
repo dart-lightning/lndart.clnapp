@@ -7,24 +7,31 @@ part of 'user_setting.dart';
 // **************************************************************************
 
 Setting _$SettingFromJson(Map<String, dynamic> json) => Setting(
-      clientMode:
-          $enumDecodeNullable(_$ClientModeEnumMap, json['clientMode']) ??
-              ClientMode.grpc,
-      host: json['host'] as String? ?? "localhost",
-      path: json['path'] as String? ?? "No path found",
-      nodeId: json['nodeId'] as String? ?? "No node id",
-      lambdaServer: json['lambdaServer'] as String? ?? "No lambda server",
-      rune: json['rune'] as String? ?? "No rune",
+      clientMode: $enumDecodeNullable(_$ClientModeEnumMap, json['clientMode']),
+      host: json['host'] as String?,
+      path: json['path'] as String?,
+      nodeId: json['nodeId'] as String?,
+      lambdaServer: json['lambdaServer'] as String?,
+      rune: json['rune'] as String?,
     );
 
-Map<String, dynamic> _$SettingToJson(Setting instance) => <String, dynamic>{
-      'clientMode': _$ClientModeEnumMap[instance.clientMode]!,
-      'host': instance.host,
-      'path': instance.path,
-      'nodeId': instance.nodeId,
-      'lambdaServer': instance.lambdaServer,
-      'rune': instance.rune,
-    };
+Map<String, dynamic> _$SettingToJson(Setting instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('clientMode', _$ClientModeEnumMap[instance.clientMode]);
+  writeNotNull('host', instance.host);
+  writeNotNull('path', instance.path);
+  writeNotNull('nodeId', instance.nodeId);
+  writeNotNull('lambdaServer', instance.lambdaServer);
+  writeNotNull('rune', instance.rune);
+  return val;
+}
 
 const _$ClientModeEnumMap = {
   ClientMode.unixSocket: 'unixSocket',

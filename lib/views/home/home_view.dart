@@ -1,17 +1,18 @@
+import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/utils/app_provider.dart';
+import 'package:clnapp/views/app_view.dart';
 import 'package:clnapp/views/pay/pay_view.dart';
 import 'package:clnapp/views/setting/setting_view.dart';
 import 'package:flutter/material.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:trash_component/components/expandable_card.dart';
 
-class HomeView extends StatefulWidget {
-  final AppProvider provider;
-
-  const HomeView({Key? key, required this.provider}) : super(key: key);
+class HomeView extends StatefulAppView {
+  const HomeView({Key? key, required AppProvider provider})
+      : super(key: key, provider: provider);
 
   @override
   State<HomeView> createState() => _HomeViewState();
@@ -212,7 +213,10 @@ class _HomeViewState extends State<HomeView> {
   void _checkIfThereAreError<T>(
       {required BuildContext context, required AsyncSnapshot<T> snapshot}) {
     if (snapshot.hasError) {
-      throw Exception(snapshot.error);
+      LogManager.getInstance.error("${snapshot.error}");
+      LogManager.getInstance.error("${snapshot.stackTrace}");
+      widget.showSnackBar(
+          context: context, message: snapshot.error!.toString());
     }
   }
 

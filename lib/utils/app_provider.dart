@@ -13,14 +13,12 @@ class AppProvider {
 
   void unregisterDependence<T extends Object>() {
     if (GetIt.instance.isRegistered<T>()) {
-      GetIt.instance.unregister<T>(instance: GetIt.instance.get<T>());
+      GetIt.instance.unregister<T>();
     }
   }
 
   void overrideDependence<T extends Object>(T instance) {
-    if (GetIt.instance.isRegistered<T>()) {
-      unregisterDependence<T>();
-    }
+    unregisterDependence<T>();
     registerDependence<T>(instance);
   }
 

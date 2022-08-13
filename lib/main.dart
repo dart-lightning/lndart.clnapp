@@ -11,7 +11,7 @@ import 'package:trash_themes/themes.dart';
 Future<void> main() async {
   var provider = await AppProvider().init();
   Setting setting = await getSettingsInfo(provider: provider);
-  ManagerAPIProvider.registerClientFromSetting(setting, provider);
+  await ManagerAPIProvider.registerClientFromSetting(setting, provider);
 
   runApp(CLNApp(provider: provider));
 }

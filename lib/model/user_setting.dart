@@ -3,28 +3,24 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'user_setting.g.dart';
 
-List<ClientMode> clients = [
-  ClientMode.grpc,
-  ClientMode.unixSocket,
-  ClientMode.lnlambda,
-];
-
 @JsonSerializable(includeIfNull: false)
 class Setting {
-  ClientMode clientMode;
-  String host;
-  String path;
-  String nodeId;
-  String lambdaServer;
-  String rune;
+  ClientMode? clientMode;
+  String? host;
+  String? path;
+  String? nodeId;
+  String? lambdaServer;
+  String? rune;
 
   Setting(
-      {this.clientMode = ClientMode.grpc,
-      this.host = "localhost",
-      this.path = "No path found",
-      this.nodeId = "No node id",
-      this.lambdaServer = "No lambda server",
-      this.rune = "No rune"});
+      {this.clientMode,
+      this.host,
+      this.path,
+      this.nodeId,
+      this.lambdaServer,
+      this.rune}) {
+    clientMode = ClientProvider.getClientByDefPlatform().first;
+  }
 
   factory Setting.fromJson(Map<String, dynamic> json) =>
       _$SettingFromJson(json);
@@ -33,8 +29,12 @@ class Setting {
     return _$SettingToJson(this);
   }
 
+  ClientMode getClientOrDefPlatform() {
+    return clientMode ?? ClientProvider.getClientByDefPlatform().first;
+  }
+
   Map<String, dynamic> toOpts() {
-    switch (clientMode) {
+    switch (clientMode!) {
       case ClientMode.grpc:
         {
           return {
@@ -53,7 +53,7 @@ class Setting {
       case ClientMode.lnlambda:
         {
           return {
-            'nodeID': nodeId,
+            'nodeId': nodeId,
             'host': host,
             'rune': rune,
             'lambdaServer': lambdaServer,
@@ -63,22 +63,19 @@ class Setting {
   }
 
   bool isValid() {
-    switch (clientMode) {
+    if (clientMode == null) {
+      return false;
+    }
+    switch (clientMode!) {
       case ClientMode.grpc:
-        {
-          return host.isNotEmpty && path != "No path found";
-        }
+        return host != null && path != null;
       case ClientMode.unixSocket:
-        {
-          return path != "No path found";
-        }
+        return path != null;
       case ClientMode.lnlambda:
-        {
-          return nodeId.isNotEmpty &&
-              lambdaServer.isNotEmpty &&
-              rune.isNotEmpty &&
-              host.isNotEmpty;
-        }
+        return nodeId != null &&
+            lambdaServer != null &&
+            rune != null &&
+            host != null;
     }
   }
 }
