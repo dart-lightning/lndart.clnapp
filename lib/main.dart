@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:trash_themes/themes.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   var provider = await AppProvider().init();
   Setting setting = await getSettingsInfo(provider: provider);
   await ManagerAPIProvider.registerClientFromSetting(setting, provider);
