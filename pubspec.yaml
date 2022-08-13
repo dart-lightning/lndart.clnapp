@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  cln_grpc: ^0.0.1-beta.2
+  cln_grpc: ^0.0.1-beta.3
   cln_common: ^0.0.1-beta.1
   clightning_rpc: ^0.0.2-beta.4
   trash_component: ^0.0.2

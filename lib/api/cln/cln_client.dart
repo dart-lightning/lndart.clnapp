@@ -124,7 +124,7 @@ class CLNApi extends AppApi {
           Amount? amount = Amount();
           amount.msat = Int64(msat);
           params = CLNPayRequest(
-              grpcRequest: PayRequest(bolt11: invoice, msatoshi: amount));
+              grpcRequest: PayRequest(bolt11: invoice, amountMsat: amount));
         }
         break;
       case ClientMode.unixSocket:
