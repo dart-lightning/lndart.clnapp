@@ -31,11 +31,6 @@ class _PayViewState extends State<PayView> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   Widget _buildMainView() {
     return Padding(
       padding: const EdgeInsets.all(30.0),

@@ -21,24 +21,12 @@ class SettingView extends StatefulWidget {
 }
 
 class _SettingViewState extends State<SettingView> {
-  late bool isLoading;
+  bool isLoading = true;
 
   TextEditingController hostController = TextEditingController()
     ..text = "localhost";
 
   Setting setting = Setting();
-
-  @override
-  void initState() {
-    super.initState();
-    isLoading = true;
-    getSettingsInfo().then((value) => {
-          setState(() {
-            isLoading = false;
-            setting = value;
-          }),
-        });
-  }
 
   Future<String> pickDir() async {
     String? path = await FilePicker.platform.getDirectoryPath();

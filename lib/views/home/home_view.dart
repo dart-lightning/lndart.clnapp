@@ -18,7 +18,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-  int _currentIndex = 0;
+  int _currentIndex = 1;
 
   int amountSat = 0;
 
@@ -28,17 +28,6 @@ class _HomeViewState extends State<HomeView> {
     const Text("profile"),
     SettingView(provider: widget.provider),
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    getamountMsat().then((amount) => {
-          setState(() {
-            amountSat = amount;
-          }),
-        });
-    _currentIndex = 1;
-  }
 
   Widget _buildInfoView(
       {required BuildContext context, required AppGetInfo getInfo}) {
@@ -134,12 +123,6 @@ class _HomeViewState extends State<HomeView> {
 
     /// FIXME: sort the payments list
     return listPayments;
-  }
-
-  Future<int> getamountMsat() async {
-    final channelsList = await widget.provider.get<AppApi>().listFunds();
-
-    return channelsList!.channelSats.toInt();
   }
 
   Widget _buildSpecificPaymentView(
