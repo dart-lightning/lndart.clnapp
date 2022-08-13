@@ -17,11 +17,14 @@ void main() async {
   provider.registerLazyDependence<AppApi>(() {
     return CLNApi(
         mode: ClientMode.grpc,
-        client: ClientProvider.getClient(mode: ClientMode.grpc, opts: {
-          'certificatePath': certificateDir,
-          'host': 'localhost',
-          'port': 8001,
-        }));
+        client: ClientProvider.getClient(
+            testing: true,
+            mode: ClientMode.grpc,
+            opts: {
+              'certificatePath': certificateDir,
+              'host': 'localhost',
+              'port': 8001,
+            }));
   });
 
   group('clnapp gRPC_client tests', () {

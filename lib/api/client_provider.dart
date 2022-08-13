@@ -35,7 +35,12 @@ extension ClientModeClass on ClientMode {
 
 class ClientProvider {
   static LightningClient getClient(
-      {required ClientMode mode, Map<String, dynamic> opts = const {}}) {
+      {required ClientMode mode,
+      Map<String, dynamic> opts = const {},
+      bool testing = false}) {
+    if (testing) {
+      return ClientProvider._buildClient(mode: mode, opts: opts);
+    }
     var supportedPlatform = ClientProvider.getClientByDefPlatform();
     if (defaultTargetPlatform == TargetPlatform.iOS ||
         defaultTargetPlatform == TargetPlatform.android) {
