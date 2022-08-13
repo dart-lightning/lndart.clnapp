@@ -7,11 +7,12 @@ class AppListInvoices {
   AppListInvoices({this.invoice = const []});
 
   factory AppListInvoices.fromJSON(Map<String, dynamic> json,
-      {bool snackCase = false, bool msatFlag = false}) {
+      {bool snackCase = false, bool isObject = false}) {
     var invoices = json.withKey("invoices", snackCase: snackCase) as List;
     if (invoices.isNotEmpty) {
       var appInvoices = invoices
-          .map((invoice) => AppInvoice.fromJSON(invoice, snackCase: snackCase))
+          .map((invoice) => AppInvoice.fromJSON(invoice,
+              snackCase: snackCase, isObject: isObject))
           .toList();
       return AppListInvoices(invoice: appInvoices);
     } else {
@@ -56,14 +57,14 @@ class AppInvoice {
       this.identifier = "invoice"});
 
   factory AppInvoice.fromJSON(Map<String, dynamic> json,
-      {bool snackCase = false, bool msatFlag = false}) {
+      {bool snackCase = false, bool isObject = false}) {
     LogManager.getInstance.debug("$json");
     var bolt11 = json.withKey("bolt11", snackCase: snackCase) ??
         json.withKey("bolt12", snackCase: snackCase);
     var paymentHash = json.withKey("paymentHash", snackCase: snackCase);
     var status = json.withKey("status", snackCase: snackCase);
-    var received =
-        json.parseMsat(key: "amountReceivedMsat", snackCase: snackCase);
+    var received = json.parseMsat(
+        key: "amountReceivedMsat", snackCase: snackCase, isObject: isObject);
     received.toString();
     var paidAt = json.withKey("paidAt", snackCase: snackCase);
     var description = json.withKey("description", snackCase: snackCase);

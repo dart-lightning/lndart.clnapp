@@ -10,6 +10,12 @@ class AppProvider {
     GetIt.instance.registerLazySingleton<T>(factoryFunc);
   }
 
+  void unregisterDependence<T extends Object>() {
+    if (GetIt.instance.isRegistered<T>()) {
+      GetIt.instance.unregister<T>(instance: GetIt.instance.get<T>());
+    }
+  }
+
   T get<T extends Object>() => GetIt.instance.get<T>();
 
   /// Main init method to initialize the Provider of the application

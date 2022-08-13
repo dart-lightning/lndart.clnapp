@@ -1,9 +1,11 @@
-import 'package:clnapp/api/api.dart';
+import 'dart:convert';
+
 import 'package:clnapp/api/client_provider.dart';
-import 'package:clnapp/api/cln/cln_client.dart';
-import 'package:clnapp/constants/user_setting.dart';
+import 'package:clnapp/model/user_setting.dart';
 import 'package:clnapp/helper/settings/get_settings.dart';
 import 'package:clnapp/utils/app_provider.dart';
+import 'package:clnapp/utils/clear_setting.dart';
+import 'package:clnapp/utils/register_provider.dart';
 import 'package:clnapp/views/home/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -21,6 +23,9 @@ class SettingView extends StatefulWidget {
 class _SettingViewState extends State<SettingView> {
   late bool isLoading;
 
+  TextEditingController hostController = TextEditingController()
+    ..text = "localhost";
+
   Setting setting = Setting();
 
   @override
@@ -37,77 +42,25 @@ class _SettingViewState extends State<SettingView> {
 
   Future<String> pickDir() async {
     String? path = await FilePicker.platform.getDirectoryPath();
+    // FIXME: migrate the setting to null safety, use the null to avoid
+    // check on string
     path == null ? setting.path = "No path found" : setting.path = path;
     return setting.path;
   }
 
   Future<bool> saveSettings() async {
     final prefs = await SharedPreferences.getInstance();
-
-    clients.asMap().forEach((index, element) async {
-      if (setting.connectionType == element) {
-        await prefs.setInt('connectionClient', index);
-      }
-    });
-
-    await prefs.setString('selectedPath', setting.path);
-
-    await prefs.setString('host', setting.host);
-
-    await prefs.setString(
-        'nickName', setting.nickName.isEmpty ? "null" : setting.nickName);
-
+    await prefs.setString("setting", json.encode(setting.toJson()));
     return true;
   }
 
-  Widget _buildMainView({required BuildContext context}) {
-    return Padding(
-      padding: EdgeInsets.only(
-          left: MediaQuery.of(context).size.width * 0.2,
-          right: MediaQuery.of(context).size.width * 0.2),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          const Text("Connection type"),
-          InputDecorator(
-            decoration: const InputDecoration(border: OutlineInputBorder()),
-            child: DropdownButton(
-              value: setting.connectionType,
-              underline: const SizedBox(),
-              items: clients.map((String items) {
-                return DropdownMenuItem(
-                  value: items,
-                  child: Text(items),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  setting.connectionType = newValue!;
-                });
-              },
-            ),
-          ),
-          const Text("Node Nick Name "),
-          TextFormField(
-            onChanged: (name) {
-              setState(() {
-                setting.nickName = name;
-              });
-            },
-            initialValue: setting.nickName == "null" ? "" : setting.nickName,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: 'My lightning node',
-            ),
-          ),
+  Widget _buildGrpcSettingView({required BuildContext context}) {
+    return Wrap(
+        runSpacing: MediaQuery.of(context).size.height * 0.05,
+        children: <Widget>[
           Row(
             children: [
-              setting.connectionType == clients[0]
-                  ? const Text("TLS certificate directory path")
-                  : setting.connectionType == clients[1]
-                      ? const Text("lightning-rpc file path")
-                      : const Text("Lnlambda related file if any?"),
+              const Text("TLS certificate directory path"),
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.1,
               ),
@@ -128,61 +81,177 @@ class _SettingViewState extends State<SettingView> {
           ),
           const Text("Host"),
           TextFormField(
+            controller: hostController,
             onChanged: (text) {
               setState(() {
                 setting.host = text;
               });
             },
-            initialValue: setting.host,
             decoration: const InputDecoration(
               border: OutlineInputBorder(),
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              if (setting.path != "No path found") {
-                setState(() {
-                  isLoading = true;
-                });
-                saveSettings().then((value) => {
-                      isLoading = false,
-                    });
-                widget.provider.registerLazyDependence<AppApi>(() {
-                  if (setting.connectionType == clients[0]) {
-                    return CLNApi(
-                        mode: ClientMode.grpc,
-                        client: ClientProvider.getClient(
-                            mode: ClientMode.grpc,
-                            opts: {
-                              ///FIXME: make a login page and take some path as input
-                              'certificatePath': setting.path,
-                              'host': setting.host,
-                              'port': 8001,
-                            }));
-                  } else {
-                    return CLNApi(
-                        mode: ClientMode.unixSocket,
+        ]);
+  }
 
-                        ///FIXME: make a login page and take some path as input
-                        client: ClientProvider.getClient(
-                            mode: ClientMode.unixSocket,
-                            opts: {
-                              // include the path if you want use the unix socket. N.B it is broken!
-                              'path': "${setting.path}/lightning-rpc",
-                            }));
-                  }
-                });
-                Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                        builder: (context) => HomeView(
-                              provider: widget.provider,
-                            )),
-                    (Route<dynamic> route) => false);
-              }
-            },
-            child: const Text("Save"),
+  Widget _buildUnixSettingView({required BuildContext context}) {
+    return Wrap(
+        runSpacing: MediaQuery.of(context).size.height * 0.05,
+        children: <Widget>[
+          Row(
+            children: [
+              const Text("lightning-rpc file path"),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.1,
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    pickDir().then((value) => {
+                          setState(() {
+                            setting.path = value;
+                          }),
+                        });
+                  },
+                  child: const Text('Browser')),
+            ],
           ),
-        ],
+          InputDecorator(
+            decoration: const InputDecoration(border: OutlineInputBorder()),
+            child: Text(setting.path),
+          ),
+        ]);
+  }
+
+  Widget _buildLnlambdaSettingView({required BuildContext context}) {
+    return Wrap(
+        runSpacing: MediaQuery.of(context).size.height * 0.05,
+        children: <Widget>[
+          const Text("Node ID"),
+          TextFormField(
+            onChanged: (text) {
+              setState(() {
+                setting.nodeId = text;
+              });
+            },
+            decoration: const InputDecoration(
+              label: Text("node Id"),
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const Text("Host"),
+          TextFormField(
+            onChanged: (text) {
+              setState(() {
+                setting.host = text;
+              });
+            },
+            decoration: const InputDecoration(
+              label: Text("host"),
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const Text("Lambda Server"),
+          TextFormField(
+            onChanged: (text) {
+              setState(() {
+                setting.lambdaServer = text;
+              });
+            },
+            decoration: const InputDecoration(
+              label: Text("lnlambda server url"),
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const Text("Rune"),
+          TextFormField(
+            onChanged: (text) {
+              setState(() {
+                setting.rune = text;
+              });
+            },
+            decoration: const InputDecoration(
+              label: Text("rune"),
+              border: OutlineInputBorder(),
+            ),
+          ),
+        ]);
+  }
+
+  Widget _buildCorrectSettingView(
+      {required BuildContext context, required Setting setting}) {
+    switch (setting.clientMode) {
+      case ClientMode.grpc:
+        return _buildGrpcSettingView(context: context);
+      case ClientMode.unixSocket:
+        return _buildUnixSettingView(context: context);
+      case ClientMode.lnlambda:
+        return _buildLnlambdaSettingView(context: context);
+    }
+  }
+
+  Widget _buildMainView({required BuildContext context}) {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.only(
+            left: MediaQuery.of(context).size.width * 0.2,
+            right: MediaQuery.of(context).size.width * 0.2),
+        child: Wrap(
+          runSpacing: MediaQuery.of(context).size.height * 0.05,
+          children: [
+            const Text("Connection type"),
+            InputDecorator(
+              decoration: const InputDecoration(border: OutlineInputBorder()),
+              child: DropdownButton(
+                value: setting.clientMode,
+                underline: const SizedBox(),
+                items: clients.map((ClientMode items) {
+                  return DropdownMenuItem(
+                    value: items,
+                    child: Text(items.toString()),
+                  );
+                }).toList(),
+                onChanged: (ClientMode? newValue) {
+                  setState(() {
+                    setting.clientMode = newValue!;
+                  });
+                },
+              ),
+            ),
+            _buildCorrectSettingView(context: context, setting: setting),
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    if (setting.isValid()) {
+                      saveSettings();
+                      RegisterProvider.registerClientFromSetting(
+                          setting, widget.provider);
+                      Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (context) => HomeView(
+                                    provider: widget.provider,
+                                  )),
+                          (Route<dynamic> route) => false);
+                    }
+                  },
+                  child: const Text("Save"),
+                ),
+                const Spacer(),
+                ElevatedButton(
+                  onPressed: () async {
+                    await ClearSetting.clear(provider: widget.provider)
+                        .then((value) {
+                      setState(() {
+                        setting = value;
+                      });
+                    });
+                  },
+                  child: const Text("Clear"),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

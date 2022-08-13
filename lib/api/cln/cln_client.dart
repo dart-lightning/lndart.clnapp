@@ -30,6 +30,9 @@ class CLNApi extends AppApi {
       case ClientMode.unixSocket:
         params = CLNGetInfoRequest(unixRequest: <String, dynamic>{});
         break;
+      case ClientMode.lnlambda:
+        params = CLNGetInfoRequest(unixRequest: <String, dynamic>{});
+        break;
     }
     return await client.call<CLNGetInfoRequest, AppGetInfo>(
         method: "getinfo",
@@ -48,6 +51,9 @@ class CLNApi extends AppApi {
             CLNListTransactionRequest(grpcRequest: ListtransactionsRequest());
         break;
       case ClientMode.unixSocket:
+        params = CLNListTransactionRequest(unixRequest: <String, dynamic>{});
+        break;
+      case ClientMode.lnlambda:
         params = CLNListTransactionRequest(unixRequest: <String, dynamic>{});
         break;
     }
@@ -69,6 +75,9 @@ class CLNApi extends AppApi {
       case ClientMode.unixSocket:
         params = CLNListFundsRequest(unixRequest: <String, dynamic>{});
         break;
+      case ClientMode.lnlambda:
+        params = CLNListFundsRequest(unixRequest: <String, dynamic>{});
+        break;
     }
     return client.call<CLNListFundsRequest, AppListFunds?>(
         method: "listfunds",
@@ -76,7 +85,8 @@ class CLNApi extends AppApi {
         onDecode: (jsonResponse) {
           LogManager.getInstance.debug("Grpc list funds call $jsonResponse");
           return AppListFunds.fromJSON(jsonResponse as Map<String, dynamic>,
-              snackCase: mode == ClientMode.unixSocket);
+              snackCase: mode == ClientMode.unixSocket,
+              isObject: mode.hashMsatAsObj());
         });
   }
 
@@ -90,13 +100,17 @@ class CLNApi extends AppApi {
       case ClientMode.unixSocket:
         params = CLNListInvoicesRequest(unixRequest: <String, dynamic>{});
         break;
+      case ClientMode.lnlambda:
+        params = CLNListInvoicesRequest(unixRequest: <String, dynamic>{});
+        break;
     }
     return client.call<CLNListInvoicesRequest, AppListInvoices>(
         method: "listinvoices",
         params: params,
         onDecode: (jsonResponse) => AppListInvoices.fromJSON(
             jsonResponse as Map<String, dynamic>,
-            snackCase: mode == ClientMode.unixSocket));
+            snackCase: mode == ClientMode.unixSocket,
+            isObject: mode.hashMsatAsObj()));
   }
 
   @override
@@ -110,10 +124,22 @@ class CLNApi extends AppApi {
           Amount? amount = Amount();
           amount.msat = Int64(msat);
           params = CLNPayRequest(
-              grpcRequest: PayRequest(bolt11: invoice, msatoshi: amount));
+              grpcRequest: PayRequest(bolt11: invoice, amountMsat: amount));
         }
         break;
       case ClientMode.unixSocket:
+        if (msat != null) {
+          params = CLNPayRequest(unixRequest: <String, dynamic>{
+            'bolt11': invoice,
+            'msatoshi': "${msat}msat"
+          });
+        } else {
+          params = CLNPayRequest(unixRequest: <String, dynamic>{
+            'bolt11': invoice,
+          });
+        }
+        break;
+      case ClientMode.lnlambda:
         if (msat != null) {
           params = CLNPayRequest(unixRequest: <String, dynamic>{
             'bolt11': invoice,
