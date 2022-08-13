@@ -11,7 +11,6 @@ List<ClientMode> clients = [
 
 @JsonSerializable(includeIfNull: false)
 class Setting {
-  String? nickName;
   ClientMode clientMode;
   String host;
   String path;
@@ -20,8 +19,7 @@ class Setting {
   String rune;
 
   Setting(
-      {this.nickName = "null",
-      this.clientMode = ClientMode.grpc,
+      {this.clientMode = ClientMode.grpc,
       this.host = "localhost",
       this.path = "No path found",
       this.nodeId = "No node id",

@@ -4,6 +4,7 @@ import 'package:clnapp/api/client_provider.dart';
 import 'package:clnapp/model/user_setting.dart';
 import 'package:clnapp/helper/settings/get_settings.dart';
 import 'package:clnapp/utils/app_provider.dart';
+import 'package:clnapp/utils/clear_setting.dart';
 import 'package:clnapp/utils/register_provider.dart';
 import 'package:clnapp/views/home/home_view.dart';
 import 'package:flutter/material.dart';
@@ -21,8 +22,6 @@ class SettingView extends StatefulWidget {
 
 class _SettingViewState extends State<SettingView> {
   late bool isLoading;
-
-  TextEditingController nickNameController = TextEditingController()..text = "";
 
   TextEditingController hostController = TextEditingController()
     ..text = "localhost";
@@ -218,19 +217,6 @@ class _SettingViewState extends State<SettingView> {
                 },
               ),
             ),
-            const Text("Node Nick Name "),
-            TextFormField(
-              controller: nickNameController,
-              onChanged: (name) {
-                setState(() {
-                  setting.nickName = name;
-                });
-              },
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'My lightning node',
-              ),
-            ),
             _buildCorrectSettingView(context: context, setting: setting),
             Row(
               children: [
@@ -238,8 +224,8 @@ class _SettingViewState extends State<SettingView> {
                   onPressed: () {
                     if (setting.isValid()) {
                       saveSettings();
-                      RegisterProvider
-                          .registerClientFromSetting(setting, widget.provider);
+                      RegisterProvider.registerClientFromSetting(
+                          setting, widget.provider);
                       Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
                               builder: (context) => HomeView(
@@ -253,15 +239,12 @@ class _SettingViewState extends State<SettingView> {
                 const Spacer(),
                 ElevatedButton(
                   onPressed: () async {
-                    final prefs = await SharedPreferences.getInstance();
-                    prefs.remove("setting");
-                    getSettingsInfo().then((value) => {
-                          setState(() {
-                            setting = value;
-                            nickNameController.clear();
-                            hostController.text = "localhost";
-                          }),
-                        });
+                    await ClearSetting.clear(provider: widget.provider)
+                        .then((value) {
+                      setState(() {
+                        setting = value;
+                      });
+                    });
                   },
                   child: const Text("Clear"),
                 ),

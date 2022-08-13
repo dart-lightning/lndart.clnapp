@@ -7,7 +7,6 @@ part of 'user_setting.dart';
 // **************************************************************************
 
 Setting _$SettingFromJson(Map<String, dynamic> json) => Setting(
-      nickName: json['nickName'] as String? ?? "null",
       clientMode:
           $enumDecodeNullable(_$ClientModeEnumMap, json['clientMode']) ??
               ClientMode.grpc,
@@ -18,24 +17,14 @@ Setting _$SettingFromJson(Map<String, dynamic> json) => Setting(
       rune: json['rune'] as String? ?? "No rune",
     );
 
-Map<String, dynamic> _$SettingToJson(Setting instance) {
-  final val = <String, dynamic>{};
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('nickName', instance.nickName);
-  val['clientMode'] = _$ClientModeEnumMap[instance.clientMode]!;
-  val['host'] = instance.host;
-  val['path'] = instance.path;
-  val['nodeId'] = instance.nodeId;
-  val['lambdaServer'] = instance.lambdaServer;
-  val['rune'] = instance.rune;
-  return val;
-}
+Map<String, dynamic> _$SettingToJson(Setting instance) => <String, dynamic>{
+      'clientMode': _$ClientModeEnumMap[instance.clientMode]!,
+      'host': instance.host,
+      'path': instance.path,
+      'nodeId': instance.nodeId,
+      'lambdaServer': instance.lambdaServer,
+      'rune': instance.rune,
+    };
 
 const _$ClientModeEnumMap = {
   ClientMode.unixSocket: 'unixSocket',
