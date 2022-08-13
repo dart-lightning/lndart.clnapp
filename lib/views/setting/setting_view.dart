@@ -19,9 +19,7 @@ class SettingView extends StatefulWidget {
 }
 
 class _SettingViewState extends State<SettingView> {
-  TextEditingController hostController = TextEditingController()
-    ..text = "localhost";
-
+  // FIXME: move in a util function
   Future<String> pickDir() async {
     final setting = widget.provider.get<Setting>();
     String? path = await FilePicker.platform.getDirectoryPath();
@@ -29,10 +27,10 @@ class _SettingViewState extends State<SettingView> {
     return setting.path!;
   }
 
-  Future<bool> saveSettings() async {
-    final setting = widget.provider.get<Setting>();
+  Future<bool> saveSettings({required Setting setting}) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("setting", json.encode(setting.toJson()));
+    widget.provider.overrideDependence(setting);
     return true;
   }
 
@@ -60,7 +58,7 @@ class _SettingViewState extends State<SettingView> {
           ),
           const Text("Host"),
           TextFormField(
-            controller: hostController,
+            controller: TextEditingController(text: setting.host ?? ''),
             onChanged: (text) {
               setting.host = text;
             },
@@ -194,7 +192,7 @@ class _SettingViewState extends State<SettingView> {
                 ElevatedButton(
                   onPressed: () async {
                     if (setting.isValid()) {
-                      await saveSettings();
+                      await saveSettings(setting: setting);
                       await ManagerAPIProvider.registerClientFromSetting(
                           setting, widget.provider);
                       // https://stackoverflow.com/questions/68871880/do-not-use-buildcontexts-across-async-gaps
