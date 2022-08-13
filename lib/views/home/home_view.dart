@@ -19,15 +19,13 @@ class HomeView extends StatefulAppView {
 }
 
 class _HomeViewState extends State<HomeView> {
-  int _currentIndex = 1;
+  int _currentIndex = 0;
 
   // FIXME: add an amount calculation for the channels!
   int amountSat = 0;
 
   late final pages = [
-    const Text("Info"),
     _buildMainView(context: context),
-    const Text("profile"),
     SettingView(provider: widget.provider),
   ];
 
@@ -39,7 +37,7 @@ class _HomeViewState extends State<HomeView> {
         width: MediaQuery.of(context).size.width,
         child: Column(children: [
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.1,
+            height: MediaQuery.of(context).size.height * 0.005,
           ),
           Container(
             alignment: Alignment.centerLeft,
@@ -183,20 +181,19 @@ class _HomeViewState extends State<HomeView> {
                               Icons.shopping_bag_outlined,
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20, top: 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  snapshot.data![index].identifier == "invoice"
-                                      ? snapshot.data![index].label
-                                      : snapshot.data![index].txId,
-                                  style: const TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500),
+                          Expanded(
+                            child: Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                snapshot.data![index].identifier == "invoice"
+                                    ? snapshot.data![index].label
+                                    : snapshot.data![index].txId,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                              ],
+                            ),
                             ),
                           ),
                         ],
@@ -275,22 +272,8 @@ class _HomeViewState extends State<HomeView> {
       items: <BottomNavyBarItem>[
         // FIXME: move this inside an Item view
         BottomNavyBarItem(
-          icon: const Icon(Icons.data_usage_outlined),
-          title: const Text('Info'),
-          textAlign: TextAlign.center,
-          activeColor: Theme.of(context).toggleableActiveColor,
-          inactiveColor: Theme.of(context).highlightColor,
-        ),
-        BottomNavyBarItem(
           icon: const Icon(Icons.home_filled),
           title: const Text('Home'),
-          textAlign: TextAlign.center,
-          activeColor: Theme.of(context).toggleableActiveColor,
-          inactiveColor: Theme.of(context).highlightColor,
-        ),
-        BottomNavyBarItem(
-          icon: const Icon(Icons.perm_identity),
-          title: const Text('Profile'),
           textAlign: TextAlign.center,
           activeColor: Theme.of(context).toggleableActiveColor,
           inactiveColor: Theme.of(context).highlightColor,
@@ -309,6 +292,13 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("CLN App"),
+        centerTitle: false,
+        primary: true,
+        elevation: 0,
+        leading: Container(),
+      ),
       body: pages[_currentIndex],
       bottomNavigationBar: _buildBottomNavigation(),
     );
