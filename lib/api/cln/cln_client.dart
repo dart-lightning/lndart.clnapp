@@ -22,24 +22,27 @@ class CLNApi extends AppApi {
 
   @override
   Future<AppGetInfo> getInfo() async {
-    dynamic params;
+    dynamic getInfoParams;
     switch (mode) {
       case ClientMode.grpc:
-        params = CLNGetInfoRequest(grpcRequest: GetinfoRequest());
+        getInfoParams = CLNGetInfoRequest(grpcRequest: GetinfoRequest());
         break;
       case ClientMode.unixSocket:
-        params = CLNGetInfoRequest(unixRequest: <String, dynamic>{});
+        getInfoParams = CLNGetInfoRequest(unixRequest: <String, dynamic>{});
         break;
       case ClientMode.lnlambda:
-        params = CLNGetInfoRequest(unixRequest: <String, dynamic>{});
+        getInfoParams = CLNGetInfoRequest(unixRequest: <String, dynamic>{});
         break;
     }
-    return await client.call<CLNGetInfoRequest, AppGetInfo>(
+    var appInfo = await client.call<CLNGetInfoRequest, AppGetInfo>(
         method: "getinfo",
-        params: params,
+        params: getInfoParams,
         onDecode: (jsonResponse) => AppGetInfo.fromJSON(
             jsonResponse as Map<String, dynamic>,
             snackCase: !mode.withCamelCase()));
+    var listFunds = await this.listFunds();
+    appInfo.totOffChainMsat = listFunds?.totOffChainMsat ?? 0;
+    return appInfo;
   }
 
   @override

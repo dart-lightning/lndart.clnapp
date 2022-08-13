@@ -6,19 +6,20 @@ class AppListFunds {
 
   List<AppFundChannel> fundChannels;
 
-  int channelSats;
+  int totOffChainMsat;
 
   AppListFunds(
       {this.fund = const [],
       this.fundChannels = const [],
-      this.channelSats = 0});
+      this.totOffChainMsat = 0});
 
   factory AppListFunds.fromJSON(Map<String, dynamic> json,
       {bool snackCase = false, bool isObject = false}) {
     LogManager.getInstance.debug("Full listfunds json received: $json");
     var funds = json.withKey("outputs", snackCase: snackCase) as List;
-    LogManager.getInstance.debug("$funds");
+    LogManager.getInstance.debug("Funds: $funds");
     var fundChannels = json.withKey("channels", snackCase: snackCase) as List;
+    LogManager.getInstance.debug("Channels: $fundChannels");
     double totalChannelsAmount = 0;
     for (var rawChannel in fundChannels) {
       var channel = Map<String, dynamic>.from(rawChannel);
@@ -32,7 +33,7 @@ class AppListFunds {
     /// converting Msat to sat
     totalChannelsAmount /= 1000;
 
-    if (funds.isNotEmpty) {
+    if (funds.isNotEmpty || fundChannels.isNotEmpty) {
       var appFunds = funds
           .map((fund) =>
               AppFund.fromJSON(fund, snackCase: snackCase, isObject: isObject))
@@ -44,7 +45,7 @@ class AppListFunds {
       return AppListFunds(
           fund: appFunds,
           fundChannels: appFundChannels,
-          channelSats: totalChannelsAmount.toInt());
+          totOffChainMsat: totalChannelsAmount.toInt());
     } else {
       return AppListFunds();
     }
