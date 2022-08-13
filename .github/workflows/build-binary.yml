@@ -30,13 +30,22 @@ jobs:
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          filename: MacRecoveryX-${{github.ref_name}}-linux.zip
-          directory: build/linux/x64/release/bundle
+          filename: clnapp-${{github.ref_name}}-linux.zip
+          directory: build/linux
       - name: Upload Linux Binary
         uses: actions/upload-artifact@v2
         with:
           name: cln.app-linux
-          path: build/linux/x64/release/bundle/clnapp-${{github.ref_name}}-linux.zip
+          path: build/linux/clnapp-${{github.ref_name}}-linux.zip
+      - uses: montudor/action-zip@v1
+        with:
+          args: zip -qq -r clnapp-${{github.ref_name}}-linux.zip bundle
+          working-directory: build/linux/x64/release/
+      - name: Upload linux Binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: cln.app-linux
+          files: build/linux/x64/release/clnapp-${{github.ref_name}}-linux.zip
 
   build-and-release-windows:
     runs-on: windows-latest
@@ -55,17 +64,15 @@ jobs:
         run: flutter config --enable-windows-desktop
       - name: Build artifacts
         run: flutter build windows --release
-      - name: Archive Release
-        uses: thedoctor0/zip-release@master
+      - uses: montudor/action-zip@v1
         with:
-          type: 'zip'
-          filename: MacRecoveryX-${{github.ref_name}}-windows.zip
-          directory: build/windows/runner/Release
-      - name: Upload Windows Binary
+          args: zip -qq -r clnapp-${{github.ref_name}}-windows.zip bundle
+          working-directory: build/windows/x64/release/
+      - name: Upload windows Binary
         uses: actions/upload-artifact@v2
         with:
           name: cln.app-windows
-          files: build/windows/runner/Release/clnapp-${{github.ref_name}}-windows.zip
+          files: build/windows/x64/release/clnapp-${{github.ref_name}}-windows.zip
 
   build-and-release-macos:
     runs-on: macos-latest
@@ -84,17 +91,15 @@ jobs:
         run: flutter config --enable-macos-desktop
       - name: Build artifacts
         run: flutter build macos --release
-      - name: Archive Release
-        uses: thedoctor0/zip-release@master
+      - uses: montudor/action-zip@v1
         with:
-          type: 'zip'
-          filename: clnapp-${{github.ref_name}}-macos.zip
-          directory: build/macos/Build/Products/Release
+          args: zip -qq -r clnapp-${{github.ref_name}}-macos.zip bundle
+          working-directory: build/macos/x64/release/
       - name: Upload Macos Binary
         uses: actions/upload-artifact@v2
         with:
           name: cln.app-macos
-          files: build/macos/Build/Products/Release/clnapp-${{github.ref_name}}-macos.zip
+          files: build/macos/x64/release/clnapp-${{github.ref_name}}-macos.zip
 
   build-and-release-android:
     runs-on: ubuntu-latest
