@@ -26,26 +26,11 @@ jobs:
         run: flutter config --enable-linux-desktop
       - name: Build artifacts
         run: flutter build linux --release
-      - name: Archive Release
-        uses: thedoctor0/zip-release@master
-        with:
-          type: 'zip'
-          filename: clnapp-${{github.ref_name}}-linux.zip
-          directory: build/linux
-      - name: Upload Linux Binary
-        uses: actions/upload-artifact@v2
-        with:
-          name: cln.app-linux
-          path: build/linux/clnapp-${{github.ref_name}}-linux.zip
-      - uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -r clnapp-${{github.ref_name}}-linux.zip bundle
-          working-directory: build/linux/x64/release/
       - name: Upload linux Binary
         uses: actions/upload-artifact@v2
         with:
           name: cln.app-linux
-          files: build/linux/x64/release/clnapp-${{github.ref_name}}-linux.zip
+          path: build/linux/x64/release/bundle
 
   build-and-release-windows:
     runs-on: windows-latest
@@ -58,21 +43,15 @@ jobs:
           channel: 'stable'
       - name: Install project dependencies
         run: flutter pub get
-      - name: Generate intermediates
-        run: flutter pub run build_runner build --delete-conflicting-outputs
       - name: Enable windows build
         run: flutter config --enable-windows-desktop
       - name: Build artifacts
         run: flutter build windows --release
-      - uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -r clnapp-${{github.ref_name}}-windows.zip bundle
-          working-directory: build/windows/x64/release/
       - name: Upload windows Binary
         uses: actions/upload-artifact@v2
         with:
           name: cln.app-windows
-          files: build/windows/x64/release/clnapp-${{github.ref_name}}-windows.zip
+          path: build/windows/x64/release/bundle
 
   build-and-release-macos:
     runs-on: macos-latest
@@ -85,21 +64,15 @@ jobs:
           channel: 'stable'
       - name: Install project dependencies
         run: flutter pub get
-      - name: Generate intermediates
-        run: flutter pub run build_runner build --delete-conflicting-outputs
       - name: Enable macOS build
         run: flutter config --enable-macos-desktop
       - name: Build artifacts
         run: flutter build macos --release
-      - uses: montudor/action-zip@v1
-        with:
-          args: zip -qq -r clnapp-${{github.ref_name}}-macos.zip bundle
-          working-directory: build/macos/x64/release/
       - name: Upload Macos Binary
         uses: actions/upload-artifact@v2
         with:
           name: cln.app-macos
-          files: build/macos/x64/release/clnapp-${{github.ref_name}}-macos.zip
+          path: build/macos/x64/release/bundle
 
   build-and-release-android:
     runs-on: ubuntu-latest
