@@ -36,7 +36,7 @@ void main() async {
       final fundsList = await provider.get<AppApi>().listFunds();
       expect(fundsList, isNotNull);
       expect(fundsList!.fund, isNotNull);
-      expect(fundsList.channelSats, isNotNull);
+      expect(fundsList.totOffChainMsat, isNotNull);
       expect(fundsList.fundChannels, isNotNull);
     });
 

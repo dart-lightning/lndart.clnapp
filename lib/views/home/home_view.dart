@@ -21,9 +21,6 @@ class HomeView extends StatefulAppView {
 class _HomeViewState extends State<HomeView> {
   int _currentIndex = 0;
 
-  // FIXME: add an amount calculation for the channels!
-  int amountSat = 0;
-
   late final pages = [
     _buildMainView(context: context),
     SettingView(provider: widget.provider),
@@ -57,7 +54,7 @@ class _HomeViewState extends State<HomeView> {
             height: 18,
           ),
           Text(
-            "${amountSat.toString()} sats",
+            "${getInfo.totOffChainMsat} sats",
             style: const TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
           ),
           Row(
@@ -193,7 +190,7 @@ class _HomeViewState extends State<HomeView> {
                                   fontSize: 15,
                                   fontWeight: FontWeight.w500,
                                 ),
-                            ),
+                              ),
                             ),
                           ),
                         ],

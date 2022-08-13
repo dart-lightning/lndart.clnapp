@@ -10,6 +10,8 @@ class AppGetInfo {
   /// Alias of the node
   final String alias;
 
+  int totOffChainMsat = 0;
+
   AppGetInfo({required this.nodeId, required this.alias});
 
   factory AppGetInfo.fromJSON(Map<String, dynamic> json,
