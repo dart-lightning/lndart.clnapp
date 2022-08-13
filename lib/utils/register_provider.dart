@@ -1,23 +1,23 @@
-import 'package:clnapp/api/api.dart';
 import 'package:clnapp/api/client_provider.dart';
 import 'package:clnapp/api/cln/cln_client.dart';
 import 'package:clnapp/model/user_setting.dart';
 import 'package:clnapp/utils/app_provider.dart';
-import 'package:clnapp/utils/unregister_provider.dart';
-import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class RegisterProvider {
+class ManagerAPIProvider {
   static void registerClientFromSetting(Setting setting, AppProvider provider) {
     if (setting.isValid()) {
-      if (GetIt.instance.isRegistered<AppApi>()) {
-        UnregisterProvider.unregisterClientFromSetting(provider);
-      }
-      provider.registerLazyDependence<AppApi>(() {
-        return CLNApi(
-            mode: setting.clientMode,
-            client: ClientProvider.getClient(
-                mode: setting.clientMode, opts: setting.toOpts()));
-      });
+      var api = CLNApi(
+          mode: setting.clientMode,
+          client: ClientProvider.getClient(
+              mode: setting.clientMode, opts: setting.toOpts()));
+      provider.overrideDependence(api);
     }
+  }
+
+  static Future<void> clear({required AppProvider provider}) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove("setting");
+    provider.overrideDependence(Setting());
   }
 }

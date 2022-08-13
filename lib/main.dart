@@ -10,32 +10,25 @@ import 'package:trash_themes/themes.dart';
 
 Future<void> main() async {
   var provider = await AppProvider().init();
+  Setting setting = await getSettingsInfo(provider: provider);
+  ManagerAPIProvider.registerClientFromSetting(setting, provider);
 
-  //FIXME: put the setting inside the APIProvider
-  Setting setting = Setting();
-
-  await getSettingsInfo().then((value) => {
-        setting = value,
-      });
-
-  RegisterProvider.registerClientFromSetting(setting, provider);
-
-  runApp(CLNApp(provider: provider, setting: setting));
+  runApp(CLNApp(provider: provider));
 }
 
 class CLNApp extends AppView {
-  const CLNApp(
-      {Key? key, required AppProvider provider, required Setting setting})
-      : super(key: key, provider: provider, setting: setting);
+  const CLNApp({Key? key, required AppProvider provider})
+      : super(key: key, provider: provider);
 
   @override
   Widget build(BuildContext context) {
+    var setting = provider.get<Setting>();
     return MaterialApp(
       title: 'CLN App',
       themeMode: ThemeMode.dark,
       theme: DraculaTheme().makeDarkTheme(context: context),
       debugShowCheckedModeBanner: false,
-      home: setting.path != "No path found"
+      home: setting.isValid()
           ? HomeView(provider: provider)
           : SettingView(provider: provider),
     );

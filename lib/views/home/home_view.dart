@@ -20,6 +20,7 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   int _currentIndex = 1;
 
+  // FIXME: add an amount calculation for the channels!
   int amountSat = 0;
 
   late final pages = [
