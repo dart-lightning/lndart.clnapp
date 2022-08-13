@@ -17,9 +17,12 @@ void main() async {
   provider.registerLazyDependence<AppApi>(() {
     return CLNApi(
         mode: ClientMode.unixSocket,
-        client: ClientProvider.getClient(mode: ClientMode.unixSocket, opts: {
-          'path': lightningRPC,
-        }));
+        client: ClientProvider.getClient(
+            testing: true,
+            mode: ClientMode.unixSocket,
+            opts: {
+              'path': lightningRPC,
+            }));
   });
 
   group('clnapp unix_client tests', () {
