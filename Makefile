@@ -17,7 +17,7 @@ clean:
 	$(CC) clean
 
 dep:
-	$(CC) pub upgrade --major-versions
+	$(CC) pub upgrade
 
 gen:
 	$(CC) pub run build_runner build --delete-conflicting-outputs;
