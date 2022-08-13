@@ -2,9 +2,7 @@ import 'dart:convert';
 
 import 'package:clnapp/api/client_provider.dart';
 import 'package:clnapp/model/user_setting.dart';
-import 'package:clnapp/helper/settings/get_settings.dart';
 import 'package:clnapp/utils/app_provider.dart';
-import 'package:clnapp/utils/clear_setting.dart';
 import 'package:clnapp/utils/register_provider.dart';
 import 'package:clnapp/views/home/home_view.dart';
 import 'package:flutter/material.dart';
@@ -26,23 +24,22 @@ class _SettingViewState extends State<SettingView> {
   TextEditingController hostController = TextEditingController()
     ..text = "localhost";
 
-  Setting setting = Setting();
-
   Future<String> pickDir() async {
+    final setting = widget.provider.get<Setting>();
     String? path = await FilePicker.platform.getDirectoryPath();
-    // FIXME: migrate the setting to null safety, use the null to avoid
-    // check on string
-    path == null ? setting.path = "No path found" : setting.path = path;
+    setting.path = path ?? "No path found";
     return setting.path;
   }
 
   Future<bool> saveSettings() async {
+    final setting = widget.provider.get<Setting>();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("setting", json.encode(setting.toJson()));
     return true;
   }
 
   Widget _buildGrpcSettingView({required BuildContext context}) {
+    final setting = widget.provider.get<Setting>();
     return Wrap(
         runSpacing: MediaQuery.of(context).size.height * 0.05,
         children: <Widget>[
@@ -53,12 +50,8 @@ class _SettingViewState extends State<SettingView> {
                 width: MediaQuery.of(context).size.width * 0.1,
               ),
               ElevatedButton(
-                  onPressed: () {
-                    pickDir().then((value) => {
-                          setState(() {
-                            setting.path = value;
-                          }),
-                        });
+                  onPressed: () async {
+                    await pickDir();
                   },
                   child: const Text('Browser')),
             ],
@@ -83,6 +76,7 @@ class _SettingViewState extends State<SettingView> {
   }
 
   Widget _buildUnixSettingView({required BuildContext context}) {
+    final setting = widget.provider.get<Setting>();
     return Wrap(
         runSpacing: MediaQuery.of(context).size.height * 0.05,
         children: <Widget>[
@@ -93,12 +87,8 @@ class _SettingViewState extends State<SettingView> {
                 width: MediaQuery.of(context).size.width * 0.1,
               ),
               ElevatedButton(
-                  onPressed: () {
-                    pickDir().then((value) => {
-                          setState(() {
-                            setting.path = value;
-                          }),
-                        });
+                  onPressed: () async {
+                    await pickDir();
                   },
                   child: const Text('Browser')),
             ],
@@ -111,6 +101,7 @@ class _SettingViewState extends State<SettingView> {
   }
 
   Widget _buildLnlambdaSettingView({required BuildContext context}) {
+    final setting = widget.provider.get<Setting>();
     return Wrap(
         runSpacing: MediaQuery.of(context).size.height * 0.05,
         children: <Widget>[
@@ -178,6 +169,7 @@ class _SettingViewState extends State<SettingView> {
   }
 
   Widget _buildMainView({required BuildContext context}) {
+    final setting = widget.provider.get<Setting>();
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.only(
@@ -212,7 +204,7 @@ class _SettingViewState extends State<SettingView> {
                   onPressed: () {
                     if (setting.isValid()) {
                       saveSettings();
-                      RegisterProvider.registerClientFromSetting(
+                      ManagerAPIProvider.registerClientFromSetting(
                           setting, widget.provider);
                       Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
@@ -226,13 +218,8 @@ class _SettingViewState extends State<SettingView> {
                 ),
                 const Spacer(),
                 ElevatedButton(
-                  onPressed: () async {
-                    await ClearSetting.clear(provider: widget.provider)
-                        .then((value) {
-                      setState(() {
-                        setting = value;
-                      });
-                    });
+                  onPressed: () async => {
+                    await ManagerAPIProvider.clear(provider: widget.provider)
                   },
                   child: const Text("Clear"),
                 ),

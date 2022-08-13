@@ -1,3 +1,4 @@
+import 'package:clnapp/model/user_setting.dart';
 import 'package:get_it/get_it.dart';
 
 class AppProvider {
@@ -16,11 +17,19 @@ class AppProvider {
     }
   }
 
+  void overrideDependence<T extends Object>(T instance) {
+    if (GetIt.instance.isRegistered<T>()) {
+      unregisterDependence<T>();
+    }
+    registerDependence<T>(instance);
+  }
+
   T get<T extends Object>() => GetIt.instance.get<T>();
 
   /// Main init method to initialize the Provider of the application
   /// this will call from the framework
   Future<AppProvider> init() async {
+    registerDependence<Setting>(Setting(), eager: true);
     return this;
   }
 }
