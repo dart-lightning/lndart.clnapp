@@ -91,7 +91,7 @@ class ClientProvider {
         defaultTargetPlatform == TargetPlatform.macOS ||
         defaultTargetPlatform == TargetPlatform.windows) {
       // Some desktop specific code there
-      return {ClientMode.lnlambda, ClientMode.unixSocket, ClientMode.grpc};
+      return {ClientMode.lnlambda, ClientMode.grpc, ClientMode.unixSocket};
     } else {
       return {ClientMode.lnlambda};
     }

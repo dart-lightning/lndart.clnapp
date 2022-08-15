@@ -23,7 +23,9 @@ class _SettingViewState extends State<SettingView> {
   Future<String> pickDir() async {
     final setting = widget.provider.get<Setting>();
     String? path = await FilePicker.platform.getDirectoryPath();
-    setting.path = path ?? "No path found";
+    setState(() {
+      setting.path = path ?? "No path found";
+    });
     return setting.path!;
   }
 
@@ -159,7 +161,7 @@ class _SettingViewState extends State<SettingView> {
   }
 
   Widget _buildMainView({required BuildContext context}) {
-    final setting = widget.provider.get<Setting>();
+    var setting = widget.provider.get<Setting>();
     final clients = ClientProvider.getClientByDefPlatform();
     return SingleChildScrollView(
       child: Padding(
@@ -182,7 +184,9 @@ class _SettingViewState extends State<SettingView> {
                   );
                 }).toList(),
                 onChanged: (ClientMode? newValue) {
-                  setting.clientMode = newValue!;
+                  setState(() {
+                    setting.clientMode = newValue!;
+                  });
                 },
               ),
             ),
@@ -210,7 +214,10 @@ class _SettingViewState extends State<SettingView> {
                 const Spacer(),
                 ElevatedButton(
                   onPressed: () async => {
-                    await ManagerAPIProvider.clear(provider: widget.provider)
+                    await ManagerAPIProvider.clear(provider: widget.provider),
+                    setState(() {
+                      setting = setting;
+                    })
                   },
                   child: const Text("Clear"),
                 ),
