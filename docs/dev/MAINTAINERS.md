@@ -1,4 +1,4 @@
-# clnapp-flutter HACKING guide
+# lndart.clnapp HACKING guide
 
 ## Table of Content
 
@@ -9,7 +9,7 @@
 
 ## Introduction
 
-Welcome in the HACKING guide and how a day in a clnapp-flutter maintainer looks like.
+Welcome in the HACKING guide and how a day in a lndart.clnapp maintainer looks like.
 
 After this reading you should be ready to contribute to the repository and also be one of
 the next maintainer in the future if you would like!
@@ -48,8 +48,7 @@ but you can end up shaving infinite yaks. This is a good time to drop a `/* FIXM
 
 ## Commit Style
 
-The commit style is one of the more important concept to manage a monorepo like graphql-flutter, amd In particular
-the commit style are used to generate the changelog for the next release.
+The commit style is one of the more important concept to manage a repository like lndart.clnapp and in particular the commit style are used to generate the changelog for the next release.
 
 The commits will follow a dart community guideline with the following rules.
 
@@ -90,8 +89,9 @@ The version in our package.json gets copied to the one we publish, and users nee
 
 ### Scopes
 
-- **clnapp**: Changes related to the cln client
-- **clnapp_flutter**: Changes related to the clnapp_flutter package
+- **cln_client**: Changes related to the cln client
+- **clnapp**: Changes related to the clnapp view or for some app specific changes
+- **clnapp_flutter**: Changes related to the clnapp flutter package
 
 
 ### Subject
@@ -129,12 +129,7 @@ Signed-off-by: Vincenzo Palazzo <vincenzopalazzodev@gmail.com>
 
 ## How make the release
 
-This is the most funny part, and also is the most difficult one in a monorepo repository.
-
-In particular, clnapp-flutter has the possibility to release one single package at the time, or
-all together.
-
-To prepare the release the following steps are required:
+To prepare the release for lndart.clnapp the following steps are required:
 
 - Bump the version number in the package before the release, and the version inside the `changelog.json` in the package root;
 - Generate the changelog related to the package:
@@ -153,4 +148,4 @@ if we make a release with the tag `v{version_number}` this will release all the 
 
 Cheers!
 
-[Vincent](https://github.com/vincenzopalazzo)
+[Vincent](https://github.com/vincenzopalazzo) and [Kavan](https://github.com/KAVAN-DESAI)
