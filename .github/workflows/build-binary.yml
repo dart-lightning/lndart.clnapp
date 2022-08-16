@@ -70,7 +70,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: cln.app-macos
-          path: build/macos/x64/release/bundle
+          path: build/macos/Build/Products/Release/clnapp.app/Contents/MacOS
 
   build-and-release-android:
     runs-on: ubuntu-latest
