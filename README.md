@@ -4,7 +4,7 @@
   <img src="https://github.com/dart-lightning/icons/raw/main/main/res/mipmap-xxxhdpi/ic_launcher.png" />
 
   <p>
-    <strong> :dart: An app to manage core lightning node using multiple clients :dart: </strong>
+    <strong> :dart: Cross platform app to manage remotely and locally a core lightning node :dart: </strong>
   </p>
   
   <h4>
@@ -62,11 +62,13 @@ sudo git clone https://github.com/dart-lightning/lndart.clnapp.git
 - Get flutter dependencies
 
 ```bash
-flutter pub upgrade
-flutter pub get
+make dep
+make get
 ```
  
 #### Linux(desktop)
+
+- Enable the linux desktop to run the application
 
 ```bash
 sudo apt-get install clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
@@ -80,7 +82,11 @@ flutter run -d linux
 flutter run -d chrome
 ```
 
+- The clnapp webapp is also deployed using github pages [Checkout here](https://dart-lightning.github.io/lndart.clnapp).
+
 #### Android
+
+##### Emulator
 
 - Find the device-id of android/emulator device connected
  
@@ -93,8 +99,14 @@ flutter devices
 flutter run -d <device-id>
 ```
 
-The clnapp webapp is also deployed using github pages [Checkout here](https://dart-lightning.github.io/lndart.clnapp).
+##### Andoid(Mobile)
 
+- Build the .apk file for android application
+```bash
+flutter build apk
+```
+
+- The apk file generated can be found inside `[project]/build/app/outputs/bundle/release/`
 
 
 ## How to Contribute

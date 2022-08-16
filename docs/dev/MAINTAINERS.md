@@ -89,9 +89,7 @@ The version in our package.json gets copied to the one we publish, and users nee
 
 ### Scopes
 
-- **cln_client**: Changes related to the cln client
 - **clnapp**: Changes related to the clnapp view or for some app specific changes
-- **clnapp_flutter**: Changes related to the clnapp flutter package
 
 
 ### Subject
