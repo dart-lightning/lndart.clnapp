@@ -1,0 +1,16 @@
+{
+  "package_name": "clnapp",
+  "version": "v0.0.1-alpha.2",
+  "api": {
+    "name": "github",
+    "repository": "dart-lightning/lndart.clnapp",
+    "branch": "main"
+  },
+  "generation_method": {
+    "name": "semver-v2",
+    "header_filter": true
+  },
+  "serialization_method": {
+    "name": "md"
+  }
+}
