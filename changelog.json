@@ -8,7 +8,7 @@
   },
   "generation_method": {
     "name": "semver-v2",
-    "header_filter": true
+    "header_filter": false
   },
   "serialization_method": {
     "name": "md"
