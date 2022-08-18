@@ -1,3 +1,9 @@
+# v0.0.1-alpha.3
+
+## Fixed
+- fix the url bug by parse the string before ([commit](https://github.com/dart-lightning/lndart.clnapp/commit/41233a399f33797f73186bb7b5ea876fbafe924d)). @vincenzopalazzo 18-08-2022
+
+
 # v0.0.1-alpha.2
 
 ## Fixed
