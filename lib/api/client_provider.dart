@@ -79,7 +79,7 @@ class ClientProvider {
             nodeID: opts['nodeId'],
             host: opts['host'],
             rune: opts['rune'],
-            lambdaServer: opts['lambdaServer']);
+            lambdaServer: Uri.parse(opts['lambdaServer']!).toString());
     }
   }
 
