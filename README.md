@@ -1,25 +1,25 @@
 <div align="center">
   <h1>lndart.clnapp</h1>
 
-  <img src="https://github.com/dart-lightning/icons/raw/main/main/res/mipmap-xxxhdpi/ic_launcher.png" />
+  <img src="https://raw.githubusercontent.com/dart-lightning/lndart.clnapp/main/assets/launcher_icon/web/icon-512.png" width="130" />
 
   <p>
     <strong> :dart: Cross platform app to manage remotely and locally a core lightning node :dart: </strong>
   </p>
-  
+
   <h4>
     <a href="https://github.com/dart-lightning">Project Homepage</a> | <a href="https://dart-lightning.github.io/lndart.clnapp">CLNAPP webapp</a>
   </h4>
-  
+
    <a>
       <img alt="GitHub Workflow Status" src="https://github.com/dart-lightning/lndart.clnapp/actions/workflows/build-ci.yml/badge.svg">
    </a>
-   
+
    <a>
         <img alt="Github Pages" src="https://github.com/dart-lightning/lndart.clnapp/actions/workflows/gh_pages.yml/badge.svg">
    </a>
-  
-   <a> 
+
+   <a>
        <img alt="Integeration Testing" src="https://github.com/dart-lightning/lndart.clnapp/actions/workflows/testing.yml/badge.svg">
    </a>
 </div>
@@ -65,7 +65,7 @@ sudo git clone https://github.com/dart-lightning/lndart.clnapp.git
 make dep
 make get
 ```
- 
+
 #### Linux(desktop)
 
 - Enable the linux desktop to run the application
@@ -89,7 +89,7 @@ flutter run -d chrome
 ##### Emulator
 
 - Find the device-id of android/emulator device connected
- 
+
 ```bash
 flutter devices
 ```
