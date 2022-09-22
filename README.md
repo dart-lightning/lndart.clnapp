@@ -33,7 +33,9 @@
     - [Installation](#installation)
         - [Linux](#linuxdesktop)
         - [Chrome](#chromeweb)
-        - [Android](#android)
+        - [Emulator](#emulator-android--ios)
+        - [Android](#android-device)
+        - [iOS](#ios-device)
 - [How to Contribute](#how-to-contribute)
 - [License](#license)
 
@@ -84,11 +86,9 @@ flutter run -d chrome
 
 - The clnapp webapp is also deployed using github pages [Checkout here](https://dart-lightning.github.io/lndart.clnapp).
 
-#### Android
+#### Emulator Android & iOS
 
-##### Emulator
-
-- Find the device-id of android/emulator device connected
+- Find the device-id of Android/iOS emulator device connected
 
 ```bash
 flutter devices
@@ -99,14 +99,23 @@ flutter devices
 flutter run -d <device-id>
 ```
 
-##### Andoid(Mobile)
+#### Android device
 
-- Build the .apk file for android application
+- Build the .apk file for Android application
 ```bash
 flutter build apk
 ```
 
 - The apk file generated can be found inside `[project]/build/app/outputs/bundle/release/`
+
+#### iOS device
+
+- Build the .xarchive file for iOS application
+```bash
+flutter build ipa
+```
+
+- The Xcode build archive (.xcarchive file) generated can be found inside `[project]/build/ios/archive/` directory and an App Store app bundle (.ipa file) in `[project]/build/ios/ipa/`
 
 
 ## How to Contribute
