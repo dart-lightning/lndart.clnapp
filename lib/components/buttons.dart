@@ -26,7 +26,7 @@ class MainCircleButton extends StatelessWidget {
       children: [
         ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              primary: Theme.of(context).primaryColor,
+              backgroundColor: Theme.of(context).primaryColor,
               maximumSize: Size(width, height),
               minimumSize: Size(width, height),
               elevation: 3,
