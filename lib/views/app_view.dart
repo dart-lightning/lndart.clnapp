@@ -10,11 +10,11 @@ abstract class AppView extends StatelessWidget {
       {Action? action, String label = "Close"}) {
     var snackBar = SnackBar(
         behavior: SnackBarBehavior.fixed,
-        backgroundColor: Theme.of(context).selectedRowColor,
+        backgroundColor: Theme.of(context).cardColor,
         content: Text(message),
         action: SnackBarAction(
             label: label,
-            textColor: Theme.of(context).textTheme.button!.color,
+            textColor: Theme.of(context).textTheme.labelLarge!.color,
             onPressed: () =>
                 ScaffoldMessenger.of(context).hideCurrentSnackBar()));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -33,11 +33,11 @@ abstract class StatefulAppView extends StatefulWidget {
       String label = "Close"}) {
     var snackBar = SnackBar(
         behavior: SnackBarBehavior.fixed,
-        backgroundColor: Theme.of(context).selectedRowColor,
+        backgroundColor: Theme.of(context).cardColor,
         content: Text(message),
         action: SnackBarAction(
             label: label,
-            textColor: Theme.of(context).textTheme.button!.color,
+            textColor: Theme.of(context).textTheme.labelLarge!.color,
             onPressed: () =>
                 ScaffoldMessenger.of(context).hideCurrentSnackBar()));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
