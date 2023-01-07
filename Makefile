@@ -7,7 +7,7 @@ get:
 	$(CC) pub get
 
 fmt:
-	$(CC) $(FMT) .
+	dart $(FMT) .
 	$(CC) analyze .
 
 check:

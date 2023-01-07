@@ -259,7 +259,7 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _buildBottomNavigation() {
     return BottomNavyBar(
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor: Theme.of(context).colorScheme.background,
       selectedIndex: _currentIndex,
       showElevation: true,
       containerHeight: 68,
@@ -272,14 +272,14 @@ class _HomeViewState extends State<HomeView> {
           icon: const Icon(Icons.home_filled),
           title: const Text('Home'),
           textAlign: TextAlign.center,
-          activeColor: Theme.of(context).toggleableActiveColor,
+          activeColor: Theme.of(context).colorScheme.primary,
           inactiveColor: Theme.of(context).highlightColor,
         ),
         BottomNavyBarItem(
           icon: const Icon(Icons.settings_outlined),
           title: const Text('Setting'),
           textAlign: TextAlign.center,
-          activeColor: Theme.of(context).toggleableActiveColor,
+          activeColor: Theme.of(context).colorScheme.primary,
           inactiveColor: Theme.of(context).highlightColor,
         ),
       ],
