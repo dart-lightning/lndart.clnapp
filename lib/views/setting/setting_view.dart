@@ -54,9 +54,6 @@ class _SettingViewState extends State<SettingView> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text("TLS certificate directory path"),
-          SizedBox(
-            width: size.width * 0.05,
-          ),
           Padding(
             padding: const EdgeInsets.only(top: 10),
             child: ElevatedButton(
