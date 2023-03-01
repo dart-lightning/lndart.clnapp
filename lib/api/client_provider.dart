@@ -1,7 +1,7 @@
 /// CLN provider is a util class that return the instance of CLN wrapper
 /// that works well with the actual platform.
 ///
-/// FIXME: This provided need to take some user choise on what the user want
+/// FIXME: This provided need to take some user choice on what the user want
 /// to use.
 import 'package:clightning_rpc/clightning_rpc.dart'
     // ignore: uri_does_not_exist
