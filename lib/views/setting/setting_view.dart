@@ -5,9 +5,13 @@ import 'package:clnapp/model/user_setting.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:clnapp/utils/register_provider.dart';
 import 'package:clnapp/views/home/home_view.dart';
+import 'package:clnapp/views/setting/lnlambda_setting_view.dart';
+import 'package:clnapp/views/setting/unix_setting_view.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'grpc_setting_view.dart';
 
 class SettingView extends StatefulWidget {
   final AppProvider provider;
@@ -36,127 +40,15 @@ class _SettingViewState extends State<SettingView> {
     return true;
   }
 
-  Widget _buildGrpcSettingView(
-      {required BuildContext context, required Setting setting}) {
-    return Wrap(
-        runSpacing: MediaQuery.of(context).size.height * 0.05,
-        children: <Widget>[
-          Row(
-            children: [
-              const Text("TLS certificate directory path"),
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.1,
-              ),
-              ElevatedButton(
-                  onPressed: () async {
-                    await pickDir();
-                  },
-                  child: const Text('Browser')),
-            ],
-          ),
-          InputDecorator(
-            decoration: const InputDecoration(border: OutlineInputBorder()),
-            child: Text(setting.path ?? "not found"),
-          ),
-          const Text("Host"),
-          TextFormField(
-            controller: TextEditingController(text: setting.host ?? ''),
-            onChanged: (text) {
-              setting.host = text;
-            },
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-            ),
-          ),
-        ]);
-  }
-
-  Widget _buildUnixSettingView(
-      {required BuildContext context, required Setting setting}) {
-    return Wrap(
-        runSpacing: MediaQuery.of(context).size.height * 0.05,
-        children: <Widget>[
-          Row(
-            children: [
-              const Text("lightning-rpc file path"),
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.1,
-              ),
-              ElevatedButton(
-                  onPressed: () async {
-                    await pickDir();
-                  },
-                  child: const Text('Browser')),
-            ],
-          ),
-          InputDecorator(
-            decoration: const InputDecoration(border: OutlineInputBorder()),
-            child: Text(setting.path ?? "not found"),
-          ),
-        ]);
-  }
-
-  Widget _buildLnlambdaSettingView(
-      {required BuildContext context, required Setting setting}) {
-    return Wrap(
-        runSpacing: MediaQuery.of(context).size.height * 0.05,
-        children: <Widget>[
-          const Text("Node ID"),
-          TextFormField(
-            controller: TextEditingController(text: setting.nodeId ?? ''),
-            onChanged: (text) {
-              setting.nodeId = text;
-            },
-            decoration: const InputDecoration(
-              label: Text("node Id"),
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const Text("Host"),
-          TextFormField(
-            controller: TextEditingController(text: setting.host ?? ''),
-            onChanged: (text) {
-              setting.host = text;
-            },
-            decoration: const InputDecoration(
-              label: Text("host"),
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const Text("Lambda Server"),
-          TextFormField(
-            controller: TextEditingController(text: setting.lambdaServer ?? ''),
-            onChanged: (text) {
-              setting.lambdaServer = text;
-            },
-            decoration: const InputDecoration(
-              label: Text("lnlambda server url"),
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const Text("Rune"),
-          TextFormField(
-            controller: TextEditingController(text: setting.rune ?? ''),
-            onChanged: (text) {
-              setting.rune = text;
-            },
-            decoration: const InputDecoration(
-              label: Text("rune"),
-              border: OutlineInputBorder(),
-            ),
-          ),
-        ]);
-  }
-
   Widget _buildCorrectSettingView(
       {required BuildContext context, required Setting setting}) {
     switch (setting.clientMode!) {
       case ClientMode.grpc:
-        return _buildGrpcSettingView(context: context, setting: setting);
+        return GrpcSettingView(context: context);
       case ClientMode.unixSocket:
-        return _buildUnixSettingView(context: context, setting: setting);
+        return UnixSettingView(context: context);
       case ClientMode.lnlambda:
-        return _buildLnlambdaSettingView(context: context, setting: setting);
+        return LnlambdaSettingView(context: context);
     }
   }
 
