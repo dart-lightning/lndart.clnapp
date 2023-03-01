@@ -15,7 +15,6 @@ class AppListFunds {
 
   factory AppListFunds.fromJSON(Map<String, dynamic> json,
       {bool snackCase = false, bool isObject = false}) {
-    LogManager.getInstance.debug("Full listfunds json received: $json");
     var funds = json.withKey("outputs", snackCase: snackCase) as List;
     LogManager.getInstance.debug("Funds: $funds");
     var fundChannels = json.withKey("channels", snackCase: snackCase) as List;
@@ -42,6 +41,7 @@ class AppListFunds {
           .map((channels) => AppFundChannel.fromJSON(channels,
               snackCase: snackCase, isObject: isObject))
           .toList();
+
       return AppListFunds(
           fund: appFunds,
           fundChannels: appFundChannels,

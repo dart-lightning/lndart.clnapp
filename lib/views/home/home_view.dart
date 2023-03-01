@@ -26,6 +26,7 @@ class _HomeViewState extends State<HomeView> {
     SettingView(provider: widget.provider),
   ];
 
+  /// Here is the main view of home screen
   Widget _buildInfoView(
       {required BuildContext context, required AppGetInfo getInfo}) {
     return Container(
@@ -113,28 +114,29 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<List<dynamic>?> listPayments() async {
-    final invoicesList = await widget.provider.get<AppApi>().listInvoices();
     final fundsList = await widget.provider.get<AppApi>().listFunds();
+    final listPays = await widget.provider.get<AppApi>().listTransaction();
+    List<dynamic> list = [];
 
-    var listPayments = List.from(invoicesList.invoice)..addAll(fundsList!.fund);
+    /// Adding all the funds and transactions we are getting from the json
+    list.addAll(fundsList!.fund);
+    list.addAll(listPays.transactions);
+    LogManager.getInstance
+        .debug("In home view : ${fundsList.fund} ${listPays.transactions}");
 
     /// FIXME: sort the payments list
-    return listPayments;
+    return list;
   }
 
   Widget _buildSpecificPaymentView(
       {required BuildContext context,
       required List<dynamic> items,
       required int index}) {
-    return items[index].identifier == "invoice"
+    return items[index].identifier == "transaction"
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Amount: ${items[index].amount}"),
-              Text("Confirmed: ${items[index].status}"),
-              Text("Bolt11: ${items[index].bolt11}"),
-              Text("Payment Hash: ${items[index].paymentHash}"),
-              Text("Paid time: ${items[index].paidTime}"),
+              Text("Transaction Hash : ${items[index].txId}"),
             ],
           )
         : Column(
@@ -218,7 +220,8 @@ class _HomeViewState extends State<HomeView> {
     return FutureBuilder<AppGetInfo>(
         future: widget.provider.get<AppApi>().getInfo(),
         builder: (context, AsyncSnapshot<AppGetInfo> snapshot) {
-          _checkIfThereAreError(context: context, snapshot: snapshot);
+          _checkIfThereAreError<AppGetInfo>(
+              context: context, snapshot: snapshot);
           if (snapshot.hasData) {
             var getInfo = snapshot.data!;
             return SingleChildScrollView(

@@ -23,7 +23,7 @@ class CLNApp extends AppView {
 
   @override
   Widget build(BuildContext context) {
-    var setting = provider.get<Setting>();
+    var setting = provider.get<Setting>(); // returns the instance of setting
     return MaterialApp(
       title: 'CLN App',
       themeMode: ThemeMode.dark,
