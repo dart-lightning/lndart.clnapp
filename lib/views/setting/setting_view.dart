@@ -69,10 +69,11 @@ class _SettingViewState extends State<SettingView> {
               child: DropdownButton(
                 value: setting.clientMode,
                 underline: const SizedBox(),
-                items: clients.map((ClientMode items) {
+                items: clients.map((ClientMode clientMode) {
                   return DropdownMenuItem(
-                    value: items,
-                    child: Text(items.toString()),
+                    enabled: ClientProvider.isClientSupported(mode: clientMode),
+                    value: clientMode,
+                    child: Text(clientMode.toString()),
                   );
                 }).toList(),
                 onChanged: (ClientMode? newValue) {
