@@ -142,7 +142,7 @@ class _SettingViewState extends State<SettingView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _buildMainView(context: context),
+      body: SafeArea(child: _buildMainView(context: context)),
     );
   }
 }
