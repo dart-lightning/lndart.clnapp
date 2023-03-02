@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../utils/utils.dart';
 import 'grpc_setting_view.dart';
 
 class SettingView extends StatefulWidget {
@@ -53,66 +54,82 @@ class _SettingViewState extends State<SettingView> {
   }
 
   Widget _buildMainView({required BuildContext context}) {
+    Size size = MediaQuery.of(context).size;
     var setting = widget.provider.get<Setting>();
     final clients = ClientProvider.getClientByDefPlatform();
     return SingleChildScrollView(
       child: Padding(
-        padding: EdgeInsets.only(
-            left: MediaQuery.of(context).size.width * 0.2,
-            right: MediaQuery.of(context).size.width * 0.2),
-        child: Wrap(
-          runSpacing: MediaQuery.of(context).size.height * 0.05,
+        padding:
+            EdgeInsets.only(left: size.width * 0.2, right: size.width * 0.2),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Connection type"),
-            InputDecorator(
-              decoration: const InputDecoration(border: OutlineInputBorder()),
-              child: DropdownButton(
-                value: setting.clientMode,
-                underline: const SizedBox(),
-                items: clients.map((ClientMode clientMode) {
-                  return DropdownMenuItem(
-                    enabled: ClientProvider.isClientSupported(mode: clientMode),
-                    value: clientMode,
-                    child: Text(clientMode.toString()),
-                  );
-                }).toList(),
-                onChanged: (ClientMode? newValue) {
-                  setState(() {
-                    setting.clientMode = newValue!;
-                  });
-                },
+            Container(
+              alignment: Alignment.bottomCenter,
+              height: size.height * 0.09,
+              child: const Text(
+                "Settings",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
+            Utils.textWithPadding("Connection Type", 10),
+            InputDecorator(
+                decoration: const InputDecoration(
+                    border: OutlineInputBorder(), isCollapsed: true),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: DropdownButton(
+                    value: setting.clientMode,
+                    underline: const SizedBox(),
+                    items: clients.map((ClientMode items) {
+                      return DropdownMenuItem(
+                        value: items,
+                        child: Text(items.toString()),
+                      );
+                    }).toList(),
+                    onChanged: (ClientMode? newValue) {
+                      setState(() {
+                        setting.clientMode = newValue!;
+                      });
+                    },
+                  ),
+                )),
             _buildCorrectSettingView(context: context, setting: setting),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    if (setting.isValid()) {
-                      await saveSettings(setting: setting);
-                      await ManagerAPIProvider.registerClientFromSetting(
-                          setting, widget.provider);
-                      // https://stackoverflow.com/questions/68871880/do-not-use-buildcontexts-across-async-gaps
-                      if (!mounted) return;
-                      Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                              builder: (context) => HomeView(
-                                    provider: widget.provider,
-                                  )),
-                          (Route<dynamic> route) => false);
-                    }
-                  },
-                  child: const Text("Save"),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, left: 5),
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (setting.isValid()) {
+                        await saveSettings(setting: setting);
+                        await ManagerAPIProvider.registerClientFromSetting(
+                            setting, widget.provider);
+                        // https://stackoverflow.com/questions/68871880/do-not-use-buildcontexts-across-async-gaps
+                        if (!mounted) return;
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (context) => HomeView(
+                                      provider: widget.provider,
+                                    )),
+                            (Route<dynamic> route) => false);
+                      }
+                    },
+                    child: const Text("Save"),
+                  ),
                 ),
-                const Spacer(),
-                ElevatedButton(
-                  onPressed: () async => {
-                    await ManagerAPIProvider.clear(provider: widget.provider),
-                    setState(() {
-                      setting = setting;
-                    })
-                  },
-                  child: const Text("Clear"),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, right: 5),
+                  child: ElevatedButton(
+                    onPressed: () async => {
+                      await ManagerAPIProvider.clear(provider: widget.provider),
+                      setState(() {
+                        setting = setting;
+                      })
+                    },
+                    child: const Text("Clear"),
+                  ),
                 ),
               ],
             ),

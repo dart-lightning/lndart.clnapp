@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../model/user_setting.dart';
 import '../../utils/app_provider.dart';
+import '../../utils/utils.dart';
 
 class LnlambdaSettingView extends StatefulWidget {
   final BuildContext context;
@@ -15,10 +16,11 @@ class LnlambdaSettingView extends StatefulWidget {
 class _LnlambdaSettingViewState extends State<LnlambdaSettingView> {
   Widget _buildLnlambdaSettingView(
       {required BuildContext context, required Setting setting}) {
-    return Wrap(
-        runSpacing: MediaQuery.of(context).size.height * 0.05,
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          const Text("Node ID"),
+          Utils.textWithPadding("Node ID", 10),
           TextFormField(
             controller: TextEditingController(text: setting.nodeId ?? ''),
             onChanged: (text) {
@@ -29,7 +31,7 @@ class _LnlambdaSettingViewState extends State<LnlambdaSettingView> {
               border: OutlineInputBorder(),
             ),
           ),
-          const Text("Host"),
+          Utils.textWithPadding("Host", 10),
           TextFormField(
             controller: TextEditingController(text: setting.host ?? ''),
             onChanged: (text) {
@@ -40,7 +42,7 @@ class _LnlambdaSettingViewState extends State<LnlambdaSettingView> {
               border: OutlineInputBorder(),
             ),
           ),
-          const Text("Lambda Server"),
+          Utils.textWithPadding("Lambda Server", 10),
           TextFormField(
             controller: TextEditingController(text: setting.lambdaServer ?? ''),
             onChanged: (text) {
@@ -51,7 +53,7 @@ class _LnlambdaSettingViewState extends State<LnlambdaSettingView> {
               border: OutlineInputBorder(),
             ),
           ),
-          const Text("Rune"),
+          Utils.textWithPadding("Rune", 10),
           TextFormField(
             controller: TextEditingController(text: setting.rune ?? ''),
             onChanged: (text) {

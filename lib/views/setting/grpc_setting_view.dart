@@ -3,6 +3,7 @@ import 'package:clnapp/utils/directory_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../../model/user_setting.dart';
+import '../../utils/utils.dart';
 
 class GrpcSettingView extends StatefulWidget {
   final BuildContext context;
@@ -16,40 +17,37 @@ class GrpcSettingView extends StatefulWidget {
 class _GrpcSettingViewState extends State<GrpcSettingView> {
   Widget buildGrpcSettingView(
       {required BuildContext context, required Setting setting}) {
-    return Wrap(
-        runSpacing: MediaQuery.of(context).size.height * 0.05,
-        children: <Widget>[
-          Row(
-            children: [
-              const Text("TLS certificate directory path"),
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.1,
-              ),
-              ElevatedButton(
-                  onPressed: () async {
-                    String picker = await DirectoryPicker.pickDir();
-                    setState(() {
-                      setting.path = picker;
-                    });
-                  },
-                  child: const Text('Browser')),
-            ],
+    Size size = MediaQuery.of(context).size;
+    return Wrap(runSpacing: size.height * 0.05, children: <Widget>[
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text("TLS certificate directory path"),
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: ElevatedButton(
+                onPressed: () async {
+                  await DirectoryPicker.pickDir();
+                },
+                child: const Text('Browser')),
           ),
-          InputDecorator(
-            decoration: const InputDecoration(border: OutlineInputBorder()),
-            child: Text(setting.path ?? "not found"),
-          ),
-          const Text("Host"),
-          TextFormField(
-            controller: TextEditingController(text: setting.host ?? ''),
-            onChanged: (text) {
-              setting.host = text;
-            },
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-            ),
-          ),
-        ]);
+        ],
+      ),
+      InputDecorator(
+        decoration: const InputDecoration(border: OutlineInputBorder()),
+        child: Text(setting.path ?? "not found"),
+      ),
+      Utils.textWithPadding("Host", 4),
+      TextFormField(
+        controller: TextEditingController(text: setting.host ?? ''),
+        onChanged: (text) {
+          setting.host = text;
+        },
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+        ),
+      ),
+    ]);
   }
 
   @override
