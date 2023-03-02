@@ -5,9 +5,13 @@ import 'package:clnapp/model/user_setting.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:clnapp/utils/register_provider.dart';
 import 'package:clnapp/views/home/home_view.dart';
+import 'package:clnapp/views/setting/lnlambda_setting_view.dart';
+import 'package:clnapp/views/setting/unix_setting_view.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'grpc_setting_view.dart';
 
 class SettingView extends StatefulWidget {
   final AppProvider provider;
@@ -160,15 +164,16 @@ class _SettingViewState extends State<SettingView> {
         ]);
   }
 
+
   Widget _buildCorrectSettingView(
       {required BuildContext context, required Setting setting}) {
     switch (setting.clientMode!) {
       case ClientMode.grpc:
-        return _buildGrpcSettingView(context: context, setting: setting);
+        return GrpcSettingView(context: context);
       case ClientMode.unixSocket:
-        return _buildUnixSettingView(context: context, setting: setting);
+        return UnixSettingView(context: context);
       case ClientMode.lnlambda:
-        return _buildLnlambdaSettingView(context: context, setting: setting);
+        return LnlambdaSettingView(context: context);
     }
   }
 
@@ -193,6 +198,7 @@ class _SettingViewState extends State<SettingView> {
             ),
             _textWithPadding("Connection Type", 10),
             InputDecorator(
+
               decoration: const InputDecoration(
                   border: OutlineInputBorder(), isCollapsed: true),
               child: Padding(
@@ -212,6 +218,24 @@ class _SettingViewState extends State<SettingView> {
                     });
                   },
                 ),
+
+              decoration: const InputDecoration(border: OutlineInputBorder()),
+              child: DropdownButton(
+                value: setting.clientMode,
+                underline: const SizedBox(),
+                items: clients.map((ClientMode clientMode) {
+                  return DropdownMenuItem(
+                    enabled: ClientProvider.isClientSupported(mode: clientMode),
+                    value: clientMode,
+                    child: Text(clientMode.toString()),
+                  );
+                }).toList(),
+                onChanged: (ClientMode? newValue) {
+                  setState(() {
+                    setting.clientMode = newValue!;
+                  });
+                },
+
               ),
             ),
             _buildCorrectSettingView(context: context, setting: setting),

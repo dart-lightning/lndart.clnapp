@@ -1,7 +1,7 @@
 /// CLN provider is a util class that return the instance of CLN wrapper
 /// that works well with the actual platform.
 ///
-/// FIXME: This provided need to take some user choise on what the user want
+/// FIXME: This provided need to take some user choice on what the user want
 /// to use.
 import 'package:clightning_rpc/clightning_rpc.dart'
     // ignore: uri_does_not_exist
@@ -95,5 +95,26 @@ class ClientProvider {
     } else {
       return {ClientMode.lnlambda};
     }
+  }
+
+  /// not all the client are supported in every platform
+  /// due platform limitation (and client API limitation)
+  /// So, this helper method try to semplify the life and
+  /// help to check if a kind of client mode is supported
+  /// or not in the current platform.
+  static bool isClientSupported({required ClientMode mode}) {
+    if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.android) {
+      if (mode != ClientMode.lnlambda) {
+        return false;
+      }
+      return true;
+    } else if (defaultTargetPlatform == TargetPlatform.linux ||
+        defaultTargetPlatform == TargetPlatform.macOS ||
+        defaultTargetPlatform == TargetPlatform.windows) {
+      return true;
+    }
+    // web
+    return mode == ClientMode.lnlambda;
   }
 }
