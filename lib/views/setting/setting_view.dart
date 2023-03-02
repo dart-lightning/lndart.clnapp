@@ -36,72 +36,84 @@ class _SettingViewState extends State<SettingView> {
     return true;
   }
 
+  Widget _textWithPadding(String text, double value) {
+    return Padding(
+      padding: EdgeInsets.only(top: value, bottom: value),
+      child: Text(
+        text,
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
+    );
+  }
+
   Widget _buildGrpcSettingView(
       {required BuildContext context, required Setting setting}) {
-    return Wrap(
-        runSpacing: MediaQuery.of(context).size.height * 0.05,
-        children: <Widget>[
-          Row(
-            children: [
-              const Text("TLS certificate directory path"),
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.1,
-              ),
-              ElevatedButton(
-                  onPressed: () async {
-                    await pickDir();
-                  },
-                  child: const Text('Browser')),
-            ],
+    Size size = MediaQuery.of(context).size;
+    return Wrap(runSpacing: size.height * 0.05, children: <Widget>[
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text("TLS certificate directory path"),
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: ElevatedButton(
+                onPressed: () async {
+                  await pickDir();
+                },
+                child: const Text('Browser')),
           ),
-          InputDecorator(
-            decoration: const InputDecoration(border: OutlineInputBorder()),
-            child: Text(setting.path ?? "not found"),
-          ),
-          const Text("Host"),
-          TextFormField(
-            controller: TextEditingController(text: setting.host ?? ''),
-            onChanged: (text) {
-              setting.host = text;
-            },
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-            ),
-          ),
-        ]);
+        ],
+      ),
+      InputDecorator(
+        decoration: const InputDecoration(border: OutlineInputBorder()),
+        child: Text(setting.path ?? "not found"),
+      ),
+      _textWithPadding("Host", 4),
+      TextFormField(
+        controller: TextEditingController(text: setting.host ?? ''),
+        onChanged: (text) {
+          setting.host = text;
+        },
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+        ),
+      ),
+    ]);
   }
 
   Widget _buildUnixSettingView(
       {required BuildContext context, required Setting setting}) {
-    return Wrap(
-        runSpacing: MediaQuery.of(context).size.height * 0.05,
-        children: <Widget>[
-          Row(
-            children: [
-              const Text("lightning-rpc file path"),
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.1,
-              ),
-              ElevatedButton(
-                  onPressed: () async {
-                    await pickDir();
-                  },
-                  child: const Text('Browser')),
-            ],
+    Size size = MediaQuery.of(context).size;
+    return Wrap(runSpacing: size.height * 0.05, children: <Widget>[
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text("lightning-rpc file path"),
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: ElevatedButton(
+                onPressed: () async {
+                  await pickDir();
+                },
+                child: const Text('Browser')),
           ),
-          InputDecorator(
-            decoration: const InputDecoration(border: OutlineInputBorder()),
-            child: Text(setting.path ?? "not found"),
-          ),
-        ]);
+        ],
+      ),
+      InputDecorator(
+        decoration: const InputDecoration(border: OutlineInputBorder()),
+        child: Text(setting.path ?? "not found"),
+      ),
+    ]);
   }
 
   Widget _buildLnlambdaSettingView(
       {required BuildContext context, required Setting setting}) {
-    return Wrap(
-        runSpacing: MediaQuery.of(context).size.height * 0.05,
+    return Column(
+        // runSpacing: MediaQuery.of(context).size.height * 0.05,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          const Text("Node ID"),
+          _textWithPadding("Node ID", 10),
           TextFormField(
             controller: TextEditingController(text: setting.nodeId ?? ''),
             onChanged: (text) {
@@ -112,7 +124,7 @@ class _SettingViewState extends State<SettingView> {
               border: OutlineInputBorder(),
             ),
           ),
-          const Text("Host"),
+          _textWithPadding("Host", 10),
           TextFormField(
             controller: TextEditingController(text: setting.host ?? ''),
             onChanged: (text) {
@@ -123,7 +135,7 @@ class _SettingViewState extends State<SettingView> {
               border: OutlineInputBorder(),
             ),
           ),
-          const Text("Lambda Server"),
+          _textWithPadding("Lambda Server", 10),
           TextFormField(
             controller: TextEditingController(text: setting.lambdaServer ?? ''),
             onChanged: (text) {
@@ -134,7 +146,7 @@ class _SettingViewState extends State<SettingView> {
               border: OutlineInputBorder(),
             ),
           ),
-          const Text("Rune"),
+          _textWithPadding("Rune", 10),
           TextFormField(
             controller: TextEditingController(text: setting.rune ?? ''),
             onChanged: (text) {
@@ -161,65 +173,83 @@ class _SettingViewState extends State<SettingView> {
   }
 
   Widget _buildMainView({required BuildContext context}) {
+    Size size = MediaQuery.of(context).size;
     var setting = widget.provider.get<Setting>();
     final clients = ClientProvider.getClientByDefPlatform();
     return SingleChildScrollView(
       child: Padding(
-        padding: EdgeInsets.only(
-            left: MediaQuery.of(context).size.width * 0.2,
-            right: MediaQuery.of(context).size.width * 0.2),
-        child: Wrap(
-          runSpacing: MediaQuery.of(context).size.height * 0.05,
+        padding:
+            EdgeInsets.only(left: size.width * 0.2, right: size.width * 0.2),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Connection type"),
+            Container(
+              alignment: Alignment.bottomCenter,
+              height: size.height * 0.09,
+              child: const Text(
+                "Settings",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+            ),
+            _textWithPadding("Connection Type", 10),
             InputDecorator(
-              decoration: const InputDecoration(border: OutlineInputBorder()),
-              child: DropdownButton(
-                value: setting.clientMode,
-                underline: const SizedBox(),
-                items: clients.map((ClientMode items) {
-                  return DropdownMenuItem(
-                    value: items,
-                    child: Text(items.toString()),
-                  );
-                }).toList(),
-                onChanged: (ClientMode? newValue) {
-                  setState(() {
-                    setting.clientMode = newValue!;
-                  });
-                },
+              decoration: const InputDecoration(
+                  border: OutlineInputBorder(), isCollapsed: true),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownButton(
+                  value: setting.clientMode,
+                  underline: const SizedBox(),
+                  items: clients.map((ClientMode items) {
+                    return DropdownMenuItem(
+                      value: items,
+                      child: Text(items.toString()),
+                    );
+                  }).toList(),
+                  onChanged: (ClientMode? newValue) {
+                    setState(() {
+                      setting.clientMode = newValue!;
+                    });
+                  },
+                ),
               ),
             ),
             _buildCorrectSettingView(context: context, setting: setting),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    if (setting.isValid()) {
-                      await saveSettings(setting: setting);
-                      await ManagerAPIProvider.registerClientFromSetting(
-                          setting, widget.provider);
-                      // https://stackoverflow.com/questions/68871880/do-not-use-buildcontexts-across-async-gaps
-                      if (!mounted) return;
-                      Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                              builder: (context) => HomeView(
-                                    provider: widget.provider,
-                                  )),
-                          (Route<dynamic> route) => false);
-                    }
-                  },
-                  child: const Text("Save"),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, left: 5),
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (setting.isValid()) {
+                        await saveSettings(setting: setting);
+                        await ManagerAPIProvider.registerClientFromSetting(
+                            setting, widget.provider);
+                        // https://stackoverflow.com/questions/68871880/do-not-use-buildcontexts-across-async-gaps
+                        if (!mounted) return;
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (context) => HomeView(
+                                      provider: widget.provider,
+                                    )),
+                            (Route<dynamic> route) => false);
+                      }
+                    },
+                    child: const Text("Save"),
+                  ),
                 ),
-                const Spacer(),
-                ElevatedButton(
-                  onPressed: () async => {
-                    await ManagerAPIProvider.clear(provider: widget.provider),
-                    setState(() {
-                      setting = setting;
-                    })
-                  },
-                  child: const Text("Clear"),
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, right: 5),
+                  child: ElevatedButton(
+                    onPressed: () async => {
+                      await ManagerAPIProvider.clear(provider: widget.provider),
+                      setState(() {
+                        setting = setting;
+                      })
+                    },
+                    child: const Text("Clear"),
+                  ),
                 ),
               ],
             ),
@@ -232,7 +262,7 @@ class _SettingViewState extends State<SettingView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _buildMainView(context: context),
+      body: SafeArea(child: _buildMainView(context: context)),
     );
   }
 }
