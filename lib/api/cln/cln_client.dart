@@ -6,10 +6,12 @@ import 'package:clnapp/api/cln/request/get_info_request.dart';
 import 'package:clnapp/api/cln/request/list_funds_request.dart';
 import 'package:clnapp/api/cln/request/list_invoices_request.dart';
 import 'package:clnapp/api/cln/request/list_transaction_request.dart';
+import 'package:clnapp/api/cln/request/listpays_request.dart';
 import 'package:clnapp/api/cln/request/pay_request.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/model/app_model/list_invoices.dart';
+import 'package:clnapp/model/app_model/list_pays.dart';
 import 'package:clnapp/model/app_model/list_transaction.dart';
 import 'package:clnapp/model/app_model/pay_invoice.dart';
 import 'package:fixnum/fixnum.dart';
@@ -160,5 +162,27 @@ class CLNApi extends AppApi {
         onDecode: (jsonResponse) => AppPayInvoice.fromJSON(
             jsonResponse as Map<String, dynamic>,
             snackCase: mode == ClientMode.unixSocket));
+  }
+
+  @override
+  Future<AppListPays> listPays() {
+    dynamic params;
+    switch (mode) {
+      case ClientMode.grpc:
+        params = CLNListPaysRequest(grpcRequest: ListpaysRequest());
+        break;
+      case ClientMode.unixSocket:
+        params = CLNListPaysRequest(unixRequest: <String, dynamic>{});
+        break;
+      case ClientMode.lnlambda:
+        params = CLNListPaysRequest(unixRequest: <String, dynamic>{});
+        break;
+    }
+    return client.call<CLNListPaysRequest, AppListPays>(
+        method: "listpays",
+        params: params,
+        onDecode: (jsonResponse) => AppListPays.fromJSON(
+            jsonResponse as Map<String, dynamic>,
+            snackCase: !mode.withCamelCase()));
   }
 }
