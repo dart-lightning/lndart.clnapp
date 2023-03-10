@@ -2,7 +2,7 @@ import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/model/app_model/app_utils.dart';
 
 class AppListInvoices {
-  List<AppInvoice?> invoice;
+  List<AppInvoice> invoice;
 
   AppListInvoices({this.invoice = const []});
 
@@ -13,14 +13,14 @@ class AppListInvoices {
       var appInvoices = invoices.map((invoice) {
         var temp = AppInvoice.fromJSON(invoice,
             snackCase: snackCase, isObject: isObject);
-        if (temp.status == status) {
+        if (temp.status == "unpaid") {
           return temp;
         }
       }).toList();
       if (appInvoices.contains(null)) {
         return AppListInvoices();
       }
-      return AppListInvoices(invoice: appInvoices);
+      return AppListInvoices(invoice: appInvoices as List<AppInvoice>);
     } else {
       return AppListInvoices();
     }
