@@ -28,7 +28,7 @@ abstract class AppApi {
   Future<AppListFunds?> listFunds();
 
   /// Return the list of invoices from lightning node.
-  Future<AppListInvoices?> listInvoices({required String status});
+  Future<AppListInvoices> listInvoices({String? status});
 
   /// Return the pay response from lightning node.
   Future<AppPayInvoice> payInvoice({required String invoice, int? msat});

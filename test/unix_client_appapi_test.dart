@@ -44,7 +44,7 @@ void main() async {
       final invoiceList =
           await provider.get<AppApi>().listInvoices(status: "paid");
       expect(invoiceList, isNotNull);
-      expect(invoiceList!.invoice, isNotNull);
+      expect(invoiceList.invoice, isNotNull);
     });
 
     test('API List Transactions', () async {

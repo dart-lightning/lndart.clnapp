@@ -95,7 +95,7 @@ class CLNApi extends AppApi {
   }
 
   @override
-  Future<AppListInvoices> listInvoices({required String status}) {
+  Future<AppListInvoices> listInvoices({String? status}) {
     dynamic params;
     switch (mode) {
       case ClientMode.grpc:

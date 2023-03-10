@@ -119,9 +119,8 @@ class _HomeViewState extends State<HomeView> {
 
     List list = [];
 
-    if (invoicesList != null) {
-      list.addAll(invoicesList.invoice);
-    }
+    list.addAll(invoicesList.invoice);
+
     list.addAll(paysList.pays);
 
     /// FIXME: sort the payments list
