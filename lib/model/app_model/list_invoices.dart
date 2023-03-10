@@ -7,7 +7,7 @@ class AppListInvoices {
   AppListInvoices({this.invoice = const []});
 
   factory AppListInvoices.fromJSON(Map<String, dynamic> json,
-      {bool snackCase = false, bool isObject = false, required String status}) {
+      {bool snackCase = false, bool isObject = false, String? status}) {
     var invoices = json.withKey("invoices", snackCase: snackCase) as List;
     if (invoices.isNotEmpty) {
       var appInvoices = invoices.map((invoice) {
@@ -18,7 +18,7 @@ class AppListInvoices {
         }
       }).toList();
       if (appInvoices.contains(null)) {
-        return AppListInvoices(invoice: []);
+        return AppListInvoices();
       }
       return AppListInvoices(invoice: appInvoices);
     } else {
