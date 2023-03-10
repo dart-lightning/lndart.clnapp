@@ -95,7 +95,7 @@ class CLNApi extends AppApi {
   }
 
   @override
-  Future<AppListInvoices> listInvoices() {
+  Future<AppListInvoices> listInvoices({required String status}) {
     dynamic params;
     switch (mode) {
       case ClientMode.grpc:
@@ -114,7 +114,8 @@ class CLNApi extends AppApi {
         onDecode: (jsonResponse) => AppListInvoices.fromJSON(
             jsonResponse as Map<String, dynamic>,
             snackCase: !mode.withCamelCase(),
-            isObject: mode.hashMsatAsObj()));
+            isObject: mode.hashMsatAsObj(),
+            status: status));
   }
 
   @override

@@ -2,18 +2,24 @@ import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/model/app_model/app_utils.dart';
 
 class AppListInvoices {
-  List<AppInvoice> invoice;
+  List<AppInvoice?> invoice;
 
   AppListInvoices({this.invoice = const []});
 
   factory AppListInvoices.fromJSON(Map<String, dynamic> json,
-      {bool snackCase = false, bool isObject = false}) {
+      {bool snackCase = false, bool isObject = false, required String status}) {
     var invoices = json.withKey("invoices", snackCase: snackCase) as List;
     if (invoices.isNotEmpty) {
-      var appInvoices = invoices
-          .map((invoice) => AppInvoice.fromJSON(invoice,
-              snackCase: snackCase, isObject: isObject))
-          .toList();
+      var appInvoices = invoices.map((invoice) {
+        var temp = AppInvoice.fromJSON(invoice,
+            snackCase: snackCase, isObject: isObject);
+        if (temp.status == status) {
+          return temp;
+        }
+      }).toList();
+      if (appInvoices.contains(null)) {
+        return AppListInvoices(invoice: []);
+      }
       return AppListInvoices(invoice: appInvoices);
     } else {
       return AppListInvoices();

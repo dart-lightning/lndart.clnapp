@@ -113,12 +113,15 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Future<List<dynamic>?> listPayments() async {
-    final invoicesList = await widget.provider.get<AppApi>().listInvoices();
+    final invoicesList =
+        await widget.provider.get<AppApi>().listInvoices(status: "paid");
     final paysList = await widget.provider.get<AppApi>().listPays();
 
     List list = [];
 
-    list.addAll(invoicesList.invoice);
+    if (invoicesList != null) {
+      list.addAll(invoicesList.invoice);
+    }
     list.addAll(paysList.pays);
 
     /// FIXME: sort the payments list
@@ -164,14 +167,6 @@ class _HomeViewState extends State<HomeView> {
                 shrinkWrap: true,
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
-                  /// Returning a null widget when the invoice is unpaid
-                  if (snapshot.data![index].identifier == "invoice" &&
-                      snapshot.data![index].status == "unpaid") {
-                    return const SizedBox(
-                      width: 0,
-                      height: 0,
-                    );
-                  }
                   return ExpandableCard(
                     expandedAlignment: Alignment.topLeft,
                     expandableChild: _buildSpecificPaymentView(
