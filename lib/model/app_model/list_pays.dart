@@ -22,7 +22,7 @@ class AppListPays {
 class AppPays {
   final String bolt11;
 
-  final String amountSentMSAT;
+  final String preimage;
 
   final String createdAt;
 
@@ -36,7 +36,7 @@ class AppPays {
 
   AppPays(
       {required this.bolt11,
-      required this.amountSentMSAT,
+      required this.preimage,
       required this.createdAt,
       required this.status,
       required this.destination,
@@ -46,8 +46,8 @@ class AppPays {
   factory AppPays.fromJSON(Map<String, dynamic> json,
       {bool snackCase = false}) {
     var bolt11 = json.withKey("bolt11", snackCase: snackCase);
-    var amountSentMSAT = json.parseMsat(
-        key: "amountsentmsat", snackCase: snackCase, isObject: false);
+    var preimage =
+        json.parseMsat(key: "preimage", snackCase: snackCase, isObject: false);
     var createdAt = json.withKey("created_at", snackCase: snackCase);
     var status = json.withKey("status", snackCase: snackCase);
     var paymentHash = json.withKey("payment_hash", snackCase: snackCase);
@@ -55,11 +55,11 @@ class AppPays {
 
     /// Checking if the status of the pay is complete or not
     return AppPays(
-        bolt11: bolt11,
-        amountSentMSAT: amountSentMSAT,
+        bolt11: bolt11 ?? "No bolt11 for this transaction",
+        preimage: preimage,
         createdAt: createdAt.toString(),
         status: status,
         paymentHash: paymentHash,
-        destination: destination);
+        destination: destination ?? "No destination");
   }
 }

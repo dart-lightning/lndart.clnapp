@@ -146,7 +146,7 @@ class _HomeViewState extends State<HomeView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("Bolt11: ${items[index].bolt11}"),
-              Text("amount sent msat: ${items[index].amountSentMSAT}"),
+              Text("preimage : ${items[index].preimage}"),
               Text("Created At: ${items[index].createdAt}"),
               Text("status: ${items[index].status}"),
               Text("payment Hash: ${items[index].paymentHash}"),
