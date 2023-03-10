@@ -166,16 +166,20 @@ class CLNApi extends AppApi {
 
   @override
   Future<AppListPays> listPays() {
+    /// Defining the map for the pays pays which are completed
+    Map<String, String> map = {"status": "complete"};
     dynamic params;
     switch (mode) {
       case ClientMode.grpc:
-        params = CLNListPaysRequest(grpcRequest: ListpaysRequest());
+        params = CLNListPaysRequest(
+            grpcRequest: ListpaysRequest(
+                status: ListpaysRequest_ListpaysStatus.COMPLETE));
         break;
       case ClientMode.unixSocket:
-        params = CLNListPaysRequest(unixRequest: <String, dynamic>{});
+        params = CLNListPaysRequest(unixRequest: map);
         break;
       case ClientMode.lnlambda:
-        params = CLNListPaysRequest(unixRequest: <String, dynamic>{});
+        params = CLNListPaysRequest(unixRequest: map);
         break;
     }
     return client.call<CLNListPaysRequest, AppListPays>(

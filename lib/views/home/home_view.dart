@@ -114,17 +114,12 @@ class _HomeViewState extends State<HomeView> {
 
   Future<List<dynamic>?> listPayments() async {
     final invoicesList = await widget.provider.get<AppApi>().listInvoices();
-    // final fundsList = await widget.provider.get<AppApi>().listFunds();
     final paysList = await widget.provider.get<AppApi>().listPays();
 
     List list = [];
 
     list.addAll(invoicesList.invoice);
     list.addAll(paysList.pays);
-
-    LogManager.getInstance.debug("FINAL PAYLIST PAYS !!!!: ${paysList.pays}");
-
-    // var listPayments = List.from(invoicesList.invoice)..addAll(fundsList!.fund);
 
     /// FIXME: sort the payments list
     return list;
@@ -148,11 +143,11 @@ class _HomeViewState extends State<HomeView> {
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Amount: ${items[index].bolt11}"),
-              Text("amount sent msat: ${items[index].amount_sent_msat}"),
-              Text("Created At: ${items[index].createdat}"),
+              Text("Bolt11: ${items[index].bolt11}"),
+              Text("amount sent msat: ${items[index].amountSentMSAT}"),
+              Text("Created At: ${items[index].createdAt}"),
               Text("status: ${items[index].status}"),
-              Text("payment Hash: ${items[index].paymenthash}"),
+              Text("payment Hash: ${items[index].paymentHash}"),
               Text("Destination: ${items[index].destination}"),
             ],
           );
@@ -169,6 +164,14 @@ class _HomeViewState extends State<HomeView> {
                 shrinkWrap: true,
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
+                  /// Returning a null widget when the invoice is unpaid
+                  if (snapshot.data![index].identifier == "invoice" &&
+                      snapshot.data![index].status == "unpaid") {
+                    return const SizedBox(
+                      width: 0,
+                      height: 0,
+                    );
+                  }
                   return ExpandableCard(
                     expandedAlignment: Alignment.topLeft,
                     expandableChild: _buildSpecificPaymentView(
@@ -195,9 +198,7 @@ class _HomeViewState extends State<HomeView> {
                               child: Text(
                                 snapshot.data![index].identifier == "invoice"
                                     ? snapshot.data![index].label
-                                    : snapshot.data![index].status == "complete"
-                                        ? snapshot.data![index].bolt11
-                                        : "Transaction failed",
+                                    : snapshot.data![index].bolt11,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   fontSize: 15,
