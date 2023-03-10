@@ -13,7 +13,7 @@ class AppListInvoices {
       var appInvoices = invoices.map((invoice) {
         var temp = AppInvoice.fromJSON(invoice,
             snackCase: snackCase, isObject: isObject);
-        if (temp.status == "unpaid") {
+        if (temp.status == status) {
           return temp;
         }
       }).toList();
