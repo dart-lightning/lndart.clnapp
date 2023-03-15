@@ -4,6 +4,8 @@ import 'package:clnapp/model/app_model/list_invoices.dart';
 import 'package:clnapp/model/app_model/list_transaction.dart';
 import 'package:clnapp/model/app_model/pay_invoice.dart';
 
+import 'package:clnapp/model/app_model/list_pays.dart';
+
 /// App API implementation, the class contains all the information
 /// to make a call to core lightning and return the correct type
 /// of useful of the UI.
@@ -26,8 +28,11 @@ abstract class AppApi {
   Future<AppListFunds?> listFunds();
 
   /// Return the list of invoices from lightning node.
-  Future<AppListInvoices> listInvoices();
+  Future<AppListInvoices> listInvoices({String? status});
 
   /// Return the pay response from lightning node.
   Future<AppPayInvoice> payInvoice({required String invoice, int? msat});
+
+  /// Return the list of payments failed and succeeded
+  Future<AppListPays> listPays();
 }

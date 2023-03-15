@@ -6,10 +6,12 @@ import 'package:clnapp/api/cln/request/get_info_request.dart';
 import 'package:clnapp/api/cln/request/list_funds_request.dart';
 import 'package:clnapp/api/cln/request/list_invoices_request.dart';
 import 'package:clnapp/api/cln/request/list_transaction_request.dart';
+import 'package:clnapp/api/cln/request/listpays_request.dart';
 import 'package:clnapp/api/cln/request/pay_request.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/model/app_model/list_invoices.dart';
+import 'package:clnapp/model/app_model/list_pays.dart';
 import 'package:clnapp/model/app_model/list_transaction.dart';
 import 'package:clnapp/model/app_model/pay_invoice.dart';
 import 'package:fixnum/fixnum.dart';
@@ -93,7 +95,7 @@ class CLNApi extends AppApi {
   }
 
   @override
-  Future<AppListInvoices> listInvoices() {
+  Future<AppListInvoices> listInvoices({String? status}) {
     dynamic params;
     switch (mode) {
       case ClientMode.grpc:
@@ -112,7 +114,8 @@ class CLNApi extends AppApi {
         onDecode: (jsonResponse) => AppListInvoices.fromJSON(
             jsonResponse as Map<String, dynamic>,
             snackCase: !mode.withCamelCase(),
-            isObject: mode.hashMsatAsObj()));
+            isObject: mode.hashMsatAsObj(),
+            status: status));
   }
 
   @override
@@ -160,5 +163,31 @@ class CLNApi extends AppApi {
         onDecode: (jsonResponse) => AppPayInvoice.fromJSON(
             jsonResponse as Map<String, dynamic>,
             snackCase: mode == ClientMode.unixSocket));
+  }
+
+  @override
+  Future<AppListPays> listPays() {
+    /// Defining the map for the pays pays which are completed
+    Map<String, String> map = {"status": "complete"};
+    dynamic params;
+    switch (mode) {
+      case ClientMode.grpc:
+        params = CLNListPaysRequest(
+            grpcRequest: ListpaysRequest(
+                status: ListpaysRequest_ListpaysStatus.COMPLETE));
+        break;
+      case ClientMode.unixSocket:
+        params = CLNListPaysRequest(unixRequest: map);
+        break;
+      case ClientMode.lnlambda:
+        params = CLNListPaysRequest(unixRequest: map);
+        break;
+    }
+    return client.call<CLNListPaysRequest, AppListPays>(
+        method: "listpays",
+        params: params,
+        onDecode: (jsonResponse) => AppListPays.fromJSON(
+            jsonResponse as Map<String, dynamic>,
+            snackCase: !mode.withCamelCase()));
   }
 }
