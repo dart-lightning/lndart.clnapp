@@ -155,6 +155,13 @@ class _HomeViewState extends State<HomeView> {
           );
   }
 
+  bool checkListIdentifier({var listTile}) {
+    if (listTile.identifier == "invoice") {
+      return true;
+    }
+    return false;
+  }
+
   Widget _buildPaymentListView({required BuildContext context}) {
     return FutureBuilder<List<dynamic>?>(
         future: listPayments(),
@@ -182,15 +189,23 @@ class _HomeViewState extends State<HomeView> {
                               shape: BoxShape.circle,
                             ),
                             alignment: Alignment.center,
-                            child: const Icon(
-                              Icons.shopping_bag_outlined,
-                            ),
+                            child: checkListIdentifier(
+                                    listTile: snapshot.data![index])
+                                ? const Icon(
+                                    Icons.arrow_downward,
+                                    color: Colors.green,
+                                  )
+                                : const Icon(
+                                    Icons.arrow_upward,
+                                    color: Colors.red,
+                                  ),
                           ),
                           Expanded(
                             child: Container(
                               alignment: Alignment.center,
                               child: Text(
-                                snapshot.data![index].identifier == "invoice"
+                                checkListIdentifier(
+                                        listTile: snapshot.data![index])
                                     ? snapshot.data![index].label
                                     : snapshot.data![index].bolt11,
                                 overflow: TextOverflow.ellipsis,
