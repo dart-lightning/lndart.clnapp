@@ -22,7 +22,6 @@ class _GrpcSettingViewState extends State<GrpcSettingView> {
         runSpacing: MediaQuery.of(context).size.height * 0.05,
         children: <Widget>[
           Row(
-            // mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text("TLS certificate directory path"),
               Padding(
