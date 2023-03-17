@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../model/user_setting.dart';
 import '../../utils/app_provider.dart';
 

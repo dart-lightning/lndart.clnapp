@@ -16,23 +16,26 @@ class GrpcSettingView extends StatefulWidget {
 class _GrpcSettingViewState extends State<GrpcSettingView> {
   Widget buildGrpcSettingView(
       {required BuildContext context, required Setting setting}) {
+    var padding = MediaQuery.of(context).size.width * 0.1;
+
     return Wrap(
         runSpacing: MediaQuery.of(context).size.height * 0.05,
         children: <Widget>[
           Row(
+            // mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text("TLS certificate directory path"),
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.1,
+              Padding(
+                padding: EdgeInsets.only(left: padding),
+                child: ElevatedButton(
+                    onPressed: () async {
+                      String picker = await DirectoryPicker.pickDir();
+                      setState(() {
+                        setting.path = picker;
+                      });
+                    },
+                    child: const Text('Browser')),
               ),
-              ElevatedButton(
-                  onPressed: () async {
-                    String picker = await DirectoryPicker.pickDir();
-                    setState(() {
-                      setting.path = picker;
-                    });
-                  },
-                  child: const Text('Browser')),
             ],
           ),
           InputDecorator(
