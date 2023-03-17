@@ -55,68 +55,72 @@ class _SettingViewState extends State<SettingView> {
   Widget _buildMainView({required BuildContext context}) {
     var setting = widget.provider.get<Setting>();
     final clients = ClientProvider.getClientByDefPlatform();
-    return SingleChildScrollView(
-      child: Padding(
-        padding: EdgeInsets.only(
-            left: MediaQuery.of(context).size.width * 0.2,
-            right: MediaQuery.of(context).size.width * 0.2),
-        child: Wrap(
-          runSpacing: MediaQuery.of(context).size.height * 0.05,
-          children: [
-            const Text("Connection type"),
-            InputDecorator(
-              decoration: const InputDecoration(border: OutlineInputBorder()),
-              child: DropdownButton(
-                value: setting.clientMode,
-                underline: const SizedBox(),
-                items: clients.map((ClientMode clientMode) {
-                  return DropdownMenuItem(
-                    enabled: ClientProvider.isClientSupported(mode: clientMode),
-                    value: clientMode,
-                    child: Text(clientMode.toString()),
-                  );
-                }).toList(),
-                onChanged: (ClientMode? newValue) {
-                  setState(() {
-                    setting.clientMode = newValue!;
-                  });
-                },
-              ),
-            ),
-            _buildCorrectSettingView(context: context, setting: setting),
-            Row(
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    if (setting.isValid()) {
-                      await saveSettings(setting: setting);
-                      await ManagerAPIProvider.registerClientFromSetting(
-                          setting, widget.provider);
-                      // https://stackoverflow.com/questions/68871880/do-not-use-buildcontexts-across-async-gaps
-                      if (!mounted) return;
-                      Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                              builder: (context) => HomeView(
-                                    provider: widget.provider,
-                                  )),
-                          (Route<dynamic> route) => false);
-                    }
-                  },
-                  child: const Text("Save"),
-                ),
-                const Spacer(),
-                ElevatedButton(
-                  onPressed: () async => {
-                    await ManagerAPIProvider.clear(provider: widget.provider),
+
+    var padding = MediaQuery.of(context).size.width * 0.2;
+
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.only(left: padding, right: padding),
+          child: Wrap(
+            runSpacing: MediaQuery.of(context).size.height * 0.05,
+            children: [
+              const Text("Connection type"),
+              InputDecorator(
+                decoration: const InputDecoration(border: OutlineInputBorder()),
+                child: DropdownButton(
+                  value: setting.clientMode,
+                  underline: const SizedBox(),
+                  items: clients.map((ClientMode clientMode) {
+                    return DropdownMenuItem(
+                      enabled:
+                          ClientProvider.isClientSupported(mode: clientMode),
+                      value: clientMode,
+                      child: Text(clientMode.toString()),
+                    );
+                  }).toList(),
+                  onChanged: (ClientMode? newValue) {
                     setState(() {
-                      setting = setting;
-                    })
+                      setting.clientMode = newValue!;
+                    });
                   },
-                  child: const Text("Clear"),
                 ),
-              ],
-            ),
-          ],
+              ),
+              _buildCorrectSettingView(context: context, setting: setting),
+              Row(
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (setting.isValid()) {
+                        await saveSettings(setting: setting);
+                        await ManagerAPIProvider.registerClientFromSetting(
+                            setting, widget.provider);
+                        // https://stackoverflow.com/questions/68871880/do-not-use-buildcontexts-across-async-gaps
+                        if (!mounted) return;
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (context) => HomeView(
+                                      provider: widget.provider,
+                                    )),
+                            (Route<dynamic> route) => false);
+                      }
+                    },
+                    child: const Text("Save"),
+                  ),
+                  const Spacer(),
+                  ElevatedButton(
+                    onPressed: () async => {
+                      await ManagerAPIProvider.clear(provider: widget.provider),
+                      setState(() {
+                        setting = setting;
+                      })
+                    },
+                    child: const Text("Clear"),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

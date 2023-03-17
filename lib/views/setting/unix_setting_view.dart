@@ -15,23 +15,25 @@ class UnixSettingView extends StatefulWidget {
 class _UnixSettingViewState extends State<UnixSettingView> {
   Widget _buildUnixSettingView(
       {required BuildContext context, required Setting setting}) {
+    var padding = MediaQuery.of(context).size.width * 0.1;
+
     return Wrap(
         runSpacing: MediaQuery.of(context).size.height * 0.05,
         children: <Widget>[
           Row(
             children: [
               const Text("lightning-rpc file path"),
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.1,
+              Padding(
+                padding: EdgeInsets.only(left: padding),
+                child: ElevatedButton(
+                    onPressed: () async {
+                      String picker = await DirectoryPicker.pickDir();
+                      setState(() {
+                        setting.path = picker;
+                      });
+                    },
+                    child: const Text('Browser')),
               ),
-              ElevatedButton(
-                  onPressed: () async {
-                    String picker = await DirectoryPicker.pickDir();
-                    setState(() {
-                      setting.path = picker;
-                    });
-                  },
-                  child: const Text('Browser')),
             ],
           ),
           InputDecorator(
