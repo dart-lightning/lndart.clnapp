@@ -16,4 +16,5 @@ class AppPayInvoice {
       return AppPayInvoice(payResponse: json);
     }
   }
+  Map<String, dynamic> toJson() => payResponse;
 }

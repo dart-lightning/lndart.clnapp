@@ -4,6 +4,8 @@ import 'package:clnapp/model/app_model/pay_invoice.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:cln_common/cln_common.dart';
+import 'dart:convert' ; 
 
 class PayView extends StatefulWidget {
   final AppProvider provider;
@@ -98,10 +100,10 @@ class _PayViewState extends State<PayView> {
                       });
                 }
               }),
-          paymentResponse != null
+          paymentResponse != null && paymentResponse!.payResponse != null 
               ? paymentResponse!.payResponse["Error"] == null
                   ? Text(
-                      "Payment Successfully : ${paymentResponse!.payResponse["amountMsat"]["msat"]} msats")
+                      "Payment Successful : ${paymentResponse!.payResponse["amount_msat"]} ")
                   : Text("${paymentResponse!.payResponse["Error"]}")
               : Container(),
         ],
