@@ -1,9 +1,9 @@
 import 'package:cln_grpc/cln_grpc.dart';
 import 'package:clnapp/api/cln/request/cln_request.dart';
 
-class CLNListPaysRequest extends CLNRequest<ListpaysRequest> {
-  CLNListPaysRequest(
-      {Map<String, dynamic>? unixRequest, ListpaysRequest? grpcRequest})
+class CLNListSendPayRequest extends CLNRequest<ListsendpaysPayments> {
+  CLNListSendPayRequest(
+      {Map<String, dynamic>? unixRequest, ListsendpaysPayments? grpcRequest})
       : super(unixRequest: unixRequest, grpcRequest: grpcRequest);
 
   @override

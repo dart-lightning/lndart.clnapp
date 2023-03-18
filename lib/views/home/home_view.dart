@@ -115,7 +115,7 @@ class _HomeViewState extends State<HomeView> {
   Future<List<dynamic>?> listPayments() async {
     final invoicesList =
         await widget.provider.get<AppApi>().listInvoices(status: "paid");
-    final paysList = await widget.provider.get<AppApi>().listPays();
+    final paysList = await widget.provider.get<AppApi>().listSendPays();
 
     List list = [];
 
@@ -127,6 +127,24 @@ class _HomeViewState extends State<HomeView> {
     return list;
   }
 
+  Widget _text({required String topic, required String value}) {
+    return RichText(
+      text: TextSpan(
+          text: "$topic : ",
+          style: const TextStyle(
+            color: Color.fromARGB(255, 255, 121, 197),
+            fontSize: 15,
+          ),
+          children: [
+            TextSpan(
+              text: value,
+              style: const TextStyle(
+                  color: Color.fromARGB(255, 98, 114, 164), fontSize: 15),
+            )
+          ]),
+    );
+  }
+
   Widget _buildSpecificPaymentView(
       {required BuildContext context,
       required List<dynamic> items,
@@ -135,22 +153,25 @@ class _HomeViewState extends State<HomeView> {
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Amount: ${items[index].amount}"),
-              Text("Confirmed: ${items[index].status}"),
-              Text("Bolt11: ${items[index].bolt11}"),
-              Text("Payment Hash: ${items[index].paymentHash}"),
-              Text("Paid time: ${items[index].paidTime}"),
+              _text(topic: "Amount", value: items[index].amount),
+              _text(topic: "Confirmed", value: items[index].status),
+              _text(topic: "Bolt11", value: items[index].bolt11),
+              _text(topic: "Payment Hash", value: items[index].paymentHash),
+              _text(topic: "Paid time", value: items[index].paidTime),
             ],
           )
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Bolt11: ${items[index].bolt11}"),
-              Text("preimage : ${items[index].preimage}"),
-              Text("Created At: ${items[index].createdAt}"),
-              Text("status: ${items[index].status}"),
-              Text("payment Hash: ${items[index].paymentHash}"),
-              Text("Destination: ${items[index].destination}"),
+              _text(topic: "Bolt11", value: items[index].bolt11),
+              _text(
+                  topic: "Payment Preimage",
+                  value: items[index].paymentPreimage),
+              _text(topic: "Created At", value: items[index].createdAt),
+              _text(topic: "status", value: items[index].status),
+              _text(topic: "payment Hash", value: items[index].paymentHash),
+              _text(topic: "Destination", value: items[index].destination),
+              _text(topic: "Label", value: items[index].label),
             ],
           );
   }
@@ -203,17 +224,23 @@ class _HomeViewState extends State<HomeView> {
                           Expanded(
                             child: Container(
                               alignment: Alignment.center,
-                              child: Text(
-                                checkListIdentifier(
-                                        listTile: snapshot.data![index])
-                                    ? snapshot.data![index].label
-                                    : snapshot.data![index].bolt11,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
+                              child: checkListIdentifier(
+                                      listTile: snapshot.data![index])
+                                  ? Text(
+                                      " + ${snapshot.data![index].amount}",
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.green),
+                                    )
+                                  : Text(
+                                      " - ${snapshot.data![index].amountSent}",
+                                      style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.red),
+                                    ),
                             ),
                           ),
                         ],
@@ -300,7 +327,7 @@ class _HomeViewState extends State<HomeView> {
         ),
         BottomNavyBarItem(
           icon: const Icon(Icons.settings_outlined),
-          title: const Text('Setting'),
+          title: const Text('Settings'),
           textAlign: TextAlign.center,
           activeColor: Theme.of(context).colorScheme.primary,
           inactiveColor: Theme.of(context).highlightColor,
