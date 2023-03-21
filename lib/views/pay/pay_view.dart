@@ -17,18 +17,14 @@ class _PayViewState extends State<PayView> {
   String? boltString;
   int? amountMsat;
   AppPayInvoice? paymentResponse;
+  String? error;
 
   Future<AppPayInvoice> payInvoice(String boltString, int? amountMsat) async {
-    try {
-      final response = await widget.provider
-          .get<AppApi>()
-          .payInvoice(invoice: boltString, msat: amountMsat);
-      return response;
-    } catch (ex) {
-      AppPayInvoice error =
-          AppPayInvoice(payResponse: {"Error": ex.toString()});
-      return error;
-    }
+    // we don't need error handling here
+    final response = await widget.provider
+        .get<AppApi>()
+        .payInvoice(invoice: boltString, msat: amountMsat);
+    return response;
   }
 
   Widget _buildMainView() {
@@ -84,25 +80,23 @@ class _PayViewState extends State<PayView> {
               label: "Pay",
               onPress: () {
                 if (boltString == null || boltString!.isEmpty) {
-                  AppPayInvoice error = AppPayInvoice(payResponse: {
-                    "Error": "Error: Bolt11/12 Invoice required"
-                  });
                   setState(() {
-                    paymentResponse = error;
+                    error = "Error: Bolt11/12 Invoice required";
                   });
                 } else {
                   payInvoice(boltString!, amountMsat).then((value) => {
                         setState(() {
                           paymentResponse = value;
+                          error = "There is no error";
                         }),
                       });
                 }
               }),
-          paymentResponse != null
-              ? paymentResponse!.payResponse["Error"] == null
+          error != null
+              ? error == "There is no error"
                   ? Text(
-                      "Payment Successfully done! : ${paymentResponse!.payResponse["amount_msat"]}")
-                  : Text("${paymentResponse!.payResponse["Error"]}")
+                      "Payment Successfully done! : ${paymentResponse!.payResponse.amountSentMSAT}")
+                  : Text(error!)
               : Container(),
         ],
       ),
