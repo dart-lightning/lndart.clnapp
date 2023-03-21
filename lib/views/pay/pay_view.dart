@@ -101,7 +101,7 @@ class _PayViewState extends State<PayView> {
           paymentResponse != null
               ? paymentResponse!.payResponse["Error"] == null
                   ? Text(
-                      "Payment Successfully : ${paymentResponse!.payResponse["amountMsat"]["msat"]} msats")
+                      "Payment Successfully done! : ${paymentResponse!.payResponse["amount_msat"]}")
                   : Text("${paymentResponse!.payResponse["Error"]}")
               : Container(),
         ],
