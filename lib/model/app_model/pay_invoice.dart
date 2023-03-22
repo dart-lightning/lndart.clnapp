@@ -44,8 +44,7 @@ class AppPay {
 
   factory AppPay.fromJSON(Map<String, dynamic> json, {bool snackCase = false}) {
     var destination = json.withKey("destination", snackCase: snackCase);
-    var paymentPreimage =
-        json.parseMsat(key: "payment_preimage", snackCase: true);
+    var paymentPreimage = json.withKey("payment_preimage", snackCase: true);
     var createdAt = json.withKey("created_at", snackCase: true);
     var status = json.withKey("status", snackCase: snackCase);
     var paymentHash = json.withKey("payment_hash", snackCase: true);
