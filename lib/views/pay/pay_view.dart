@@ -14,6 +14,7 @@ class PayView extends StatefulWidget {
 }
 
 class _PayViewState extends State<PayView> {
+  String state = "";
   String? boltString;
   int? amountMsat;
   AppPayInvoice? paymentResponse;
@@ -24,6 +25,9 @@ class _PayViewState extends State<PayView> {
     final response = await widget.provider
         .get<AppApi>()
         .payInvoice(invoice: boltString, msat: amountMsat);
+    setState(() {
+      state = "Payment Status ${response.payResponse.status}";
+    });
     return response;
   }
 
@@ -87,17 +91,12 @@ class _PayViewState extends State<PayView> {
                   payInvoice(boltString!, amountMsat).then((value) => {
                         setState(() {
                           paymentResponse = value;
-                          error = "There is no error";
+                          error = null;
                         }),
                       });
                 }
               }),
-          error != null
-              ? error == "There is no error"
-                  ? Text(
-                      "Payment Successfully done! : ${paymentResponse!.payResponse.amountSentMSAT}")
-                  : Text(error!)
-              : Container(),
+          error == null ? Text(state) : Text(error!)
         ],
       ),
     );
