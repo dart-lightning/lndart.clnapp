@@ -52,8 +52,8 @@ class AppSendPays {
   factory AppSendPays.fromJSON(Map<String, dynamic> json,
       {bool snackCase = false}) {
     var bolt11 = json.withKey("bolt11", snackCase: snackCase);
-    var paymentPreimage = json.parseMsat(
-        key: "payment_preimage", snackCase: snackCase, isObject: false);
+    var paymentPreimage =
+        json.parseMsat(key: "payment_preimage", snackCase: snackCase);
     var createdAt = json.withKey("created_at", snackCase: snackCase);
     var status = json.withKey("status", snackCase: snackCase);
     var paymentHash = json.withKey("payment_hash", snackCase: snackCase);
@@ -69,7 +69,7 @@ class AppSendPays {
         status: status,
         paymentHash: paymentHash,
         destination: destination ?? "No destination",
-        amountSent: amountSent,
+        amountSent: amountSent.toString(),
         label: label ?? "No label provided for the payment");
   }
 }
