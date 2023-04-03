@@ -2,6 +2,7 @@ import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
+import 'package:clnapp/model/app_model/list_invoices.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:clnapp/views/app_view.dart';
 import 'package:clnapp/views/pay/pay_view.dart';
@@ -145,6 +146,20 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
+  String topic(AppInvoice topic) {
+    if (topic.bolt11 == null) {
+      return "bolt12";
+    }
+    return "bolt11";
+  }
+
+  String value(AppInvoice value) {
+    if (value.bolt11 == null) {
+      return value.bolt12.toString();
+    }
+    return value.bolt11.toString();
+  }
+
   Widget _buildSpecificPaymentView(
       {required BuildContext context,
       required List<dynamic> items,
@@ -154,13 +169,9 @@ class _HomeViewState extends State<HomeView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _text(topic: "Amount", value: items[index].amount),
-              _text(
-                  topic: "Payment Request", value: items[index].paymentRequest),
-              _text(topic: "Bolt11", value: items[index].bolt11),
-              _text(topic: "Prefix", value: items[index].prefix),
-              _text(
-                  topic: "Signature", value: items[index].signature.toString()),
-              _text(topic: "TimeStamp", value: items[index].timeStamp),
+              _text(topic: "Description", value: items[index].description),
+              _text(topic: topic(items[index]), value: value(items[index])),
+              _text(topic: "Status", value: items[index].status),
             ],
           )
         : Column(
@@ -230,7 +241,7 @@ class _HomeViewState extends State<HomeView> {
                               child: checkListIdentifier(
                                       listTile: snapshot.data![index])
                                   ? Text(
-                                      " + ${snapshot.data![index].amount} btc",
+                                      " + ${snapshot.data![index].amount} msats",
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                           fontSize: 15,
