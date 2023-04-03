@@ -25,6 +25,7 @@ dependencies:
   lnlambda: ^0.0.1-beta.6
   json_annotation: ^4.5.0
   flutter_launcher_icons: ^0.10.0
+  bolt11_decoder: ^1.0.2
 
 dev_dependencies:
   flutter_test:

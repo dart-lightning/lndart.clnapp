@@ -154,10 +154,13 @@ class _HomeViewState extends State<HomeView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _text(topic: "Amount", value: items[index].amount),
-              _text(topic: "Confirmed", value: items[index].status),
+              _text(
+                  topic: "Payment Request", value: items[index].paymentRequest),
               _text(topic: "Bolt11", value: items[index].bolt11),
-              _text(topic: "Payment Hash", value: items[index].paymentHash),
-              _text(topic: "Paid time", value: items[index].paidTime),
+              _text(topic: "Prefix", value: items[index].prefix),
+              _text(
+                  topic: "Signature", value: items[index].signature.toString()),
+              _text(topic: "TimeStamp", value: items[index].timeStamp),
             ],
           )
         : Column(
@@ -227,7 +230,7 @@ class _HomeViewState extends State<HomeView> {
                               child: checkListIdentifier(
                                       listTile: snapshot.data![index])
                                   ? Text(
-                                      " + ${snapshot.data![index].amount}",
+                                      " + ${snapshot.data![index].amount} btc",
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(
                                           fontSize: 15,

@@ -1,5 +1,6 @@
 import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/model/app_model/app_utils.dart';
+import 'package:bolt11_decoder/bolt11_decoder.dart' as pay_req;
 
 class AppListInvoices {
   List<AppInvoice> invoice;
@@ -28,61 +29,70 @@ class AppListInvoices {
 }
 
 class AppInvoice {
-  /// payment hash
-  final String paymentHash;
-
   /// bolt11 identifier
   final String bolt11;
 
   /// The quantity of Bitcoin in millisatoshi
   final String amount;
 
-  /// If the invoice is paid or not on the blockchain
-  final String status;
+  final String paymentRequest;
 
-  /// The Invoice paid time
-  final String paidTime;
+  final String prefix;
 
-  /// The Invoice description
-  final String label;
+  final List<int> signature;
 
-  /// The Invoice description
-  final String description;
+  final List<pay_req.TaggedField> tags;
 
-  /// flag to identify invoice
+  final String timeStamp;
+
   final String identifier;
 
+  final String status;
+
   AppInvoice(
-      {required this.paymentHash,
+      {required this.bolt11,
       required this.amount,
+      required this.paymentRequest,
+      required this.prefix,
+      required this.signature,
+      required this.tags,
+      required this.timeStamp,
       required this.status,
-      required this.paidTime,
-      required this.bolt11,
-      required this.description,
-      required this.label,
       this.identifier = "invoice"});
 
   factory AppInvoice.fromJSON(Map<String, dynamic> json,
       {bool snackCase = false, bool isObject = false}) {
     LogManager.getInstance.debug("$json");
-    var bolt11 = json.withKey("bolt11", snackCase: snackCase) ??
-        json.withKey("bolt12", snackCase: snackCase);
-    var paymentHash = json.withKey("paymentHash", snackCase: snackCase);
+    var bolt11 = json.withKey("bolt11", snackCase: snackCase);
     var status = json.withKey("status", snackCase: snackCase);
-    var received = json.parseMsat(
-        key: "amountReceivedMsat", snackCase: snackCase, isObject: isObject);
-    received.toString();
-    var paidAt = json.withKey("paidAt", snackCase: snackCase);
-    var description = json.withKey("description", snackCase: snackCase);
-    var label = json.withKey("label", snackCase: snackCase);
+    pay_req.Bolt11PaymentRequest req = pay_req.Bolt11PaymentRequest(bolt11);
+    LogManager.getInstance.debug(
+        "NEW RESPONSE HERE : ${req.amount} ${req.paymentRequest} ${req.prefix} ${req.signature} ${req.tags} ${req.timestamp}");
+    var amount = req.amount;
+    var paymentRequest = req.paymentRequest;
+    var pre = req.prefix;
+    String prefix = '';
+    if (pre == pay_req.PayRequestPrefix.lntb) {
+      prefix = "lntb";
+    } else if (pre == pay_req.PayRequestPrefix.lnbcrt) {
+      prefix = "lncbrt";
+    } else if (pre == pay_req.PayRequestPrefix.lnbc) {
+      prefix = "lnbc";
+    } else {
+      prefix = "lnsb";
+    }
+    var signature = req.signature;
+    var tags = req.tags;
+    var timeStamp = req.timestamp;
     return AppInvoice(
       bolt11: bolt11,
-      paymentHash: paymentHash,
+      amount: amount.toString(),
       status: status ?? "unpaid",
-      amount: received.toString(),
-      paidTime: paidAt != null ? paidAt.toString() : "unpaid",
-      description: description,
-      label: label,
+      paymentRequest: paymentRequest,
+      prefix: prefix.toString(),
+      signature: signature,
+      tags: tags,
+      timeStamp: timeStamp.toString(),
     );
   }
 }

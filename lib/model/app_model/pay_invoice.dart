@@ -6,7 +6,6 @@ class AppPayInvoice {
 
   AppPayInvoice({required this.payResponse});
 
-  //TODO: how manage this? looks incompleted.
   factory AppPayInvoice.fromJSON(Map<String, dynamic> json,
       {bool snackCase = false}) {
     LogManager.getInstance.debug("RESPONSE HERE : $json");
