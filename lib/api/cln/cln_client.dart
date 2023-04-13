@@ -136,7 +136,7 @@ class CLNApi extends AppApi {
         if (msat != null) {
           params = CLNPayRequest(unixRequest: <String, dynamic>{
             'bolt11': invoice,
-            'msatoshi': "${msat}msat"
+            'amount_msat': "${msat}msat"
           });
         } else {
           params = CLNPayRequest(unixRequest: <String, dynamic>{
@@ -148,7 +148,7 @@ class CLNApi extends AppApi {
         if (msat != null) {
           params = CLNPayRequest(unixRequest: <String, dynamic>{
             'bolt11': invoice,
-            'msatoshi': "${msat}msat"
+            'amount_msat': "${msat}msat"
           });
         } else {
           params = CLNPayRequest(unixRequest: <String, dynamic>{
