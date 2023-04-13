@@ -2,12 +2,14 @@ import 'package:cln_common/cln_common.dart';
 import 'package:cln_grpc/cln_grpc.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/api/client_provider.dart';
+import 'package:clnapp/api/cln/request/generate_invoice.dart';
 import 'package:clnapp/api/cln/request/get_info_request.dart';
 import 'package:clnapp/api/cln/request/list_funds_request.dart';
 import 'package:clnapp/api/cln/request/list_invoices_request.dart';
 import 'package:clnapp/api/cln/request/list_transaction_request.dart';
 import 'package:clnapp/api/cln/request/listsendpays_request.dart';
 import 'package:clnapp/api/cln/request/pay_request.dart';
+import 'package:clnapp/model/app_model/generate_invoice.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/model/app_model/list_invoices.dart';
@@ -190,5 +192,69 @@ class CLNApi extends AppApi {
         onDecode: (jsonResponse) => AppListSendPays.fromJSON(
             jsonResponse as Map<String, dynamic>,
             snackCase: !mode.withCamelCase()));
+  }
+
+  @override
+  Future<AppGenerateInvoice> generateInvoice(
+      {required String label,
+      required String description,
+      int? msat,
+      int? expiry}) {
+    dynamic params;
+    switch (mode) {
+      case ClientMode.grpc:
+        if (msat == null) {
+          params = CLNInvoiceRequest(
+              grpcRequest: InvoiceRequest(
+                  label: label,
+                  description: description,
+                  amountMsat: AmountOrAny(any: true)));
+        } else {
+          Amount? amount = Amount();
+          amount.msat = Int64(msat);
+          params = CLNInvoiceRequest(
+              grpcRequest: InvoiceRequest(
+                  label: label,
+                  description: description,
+                  amountMsat: AmountOrAny(amount: amount)));
+        }
+        break;
+      case ClientMode.unixSocket:
+        if (msat != null) {
+          params = CLNInvoiceRequest(unixRequest: <String, dynamic>{
+            'label': label,
+            'amount_msat': "${msat}msat",
+            'description': description
+          });
+        } else {
+          params = CLNInvoiceRequest(unixRequest: <String, dynamic>{
+            'label': label,
+            'description': description,
+            'amount_msat': "any",
+          });
+        }
+        break;
+      case ClientMode.lnlambda:
+        if (msat != null) {
+          params = CLNInvoiceRequest(unixRequest: <String, dynamic>{
+            'label': label,
+            'amount_msat': "${msat}msat",
+            'description': description
+          });
+        } else {
+          params = CLNPayRequest(unixRequest: <String, dynamic>{
+            'label': label,
+            'description': description,
+            'amount_msat': "any",
+          });
+        }
+        break;
+    }
+    return client.call<CLNInvoiceRequest, AppGenerateInvoice>(
+        method: "invoice",
+        params: params,
+        onDecode: (jsonResponse) => AppGenerateInvoice.fromJSON(
+            jsonResponse as Map<String, dynamic>,
+            snackCase: mode == ClientMode.unixSocket));
   }
 }

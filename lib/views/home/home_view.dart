@@ -5,6 +5,7 @@ import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/model/app_model/list_invoices.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:clnapp/views/app_view.dart';
+import 'package:clnapp/views/generate_invoice/generate_invoice_view.dart';
 import 'package:clnapp/views/pay/pay_view.dart';
 import 'package:clnapp/views/setting/setting_view.dart';
 import 'package:flutter/material.dart';
@@ -108,7 +109,13 @@ class _HomeViewState extends State<HomeView> {
             MainCircleButton(
                 icon: Icons.call_received_outlined,
                 label: "Request",
-                onPress: () {}),
+                onPress: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              GenerateInvoiceView(provider: widget.provider)));
+                }),
           ])
         ]));
   }

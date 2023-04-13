@@ -1,3 +1,4 @@
+import 'package:clnapp/model/app_model/generate_invoice.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/model/app_model/list_invoices.dart';
@@ -32,6 +33,12 @@ abstract class AppApi {
 
   /// Return the pay response from lightning node.
   Future<AppPayInvoice> payInvoice({required String invoice, int? msat});
+
+  Future<AppGenerateInvoice> generateInvoice(
+      {required String label,
+      required String description,
+      int? msat,
+      int? expiry});
 
   /// Return the list of payments that succeeded
   Future<AppListSendPays> listSendPays();
