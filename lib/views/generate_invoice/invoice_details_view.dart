@@ -26,9 +26,9 @@ class _InvoiceDetailsViewState extends State<InvoiceDetailsView> {
           SizedBox(
             width: 180,
             child:
-                QrImage(data: widget.invoiceResponse!.generateResponse.invoice),
+                QrImage(data: widget.invoiceResponse.generateResponse.invoice),
           ),
-          Text(widget.invoiceResponse!.generateResponse.invoice),
+          Text(widget.invoiceResponse.generateResponse.invoice),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
