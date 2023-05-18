@@ -201,8 +201,13 @@ class _HomeViewState extends State<HomeView> {
     return FutureBuilder<List<dynamic>?>(
         future: listPayments(),
         builder: (context, AsyncSnapshot<List<dynamic>?> snapshot) {
-          _checkIfThereAreError(context: context, snapshot: snapshot);
-          if (snapshot.hasData) {
+          String error = '';
+          if (snapshot.hasError) {
+            LogManager.getInstance.error("${snapshot.error}");
+            LogManager.getInstance.error("${snapshot.stackTrace}");
+            error = snapshot.error!.toString();
+            return Text(error);
+          } else if (snapshot.hasData) {
             return ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
@@ -262,32 +267,28 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   );
                 });
-          } else {
-            return const Text("No Payments found");
           }
+          return const Text('No payments found!');
         });
-  }
-
-  void _checkIfThereAreError<T>(
-      {required BuildContext context, required AsyncSnapshot<T> snapshot}) {
-    if (snapshot.hasError) {
-      LogManager.getInstance.error("${snapshot.error}");
-      LogManager.getInstance.error("${snapshot.stackTrace}");
-      widget.showSnackBar(
-          context: context, message: snapshot.error!.toString());
-    }
   }
 
   Widget _buildMainView({required BuildContext context}) {
     return FutureBuilder<AppGetInfo>(
         future: widget.provider.get<AppApi>().getInfo(),
         builder: (context, AsyncSnapshot<AppGetInfo> snapshot) {
-          _checkIfThereAreError(context: context, snapshot: snapshot);
-          if (snapshot.hasData) {
+          String error = '';
+          if (snapshot.hasError) {
+            /// This error resonates with the user either not having his/her node up
+            /// or the file they have chosen can't communicate with the server.
+            LogManager.getInstance.error("${snapshot.error}");
+            LogManager.getInstance.error("${snapshot.stackTrace}");
+            error = snapshot.error!.toString();
+          } else if (snapshot.hasData) {
             var getInfo = snapshot.data!;
             return SingleChildScrollView(
                 physics: const ScrollPhysics(),
                 child: Column(children: <Widget>[
+                  ///TODO: Put this in a different file
                   _buildInfoView(context: context, getInfo: getInfo),
                   const SizedBox(
                     height: 20,
@@ -313,11 +314,31 @@ class _HomeViewState extends State<HomeView> {
                       ),
                     ),
                   ),
+
+                  ///TODO: Put this in a different file.
                   _buildPaymentListView(context: context)
                 ]));
-          } else {
-            return const Text("Loading");
           }
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Image(
+                image: AssetImage('assets/images/exclamation.png'),
+              ),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      error,
+                      style: const TextStyle(fontSize: 20),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ]),
+            ],
+          );
         });
   }
 
