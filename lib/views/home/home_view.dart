@@ -201,6 +201,11 @@ class _HomeViewState extends State<HomeView> {
     return FutureBuilder<List<dynamic>?>(
         future: listPayments(),
         builder: (context, AsyncSnapshot<List<dynamic>?> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: Text('Loading...'),
+            );
+          }
           if (snapshot.hasError) {
             LogManager.getInstance.error("${snapshot.error}");
             LogManager.getInstance.error("${snapshot.stackTrace}");
@@ -276,6 +281,11 @@ class _HomeViewState extends State<HomeView> {
         future: widget.provider.get<AppApi>().getInfo(),
         builder: (context, AsyncSnapshot<AppGetInfo> snapshot) {
           String? error;
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: Text('Loading...'),
+            );
+          }
           if (snapshot.hasError) {
             /// This error resonates with the user either not having his/her node up
             /// or the file they have chosen can't communicate with the server.
