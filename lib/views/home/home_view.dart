@@ -201,11 +201,10 @@ class _HomeViewState extends State<HomeView> {
     return FutureBuilder<List<dynamic>?>(
         future: listPayments(),
         builder: (context, AsyncSnapshot<List<dynamic>?> snapshot) {
-          String error = '';
           if (snapshot.hasError) {
             LogManager.getInstance.error("${snapshot.error}");
             LogManager.getInstance.error("${snapshot.stackTrace}");
-            error = snapshot.error!.toString();
+            String error = snapshot.error!.toString();
             return Text(error);
           } else if (snapshot.hasData) {
             return ListView.builder(
@@ -276,7 +275,7 @@ class _HomeViewState extends State<HomeView> {
     return FutureBuilder<AppGetInfo>(
         future: widget.provider.get<AppApi>().getInfo(),
         builder: (context, AsyncSnapshot<AppGetInfo> snapshot) {
-          String error = '';
+          String? error;
           if (snapshot.hasError) {
             /// This error resonates with the user either not having his/her node up
             /// or the file they have chosen can't communicate with the server.
@@ -330,7 +329,7 @@ class _HomeViewState extends State<HomeView> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
                     child: Text(
-                      error,
+                      error!,
                       style: const TextStyle(fontSize: 20),
                       textAlign: TextAlign.center,
                     ),
