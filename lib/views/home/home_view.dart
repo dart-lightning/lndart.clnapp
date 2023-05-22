@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/components/error.dart';
@@ -26,6 +27,24 @@ class _HomeViewState extends State<HomeView> {
     SettingView(provider: widget.provider),
   ];
 
+  String errors(dynamic error) {
+    String errorhandling;
+    if (error is SocketException) {
+      /// For socket
+      errorhandling =
+          'The path provided to the socket is wrong or the lightning node is not currently running.';
+    } else if (error is ArgumentError) {
+      /// For lnlambda
+      errorhandling =
+          'The arguments provided are wrong. Please try again with correct arguments.';
+    } else {
+      /// For Grpc
+      errorhandling =
+          'Please re-check the host and the TLS certificate path of the gRPC.';
+    }
+    return errorhandling;
+  }
+
   Widget _buildMainView({required BuildContext context}) {
     return FutureBuilder<AppGetInfo>(
         future: widget.provider.get<AppApi>().getInfo(),
@@ -43,7 +62,7 @@ class _HomeViewState extends State<HomeView> {
             /// or the file they have chosen can't communicate with the server.
             LogManager.getInstance.error("${snapshot.error}");
             LogManager.getInstance.error("${snapshot.stackTrace}");
-            error = snapshot.error!.toString();
+            error = errors(snapshot.error);
           } else if (snapshot.hasData) {
             /// This is the case when the node is up and the provided parameters are
             /// correct.

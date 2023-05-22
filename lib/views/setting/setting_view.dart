@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/api/client_provider.dart';
 import 'package:clnapp/model/user_setting.dart';
 import 'package:clnapp/utils/app_provider.dart';
@@ -8,7 +9,6 @@ import 'package:clnapp/views/home/home_view.dart';
 import 'package:clnapp/views/setting/lnlambda_setting_view.dart';
 import 'package:clnapp/views/setting/unix_setting_view.dart';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'grpc_setting_view.dart';
@@ -24,14 +24,6 @@ class SettingView extends StatefulWidget {
 
 class _SettingViewState extends State<SettingView> {
   // FIXME: move in a util function
-  Future<String> pickDir() async {
-    final setting = widget.provider.get<Setting>();
-    String? path = await FilePicker.platform.getDirectoryPath();
-    setState(() {
-      setting.path = path ?? "No path found";
-    });
-    return setting.path!;
-  }
 
   Future<bool> saveSettings({required Setting setting}) async {
     final prefs = await SharedPreferences.getInstance();
@@ -103,6 +95,16 @@ class _SettingViewState extends State<SettingView> {
                                       provider: widget.provider,
                                     )),
                             (Route<dynamic> route) => false);
+                      } else {
+                        /// This condition hits when we currently do not have any data that resides in the sharedpreferences
+                        /// and we haven't provided any data in the fields.
+                        LogManager.getInstance
+                            .debug('Please choose valid settings fields');
+                        const snackBar = SnackBar(
+                          content: Text('Please choose valid settings fields'),
+                          duration: Duration(seconds: 2),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
                     },
                     child: const Text("Save"),
