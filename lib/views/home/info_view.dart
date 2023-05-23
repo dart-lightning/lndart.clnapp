@@ -1,5 +1,6 @@
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/utils/app_provider.dart';
+import 'package:clnapp/views/request/request_view.dart';
 import 'package:flutter/material.dart';
 
 import '../../components/buttons.dart';
@@ -60,9 +61,17 @@ class _InfoViewState extends State<InfoView> {
               },
             ),
             MainCircleButton(
-                icon: Icons.call_received_outlined,
-                label: "Request",
-                onPress: () {}),
+              icon: Icons.call_received_outlined,
+              label: "Request",
+              onPress: () => {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => RequestView(
+                              provider: widget.provider,
+                            ))),
+              },
+            ),
           ])
         ]));
   }
