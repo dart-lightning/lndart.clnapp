@@ -6,6 +6,8 @@ import 'package:clnapp/model/app_model/pay_invoice.dart';
 
 import 'package:clnapp/model/app_model/list_send_pays.dart';
 
+import 'package:clnapp/model/app_model/generate_invoice.dart';
+
 /// App API implementation, the class contains all the information
 /// to make a call to core lightning and return the correct type
 /// of useful of the UI.
@@ -35,4 +37,8 @@ abstract class AppApi {
 
   /// Return the list of payments that succeeded
   Future<AppListSendPays> listSendPays();
+
+  /// Return a bolt 11/12 invoice
+  Future<AppGenerateInvoice> generateInvoice(String label, String description,
+      {int? amount});
 }

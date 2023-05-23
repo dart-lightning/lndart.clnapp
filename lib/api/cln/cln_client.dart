@@ -2,12 +2,14 @@ import 'package:cln_common/cln_common.dart';
 import 'package:cln_grpc/cln_grpc.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/api/client_provider.dart';
+import 'package:clnapp/api/cln/request/generateinvoice_request.dart';
 import 'package:clnapp/api/cln/request/get_info_request.dart';
 import 'package:clnapp/api/cln/request/list_funds_request.dart';
 import 'package:clnapp/api/cln/request/list_invoices_request.dart';
 import 'package:clnapp/api/cln/request/list_transaction_request.dart';
 import 'package:clnapp/api/cln/request/listsendpays_request.dart';
 import 'package:clnapp/api/cln/request/pay_request.dart';
+import 'package:clnapp/model/app_model/generate_invoice.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/model/app_model/list_invoices.dart';
@@ -188,6 +190,44 @@ class CLNApi extends AppApi {
         method: "listsendpays",
         params: params,
         onDecode: (jsonResponse) => AppListSendPays.fromJSON(
+            jsonResponse as Map<String, dynamic>,
+            snackCase: !mode.withCamelCase()));
+  }
+
+  @override
+  Future<AppGenerateInvoice> generateInvoice(String label, String description,
+      {int? amount}) {
+    dynamic params;
+    switch (mode) {
+      case ClientMode.grpc:
+        var reqAmount = amount == null
+            ? AmountOrAny(any: true)
+            : AmountOrAny(amount: Amount(msat: Int64(amount)));
+        params = CLNGenerateInvoiceRequest(
+            grpcRequest: InvoiceRequest(
+                label: label, description: description, amountMsat: reqAmount));
+        break;
+      case ClientMode.unixSocket:
+        var reqAmount = amount == null ? "any" : amount.toString();
+        params = CLNGenerateInvoiceRequest(unixRequest: <String, dynamic>{
+          'amount_msat': reqAmount,
+          'label': label,
+          'description': description
+        });
+        break;
+      case ClientMode.lnlambda:
+        var reqAmount = amount == null ? "any" : amount.toString();
+        params = CLNGenerateInvoiceRequest(unixRequest: <String, dynamic>{
+          'amount_msat': reqAmount,
+          'label': label,
+          'description': description
+        });
+        break;
+    }
+    return client.call<CLNGenerateInvoiceRequest, AppGenerateInvoice>(
+        method: "invoice",
+        params: params,
+        onDecode: (jsonResponse) => AppGenerateInvoice.fromJSON(
             jsonResponse as Map<String, dynamic>,
             snackCase: !mode.withCamelCase()));
   }
