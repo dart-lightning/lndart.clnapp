@@ -1,6 +1,5 @@
 import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/api/api.dart';
-import 'package:clnapp/components/error.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:clnapp/views/app_view.dart';
@@ -9,6 +8,8 @@ import 'package:clnapp/views/home/paymentlist_view.dart';
 import 'package:clnapp/views/setting/setting_view.dart';
 import 'package:flutter/material.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:trash_component/components/global_components.dart';
 
 class HomeView extends StatefulAppView {
   const HomeView({Key? key, required AppProvider provider})
@@ -60,7 +61,20 @@ class _HomeViewState extends State<HomeView> {
           }
 
           /// Logging an error on the screen
-          return ErrorContainer(errorText: error!);
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+            GlobalComponent.showAppDialog(
+                context: context,
+                title: 'Oops, An error occured!',
+                message: error!,
+                closeMsg: 'Close',
+                imageProvided:
+                    const AssetImage('assets/images/exclamation.png'));
+          });
+          return const Center(
+              child: Text(
+            'Nothing to show here',
+            style: TextStyle(fontSize: 30),
+          ));
         });
   }
 

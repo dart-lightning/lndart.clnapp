@@ -10,6 +10,7 @@ import 'package:clnapp/views/setting/unix_setting_view.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:trash_component/components/global_components.dart';
 
 import 'grpc_setting_view.dart';
 
@@ -103,6 +104,15 @@ class _SettingViewState extends State<SettingView> {
                                       provider: widget.provider,
                                     )),
                             (Route<dynamic> route) => false);
+                      } else {
+                        GlobalComponent.showAppDialog(
+                            context: context,
+                            title: 'Oops, An error occurred!',
+                            message:
+                                'Please fill all the fields given in the settings',
+                            closeMsg: 'Close',
+                            imageProvided: const AssetImage(
+                                'assets/images/exclamation.png'));
                       }
                     },
                     child: const Text("Save"),
