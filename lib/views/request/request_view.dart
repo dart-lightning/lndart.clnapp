@@ -15,7 +15,7 @@ class RequestView extends StatefulWidget {
 }
 
 class _RequestViewState extends State<RequestView> {
-  String display = '';
+  String display = '0';
 
   Future<AppGenerateInvoice> generateInvoice() async {
     String label = '${DateTime.now()}';
@@ -31,86 +31,89 @@ class _RequestViewState extends State<RequestView> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Generate an invoice'),
-      ),
+      appBar: AppBar(),
       body: SafeArea(
+        bottom: true,
+        top: true,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            const SizedBox(
-              height: 30,
-            ),
-            SizedBox(
-              width: 350,
-              child: ListTile(
-                leading: Padding(
-                  padding: const EdgeInsets.only(left: 30),
-                  child: Text(
-                    display,
-                    textScaleFactor: 1.0,
-                    style: const TextStyle(
-                      fontSize: 50,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+            const Spacer(flex: 1),
+            Expanded(
+              flex: 1,
+              child: Text(
+                display,
+                textScaleFactor: 1.0,
+                style: const TextStyle(
+                  fontSize: 40,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            const SizedBox(
-              height: 20,
+            const Spacer(flex: 1),
+            Expanded(
+              child: ButtonBar(
+                buttonHeight: 0,
+                alignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  numberButton(size, '1'),
+                  numberButton(size, '2'),
+                  numberButton(size, '3')
+                ],
+              ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                numberButton(size, '1'),
-                numberButton(size, '2'),
-                numberButton(size, '3')
-              ],
+            Expanded(
+              child: ButtonBar(
+                buttonHeight: 0,
+                alignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  numberButton(size, '4'),
+                  numberButton(size, '5'),
+                  numberButton(size, '6')
+                ],
+              ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                numberButton(size, '4'),
-                numberButton(size, '5'),
-                numberButton(size, '6')
-              ],
+            Expanded(
+              child: ButtonBar(
+                buttonHeight: 0,
+                alignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  numberButton(size, '7'),
+                  numberButton(size, '8'),
+                  numberButton(size, '9')
+                ],
+              ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                numberButton(size, '7'),
-                numberButton(size, '8'),
-                numberButton(size, '9')
-              ],
+            Expanded(
+              child: ButtonBar(
+                buttonHeight: 0,
+                alignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  numberButton(size, '.'),
+                  numberButton(size, '0'),
+                  numberButton(
+                    size,
+                    '',
+                    icon: Icons.backspace_outlined,
+                  ),
+                ],
+              ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                numberButton(size, '.'),
-                numberButton(size, '0'),
-                numberButton(
-                  size,
-                  '',
-                  icon: Icons.backspace_outlined,
-                ),
-              ],
+            const Spacer(flex: 1),
+            Expanded(
+              child: MainCircleButton(
+                  icon: Icons.send_outlined,
+                  label: "Request",
+                  onPress: () async {
+                    AppGenerateInvoice invoiceModel = await generateInvoice();
+                    if (context.mounted) {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => QrScreen(
+                              invoice: invoiceModel.invoice,
+                              provider: widget.provider)));
+                    }
+                  }),
             ),
-            MainCircleButton(
-                icon: Icons.send_outlined,
-                label: "Request",
-                onPress: () async {
-                  AppGenerateInvoice invoiceModel = await generateInvoice();
-                  if (context.mounted) {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => QrScreen(
-                            invoice: invoiceModel.invoice,
-                            provider: widget.provider)));
-                  }
-                }),
-            const SizedBox(
-              height: 40,
-            )
+            const Spacer(flex: 1),
           ],
         ),
       ),
@@ -119,13 +122,15 @@ class _RequestViewState extends State<RequestView> {
 
   Widget numberButton(Size size, String value, {IconData? icon}) {
     return InkWell(
+      borderRadius: BorderRadius.circular(45),
       onTap: () {
         if (icon != null) {
           /// Handling the exception
-          if (display.isEmpty) {
-            return;
+          if (display.length == 1) {
+            display = '0';
+          } else {
+            display = display.substring(0, display.length - 1);
           }
-          display = display.substring(0, display.length - 1);
         }
 
         /// To get only one decimal in the field
@@ -140,12 +145,13 @@ class _RequestViewState extends State<RequestView> {
           return;
         }
         setState(() {
-          display = display + value;
+          display = int.parse(display + value).toString();
         });
       },
       child: Container(
+        alignment: Alignment.center,
         height: size.height * 0.12,
-        width: size.width * 0.25,
+        width: size.width * 0.15,
         decoration: BoxDecoration(border: Border.all(width: 0.025)),
         child: Center(
           child: icon != null
