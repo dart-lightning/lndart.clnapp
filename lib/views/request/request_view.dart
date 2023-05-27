@@ -1,6 +1,7 @@
 import 'package:clnapp/api/api.dart';
-import 'package:clnapp/views/pay/qr_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import '../../components/buttons.dart';
 import '../../model/app_model/generate_invoice.dart';
 import '../../utils/app_provider.dart';
@@ -43,9 +44,10 @@ class _RequestViewState extends State<RequestView> {
               child: Text(
                 display,
                 textScaleFactor: 1.0,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ),
@@ -106,10 +108,8 @@ class _RequestViewState extends State<RequestView> {
                   onPress: () async {
                     AppGenerateInvoice invoiceModel = await generateInvoice();
                     if (context.mounted) {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => QrScreen(
-                              invoice: invoiceModel.invoice,
-                              provider: widget.provider)));
+                      _showBottomDialog(
+                          context: context, invoice: invoiceModel.invoice);
                     }
                   }),
             ),
@@ -118,6 +118,68 @@ class _RequestViewState extends State<RequestView> {
         ),
       ),
     );
+  }
+
+  // FIXME: put this generic component inside the trash package
+  void _showBottomDialog(
+      {required BuildContext context, required AppInvoice invoice}) {
+    showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(25.0), topRight: Radius.circular(25.0)),
+        ),
+        builder: (BuildContext context) {
+          return FractionallySizedBox(
+              heightFactor: 0.7,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        const Spacer(flex: 2),
+                        Expanded(
+                            flex: 1,
+                            child: Container(
+                                alignment: Alignment.topRight,
+                                padding: const EdgeInsets.all(20),
+                                child: IconButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    icon: const Icon(
+                                      Icons.close,
+                                      size: 20,
+                                    )))),
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                      flex: 2,
+                      child: QrImageView(
+                        data: invoice.bolt11,
+                        version: QrVersions.auto,
+                        backgroundColor: Colors.white,
+                      )),
+                  Expanded(
+                      flex: 1,
+                      child: IconButton(
+                          onPressed: () {
+                            Clipboard.setData(
+                                ClipboardData(text: invoice.bolt11));
+                            const snackBar =
+                                SnackBar(content: Text('Copied to clipboard!'));
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(snackBar);
+                          },
+                          icon: const Icon(
+                            Icons.copy,
+                            size: 20,
+                          ))),
+                  const Spacer(flex: 2),
+                ],
+              ));
+        });
   }
 
   Widget numberButton(Size size, String value, {IconData? icon}) {
