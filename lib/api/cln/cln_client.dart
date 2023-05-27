@@ -200,59 +200,35 @@ class CLNApi extends AppApi {
     dynamic params;
     switch (mode) {
       case ClientMode.grpc:
-        if (amount == null) {
-          params = CLNGenerateInvoiceRequest(
-              grpcRequest: InvoiceRequest(
-                  label: label,
-                  description: description,
-                  amountMsat: AmountOrAny(any: true)));
-        } else {
-          Amount amount2 = Amount();
-          amount2.msat = Int64(amount);
-          params = CLNGenerateInvoiceRequest(
-              grpcRequest: InvoiceRequest(
-                  label: label,
-                  description: description,
-                  amountMsat: AmountOrAny(
-                      amount: Amount(msat: amount2.msat), any: false)));
-        }
+        var reqAmount = amount == null
+            ? AmountOrAny(any: true)
+            : AmountOrAny(amount: Amount(msat: Int64(amount)));
+        params = CLNGenerateInvoiceRequest(
+            grpcRequest: InvoiceRequest(
+                label: label, description: description, amountMsat: reqAmount));
         break;
       case ClientMode.unixSocket:
-        if (amount == null) {
-          params = CLNGenerateInvoiceRequest(unixRequest: <String, dynamic>{
-            'amount_msat': 'any',
-            'label': label,
-            'description': description
-          });
-        } else {
-          params = CLNGenerateInvoiceRequest(unixRequest: <String, dynamic>{
-            'amount_msat': amount,
-            'label': label,
-            'description': description
-          });
-        }
+        var reqAmount = amount == null ? "any" : amount.toString();
+        params = CLNGenerateInvoiceRequest(unixRequest: <String, dynamic>{
+          'amount_msat': reqAmount,
+          'label': label,
+          'description': description
+        });
         break;
       case ClientMode.lnlambda:
-        if (amount == null) {
-          params = CLNGenerateInvoiceRequest(unixRequest: <String, dynamic>{
-            'amount_msat': 'any',
-            'label': label,
-            'description': description
-          });
-        } else {
-          params = CLNGenerateInvoiceRequest(unixRequest: <String, dynamic>{
-            'amount_msat': amount,
-            'label': label,
-            'description': description
-          });
-        }
+        var reqAmount = amount == null ? "any" : amount.toString();
+        params = CLNGenerateInvoiceRequest(unixRequest: <String, dynamic>{
+          'amount_msat': reqAmount,
+          'label': label,
+          'description': description
+        });
         break;
     }
     return client.call<CLNGenerateInvoiceRequest, AppGenerateInvoice>(
         method: "invoice",
         params: params,
         onDecode: (jsonResponse) => AppGenerateInvoice.fromJSON(
-              jsonResponse as Map<String, dynamic>,
-            ));
+            jsonResponse as Map<String, dynamic>,
+            snackCase: !mode.withCamelCase()));
   }
 }
