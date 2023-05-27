@@ -1,9 +1,9 @@
 import 'package:clnapp/api/api.dart';
-import 'package:clnapp/views/pay/qr_screen.dart';
+import 'package:clnapp/views/request/qr_screen.dart';
 import 'package:flutter/material.dart';
-import '../../components/buttons.dart';
-import '../../model/app_model/generate_invoice.dart';
-import '../../utils/app_provider.dart';
+import 'package:clnapp/components/buttons.dart';
+import 'package:clnapp/model/app_model/generate_invoice.dart';
+import 'package:clnapp/utils/app_provider.dart';
 
 class RequestView extends StatefulWidget {
   final AppProvider provider;
@@ -15,7 +15,8 @@ class RequestView extends StatefulWidget {
 }
 
 class _RequestViewState extends State<RequestView> {
-  String display = '';
+  String display = '0';
+  String msats = 'msats';
 
   Future<AppGenerateInvoice> generateInvoice() async {
     String label = '${DateTime.now()}';
@@ -23,7 +24,8 @@ class _RequestViewState extends State<RequestView> {
         "This is a new description created at${DateTime.now()}";
     AppGenerateInvoice response = await widget.provider
         .get<AppApi>()
-        .generateInvoice(label, description, amount: int.parse(display));
+        .generateInvoice(label, description, amount: double.parse(display).floor());
+    ///TODO: Implement a Alertbox for decimal values
     return response;
   }
 
@@ -32,7 +34,7 @@ class _RequestViewState extends State<RequestView> {
     var size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Generate an invoice'),
+        title: const Text(''),
       ),
       body: SafeArea(
         child: Column(
@@ -42,18 +44,16 @@ class _RequestViewState extends State<RequestView> {
               height: 30,
             ),
             SizedBox(
-              width: 350,
+              width: size.width * 0.35,
               child: ListTile(
-                leading: Padding(
-                  padding: const EdgeInsets.only(left: 30),
-                  child: Text(
-                    display,
-                    textScaleFactor: 1.0,
-                    style: const TextStyle(
-                      fontSize: 50,
-                      fontWeight: FontWeight.bold,
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '$display $msats',
+                      style: Theme.of(context).textTheme.headlineMedium,
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
@@ -128,11 +128,33 @@ class _RequestViewState extends State<RequestView> {
           display = display.substring(0, display.length - 1);
         }
 
+        /// when we first boot up the request screen
+        if(display == '0') {
+          setState(() {
+            display = value;
+          });
+          return;
+        }
+
+        // if(display.startsWith('.')) {
+        //   setState(() {
+        //     display = '0.';
+        //   });
+        //   return;
+        // }
+
         /// To get only one decimal in the field
         if (display.contains('.')) {
           if (value == '.') {
             return;
           }
+        }
+
+        /// When display value sets to null
+        if(display.isEmpty) {
+          setState(() {
+            display = '0';
+          });
         }
 
         /// Maximum length of 9

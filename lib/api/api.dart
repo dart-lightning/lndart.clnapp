@@ -6,7 +6,7 @@ import 'package:clnapp/model/app_model/pay_invoice.dart';
 
 import 'package:clnapp/model/app_model/list_send_pays.dart';
 
-import '../model/app_model/generate_invoice.dart';
+import 'package:clnapp/model/app_model/generate_invoice.dart';
 
 /// App API implementation, the class contains all the information
 /// to make a call to core lightning and return the correct type

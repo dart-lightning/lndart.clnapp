@@ -3,8 +3,8 @@ import 'package:clnapp/utils/app_provider.dart';
 import 'package:clnapp/views/request/request_view.dart';
 import 'package:flutter/material.dart';
 
-import '../../components/buttons.dart';
-import '../pay/pay_view.dart';
+import 'package:clnapp/components/buttons.dart';
+import 'package:clnapp/views/pay/pay_view.dart';
 
 class InfoView extends StatefulWidget {
   final AppProvider provider;

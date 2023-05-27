@@ -21,7 +21,6 @@ class _PayViewState extends State<PayView> {
   String? error;
 
   Future<AppPayInvoice> payInvoice(String boltString, int? amountMsat) async {
-    // we don't need error handling here
     final response = await widget.provider
         .get<AppApi>()
         .payInvoice(invoice: boltString, msat: amountMsat);

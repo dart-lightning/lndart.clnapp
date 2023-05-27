@@ -207,52 +207,36 @@ class CLNApi extends AppApi {
                   description: description,
                   amountMsat: AmountOrAny(any: true)));
         } else {
-          Amount amount2 = Amount();
-          amount2.msat = Int64(amount);
+          Amount amount64 = Amount();
+          amount64.msat = Int64(amount);
           params = CLNGenerateInvoiceRequest(
               grpcRequest: InvoiceRequest(
                   label: label,
                   description: description,
                   amountMsat: AmountOrAny(
-                      amount: Amount(msat: amount2.msat), any: false)));
+                      amount: Amount(msat: amount64.msat), any: false)));
         }
         break;
       case ClientMode.unixSocket:
-        if (amount == null) {
-          params = CLNGenerateInvoiceRequest(unixRequest: <String, dynamic>{
-            'amount_msat': 'any',
-            'label': label,
-            'description': description
-          });
-        } else {
-          params = CLNGenerateInvoiceRequest(unixRequest: <String, dynamic>{
-            'amount_msat': amount,
-            'label': label,
-            'description': description
-          });
-        }
+        params = CLNGenerateInvoiceRequest(unixRequest: <String, dynamic>{
+          'amount_msat': amount ?? 'any',
+          'label': label,
+          'description': description
+        });
         break;
       case ClientMode.lnlambda:
-        if (amount == null) {
-          params = CLNGenerateInvoiceRequest(unixRequest: <String, dynamic>{
-            'amount_msat': 'any',
-            'label': label,
-            'description': description
-          });
-        } else {
-          params = CLNGenerateInvoiceRequest(unixRequest: <String, dynamic>{
-            'amount_msat': amount,
-            'label': label,
-            'description': description
-          });
-        }
+        params = CLNGenerateInvoiceRequest(unixRequest: <String, dynamic>{
+          'amount_msat': amount ?? 'any',
+          'label': label,
+          'description': description
+        });
         break;
     }
     return client.call<CLNGenerateInvoiceRequest, AppGenerateInvoice>(
         method: "invoice",
         params: params,
         onDecode: (jsonResponse) => AppGenerateInvoice.fromJSON(
-              jsonResponse as Map<String, dynamic>,
-            ));
+            jsonResponse as Map<String, dynamic>,
+            snackCase: !mode.withCamelCase()));
   }
 }
