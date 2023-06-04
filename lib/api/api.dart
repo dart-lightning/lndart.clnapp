@@ -3,10 +3,10 @@ import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/model/app_model/list_invoices.dart';
 import 'package:clnapp/model/app_model/list_transaction.dart';
 import 'package:clnapp/model/app_model/pay_invoice.dart';
-
 import 'package:clnapp/model/app_model/list_send_pays.dart';
-
 import 'package:clnapp/model/app_model/generate_invoice.dart';
+import 'package:clnapp/model/app_model/decode_invoice.dart';
+import 'package:clnapp/model/app_model/list_peers.dart';
 
 /// App API implementation, the class contains all the information
 /// to make a call to core lightning and return the correct type
@@ -41,4 +41,10 @@ abstract class AppApi {
   /// Return a bolt 11/12 invoice
   Future<AppGenerateInvoice> generateInvoice(String label, String description,
       {int? amount});
+
+  /// For decoding the invoice
+  Future<AppDecodeInvoice> decodeInvoice(String invoice);
+
+  /// For checking the status of node
+  Future<AppListPeers> listPeers(String id);
 }
