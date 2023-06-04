@@ -1,22 +1,28 @@
+import 'dart:convert';
+
 import 'package:cln_common/cln_common.dart';
 import 'package:cln_grpc/cln_grpc.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/api/client_provider.dart';
+import 'package:clnapp/api/cln/request/decodeinvoice_request.dart';
 import 'package:clnapp/api/cln/request/generateinvoice_request.dart';
 import 'package:clnapp/api/cln/request/get_info_request.dart';
 import 'package:clnapp/api/cln/request/list_funds_request.dart';
 import 'package:clnapp/api/cln/request/list_invoices_request.dart';
 import 'package:clnapp/api/cln/request/list_transaction_request.dart';
+import 'package:clnapp/api/cln/request/listpeers_request.dart';
 import 'package:clnapp/api/cln/request/listsendpays_request.dart';
 import 'package:clnapp/api/cln/request/pay_request.dart';
 import 'package:clnapp/model/app_model/generate_invoice.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/model/app_model/list_invoices.dart';
+import 'package:clnapp/model/app_model/list_peers.dart';
 import 'package:clnapp/model/app_model/list_send_pays.dart';
 import 'package:clnapp/model/app_model/list_transaction.dart';
 import 'package:clnapp/model/app_model/pay_invoice.dart';
 import 'package:fixnum/fixnum.dart';
+import 'package:clnapp/model/app_model/decode_invoice.dart';
 
 class CLNApi extends AppApi {
   ClientMode mode;
@@ -228,6 +234,60 @@ class CLNApi extends AppApi {
         method: "invoice",
         params: params,
         onDecode: (jsonResponse) => AppGenerateInvoice.fromJSON(
+            jsonResponse as Map<String, dynamic>,
+            snackCase: !mode.withCamelCase()));
+  }
+
+  @override
+  Future<AppDecodeInvoice> decodeInvoice(String invoice) {
+    dynamic params;
+    switch (mode) {
+      ///FIXME: Add grpc request
+      case ClientMode.grpc:
+        throw Exception("Unsupported client");
+      case ClientMode.unixSocket:
+        params = CLNDecodeInvoiceRequest(unixRequest: <String, dynamic>{
+          'string': invoice,
+        });
+        break;
+      case ClientMode.lnlambda:
+        params = CLNDecodeInvoiceRequest(unixRequest: <String, dynamic>{
+          'string': invoice,
+        });
+        break;
+    }
+    return client.call<CLNDecodeInvoiceRequest, AppDecodeInvoice>(
+        method: "decode",
+        params: params,
+        onDecode: (jsonResponse) => AppDecodeInvoice.fromJSON(
+            jsonResponse as Map<String, dynamic>,
+            snackCase: !mode.withCamelCase()));
+  }
+
+  @override
+  Future<AppListPeers> listPeers(String id) {
+    dynamic params;
+    switch (mode) {
+      case ClientMode.grpc:
+        List<int> idInBytes = utf8.encode(id);
+        params =
+            CLNListPeersRequest(grpcRequest: ListpeersRequest(id: idInBytes));
+        break;
+      case ClientMode.unixSocket:
+        params = CLNListPeersRequest(unixRequest: <String, dynamic>{
+          'id': id,
+        });
+        break;
+      case ClientMode.lnlambda:
+        params = CLNListPeersRequest(unixRequest: <String, dynamic>{
+          'id': id,
+        });
+        break;
+    }
+    return client.call<CLNListPeersRequest, AppListPeers>(
+        method: "listpeers",
+        params: params,
+        onDecode: (jsonResponse) => AppListPeers.fromJSON(
             jsonResponse as Map<String, dynamic>,
             snackCase: !mode.withCamelCase()));
   }
