@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/components/bottomsheet.dart';
 import 'package:clnapp/components/buttons.dart';
@@ -5,6 +8,7 @@ import 'package:clnapp/model/app_model/decode_invoice.dart';
 import 'package:clnapp/model/app_model/pay_invoice.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:clnapp/views/pay/numberpad_view.dart';
+import 'package:clnapp/views/pay/scanner_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -21,6 +25,8 @@ class _PayViewState extends State<PayView> {
   String? boltString;
   final _invoiceController = TextEditingController();
   String? display;
+  String? createdTime;
+  String? expirationTime;
 
   Future<AppPayInvoice> payInvoice(String boltString) async {
     final response =
@@ -41,14 +47,18 @@ class _PayViewState extends State<PayView> {
     return date;
   }
 
-  void invoiceActions() async {
-    AppDecodeInvoice invoice = await decodeInvoice(_invoiceController.text);
+  void invoiceActions(String boltString) async {
+    AppDecodeInvoice invoice = await decodeInvoice(boltString);
     setState(() {
       display = invoice.invoice.amount.toString();
     });
-    String createdTime = getTimeStamp(invoice.invoice.createdTime);
-    String expirationTime = getTimeStamp(
+    createdTime = getTimeStamp(invoice.invoice.createdTime);
+    expirationTime = getTimeStamp(
         (invoice.invoice.createdTime + invoice.invoice.expirationTime));
+    showBottomSheet(invoice: invoice);
+  }
+
+  void showBottomSheet({required AppDecodeInvoice invoice}) {
     if (context.mounted) {
       CLNBottomSheet.bottomSheet(
         context: context,
@@ -66,12 +76,19 @@ class _PayViewState extends State<PayView> {
     }
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    boltString = '';
+    _invoiceController.dispose();
+  }
+
   Widget _buildMainView(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: size.width * 0.08),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           TextFormField(
             minLines: 5,
@@ -93,10 +110,13 @@ class _PayViewState extends State<PayView> {
                 ),
               ),
               alignLabelWithHint: true,
-              contentPadding: const EdgeInsets.all(20),
-              labelText: 'Invoice',
-              hintText: 'invoice',
+              contentPadding: const EdgeInsets.all(30),
+              labelText: 'Invoice/ btc address',
+              hintText: 'Invoice/ btc address',
             ),
+          ),
+          const SizedBox(
+            height: 20,
           ),
           MainCircleButton(
               icon: Icons.copy,
@@ -108,7 +128,7 @@ class _PayViewState extends State<PayView> {
                   _invoiceController.text = data!.text!;
                 });
                 boltString = data!.text;
-                invoiceActions();
+                invoiceActions(data.text!);
               }),
         ],
       ),
@@ -120,6 +140,26 @@ class _PayViewState extends State<PayView> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
+        actions: [
+          Platform.isAndroid || Platform.isIOS
+              ? Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: IconButton(
+                    icon: const ImageIcon(
+                        AssetImage('assets/images/scanner.png')),
+                    onPressed: () async {
+                      boltString =
+                          await Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => ScannerView(
+                                    provider: widget.provider,
+                                  )));
+                      LogManager.getInstance.debug("bolt string : $boltString");
+                      invoiceActions(boltString!);
+                    },
+                  ),
+                )
+              : Container(),
+        ],
       ),
       body: _buildMainView(context),
     );
