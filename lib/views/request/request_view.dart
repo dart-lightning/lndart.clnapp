@@ -32,7 +32,9 @@ class _RequestViewState extends State<RequestView> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        elevation: 0,
+      ),
       body: SafeArea(
         bottom: true,
         top: true,
