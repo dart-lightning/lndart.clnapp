@@ -1,8 +1,7 @@
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/utils/app_provider.dart';
-import 'package:clnapp/views/request/request_view.dart';
+import 'package:clnapp/views/request/btcadress.dart';
 import 'package:flutter/material.dart';
-
 import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/views/pay/pay_view.dart';
 
@@ -63,7 +62,7 @@ class _InfoViewState extends State<InfoView> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => RequestView(
+                        builder: (context) => BTCAddress(
                               provider: widget.provider,
                             ))),
               },

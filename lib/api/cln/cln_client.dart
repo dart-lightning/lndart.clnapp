@@ -12,6 +12,7 @@ import 'package:clnapp/api/cln/request/list_invoices_request.dart';
 import 'package:clnapp/api/cln/request/list_transaction_request.dart';
 import 'package:clnapp/api/cln/request/listpeers_request.dart';
 import 'package:clnapp/api/cln/request/listsendpays_request.dart';
+import 'package:clnapp/api/cln/request/newaddr_request.dart';
 import 'package:clnapp/api/cln/request/pay_request.dart';
 import 'package:clnapp/model/app_model/generate_invoice.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
@@ -20,6 +21,7 @@ import 'package:clnapp/model/app_model/list_invoices.dart';
 import 'package:clnapp/model/app_model/list_peers.dart';
 import 'package:clnapp/model/app_model/list_send_pays.dart';
 import 'package:clnapp/model/app_model/list_transaction.dart';
+import 'package:clnapp/model/app_model/newaddr.dart';
 import 'package:clnapp/model/app_model/pay_invoice.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:clnapp/model/app_model/decode_invoice.dart';
@@ -288,6 +290,28 @@ class CLNApi extends AppApi {
         method: "listpeers",
         params: params,
         onDecode: (jsonResponse) => AppListPeers.fromJSON(
+            jsonResponse as Map<String, dynamic>,
+            snackCase: !mode.withCamelCase()));
+  }
+
+  @override
+  Future<AppNewAddr> newAddr() {
+    dynamic params;
+    switch (mode) {
+      case ClientMode.grpc:
+        params = CLNNewAddrRequest(grpcRequest: NewaddrRequest());
+        break;
+      case ClientMode.unixSocket:
+        params = CLNNewAddrRequest(unixRequest: <String, dynamic>{});
+        break;
+      case ClientMode.lnlambda:
+        params = CLNNewAddrRequest(unixRequest: <String, dynamic>{});
+        break;
+    }
+    return client.call<CLNNewAddrRequest, AppNewAddr>(
+        method: "newaddr",
+        params: params,
+        onDecode: (jsonResponse) => AppNewAddr.fromJSON(
             jsonResponse as Map<String, dynamic>,
             snackCase: !mode.withCamelCase()));
   }

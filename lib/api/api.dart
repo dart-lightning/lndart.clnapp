@@ -8,6 +8,8 @@ import 'package:clnapp/model/app_model/generate_invoice.dart';
 import 'package:clnapp/model/app_model/decode_invoice.dart';
 import 'package:clnapp/model/app_model/list_peers.dart';
 
+import 'package:clnapp/model/app_model/newaddr.dart';
+
 /// App API implementation, the class contains all the information
 /// to make a call to core lightning and return the correct type
 /// of useful of the UI.
@@ -47,4 +49,7 @@ abstract class AppApi {
 
   /// For checking the status of node
   Future<AppListPeers> listPeers(String id);
+
+  /// For generating new address
+  Future<AppNewAddr> newAddr();
 }
