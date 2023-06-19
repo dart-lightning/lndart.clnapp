@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:trash_component/components/global_components.dart';
 import 'package:trash_component/utils/platform_utils.dart';
+import 'package:clnapp/utils/app_utils.dart';
 
 class PayView extends StatefulWidget {
   final AppProvider provider;
@@ -24,10 +25,11 @@ class PayView extends StatefulWidget {
 
 class _PayViewState extends State<PayView> {
   String? boltString;
-  final _invoiceController = TextEditingController();
+  final _controller = TextEditingController();
   String? display;
   String? createdTime;
   String? expirationTime;
+  String? btcAddress;
 
   Future<void> payInvoice(String boltString) async {
     try {
@@ -41,17 +43,15 @@ class _PayViewState extends State<PayView> {
             imageProvided: const AssetImage('assets/images/Checkmark.png'));
       }
     } catch (e) {
-      /// FIXME: this should be manage in a better way
+      ///FIXME: This could be handled in a better way after this PR gets merged https://github.com/dart-lightning/lndart.clnapp/pull/122
       var jsonString = e.toString().substring(e.toString().indexOf('{'));
       ErrorDecoder decoder = ErrorDecoder.fromJSON(jsonDecode(jsonString));
-      if (context.mounted) {
-        GlobalComponent.showAppDialog(
-            context: context,
-            title: 'Payment failed',
-            message: decoder.message,
-            closeMsg: 'Ok',
-            imageProvided: const AssetImage('assets/images/exclamation.png'));
-      }
+      GlobalComponent.showAppDialog(
+          context: context,
+          title: 'Payment failed',
+          message: decoder.message,
+          closeMsg: 'Ok',
+          imageProvided: const AssetImage('assets/images/exclamation.png'));
     }
   }
 
@@ -89,17 +89,14 @@ class _PayViewState extends State<PayView> {
     final key = event.logicalKey.keyLabel;
     if (event is KeyUpEvent && key == "Enter") {
       LogManager.getInstance.debug("Found: $key");
-      invoiceFunction();
+      if (_controller.text.trim().isNotEmpty) {
+        navigateToDesiredPage(_controller.text.trim());
+      } else {
+        showSnackBar('Please enter a valid value', context);
+      }
       return true;
     }
     return false;
-  }
-
-  void invoiceFunction() {
-    boltString = _invoiceController.text.trim();
-    if (_invoiceController.text.trim().isNotEmpty) {
-      invoiceActions(boltString!);
-    }
   }
 
   void showBottomSheet({required AppDecodeInvoice invoice}) {
@@ -120,12 +117,29 @@ class _PayViewState extends State<PayView> {
     }
   }
 
+  void navigateToDesiredPage(String text) {
+    if (text.startsWith('ln')) {
+      /// This is a lightning invoice
+      boltString = text;
+      invoiceActions(boltString!);
+    } else {
+      ///FIXME : This could be handled in a better way by having a library that parse the bitcoin address
+      /// Assuming this is a btc address
+      btcAddress = text;
+      Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) => NumberPad(
+                provider: widget.provider,
+                btcAddress: btcAddress,
+              )));
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
     ServicesBinding.instance.keyboard.removeHandler(_onKey);
     boltString = '';
-    _invoiceController.dispose();
+    _controller.dispose();
   }
 
   Widget _buildMainView(BuildContext context) {
@@ -138,7 +152,7 @@ class _PayViewState extends State<PayView> {
           TextFormField(
             minLines: 5,
             maxLines: 10,
-            controller: _invoiceController,
+            controller: _controller,
             decoration: InputDecoration(
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(20),
@@ -169,11 +183,14 @@ class _PayViewState extends State<PayView> {
               width: 200,
               onPress: () async {
                 ClipboardData? data = await Clipboard.getData('text/plain');
+                if (data!.text!.trim() == '' && context.mounted) {
+                  showSnackBar('Nothing to paste', context);
+                  return;
+                }
                 setState(() {
-                  _invoiceController.text = data!.text!;
+                  _controller.text = data.text!;
                 });
-                boltString = data!.text;
-                invoiceActions(data.text!);
+                navigateToDesiredPage(data.text!);
               }),
         ],
       ),
@@ -193,17 +210,32 @@ class _PayViewState extends State<PayView> {
                     icon: const ImageIcon(
                         AssetImage('assets/images/scanner.png')),
                     onPressed: () async {
-                      boltString =
+                      String str =
                           await Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => ScannerView(
                                     provider: widget.provider,
                                   )));
-                      LogManager.getInstance.debug("bolt string : $boltString");
-                      invoiceActions(boltString!);
+                      if (str.trim().startsWith('ln')) {
+                        /// Declare the boltString here
+                        boltString = str;
+                        invoiceActions(boltString!);
+                      } else {
+                        ///FIXME : This could be handled in a better way by having a library that parse the bitcoin address
+                        /// Declare the btc address here
+                        btcAddress = str;
+                        if (context.mounted) {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => NumberPad(
+                                    provider: widget.provider,
+                                    btcAddress: btcAddress,
+                                  )));
+                        }
+                      }
+                      LogManager.getInstance.debug(str);
                     },
                   ),
                 )
-              : Container(),
+              : Container()
         ],
       ),
       body: _buildMainView(context),

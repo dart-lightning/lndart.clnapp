@@ -7,6 +7,8 @@ import 'package:clnapp/model/app_model/list_send_pays.dart';
 import 'package:clnapp/model/app_model/generate_invoice.dart';
 import 'package:clnapp/model/app_model/decode_invoice.dart';
 import 'package:clnapp/model/app_model/list_peers.dart';
+import 'package:clnapp/model/app_model/newaddr.dart';
+import 'package:clnapp/model/app_model/withdraw.dart';
 
 /// App API implementation, the class contains all the information
 /// to make a call to core lightning and return the correct type
@@ -47,4 +49,10 @@ abstract class AppApi {
 
   /// For checking the status of node
   Future<AppListPeers> listPeers(String id);
+
+  /// For generating new address
+  Future<AppNewAddr> newAddr();
+
+  Future<AppWithdraw> withdraw(
+      {required String destination, required int mSatoshi});
 }

@@ -1,14 +1,22 @@
+import 'dart:convert';
 import 'package:clnapp/utils/app_provider.dart';
+import 'package:clnapp/utils/error_decoder.dart';
 import 'package:flutter/material.dart';
-
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/model/app_model/pay_invoice.dart';
+import 'package:clnapp/model/app_model/withdraw.dart';
+import 'package:flutter/services.dart';
+import 'package:trash_component/components/global_components.dart';
+import 'package:clnapp/utils/app_utils.dart';
 
 class NumberPad extends StatefulWidget {
-  final String invoice;
+  final String? invoice;
   final AppProvider provider;
-  const NumberPad({Key? key, required this.provider, required this.invoice})
+  final String? btcAddress;
+
+  const NumberPad(
+      {Key? key, required this.provider, this.invoice, this.btcAddress})
       : super(key: key);
 
   @override
@@ -18,18 +26,94 @@ class NumberPad extends StatefulWidget {
 class _NumberPadState extends State<NumberPad> {
   String display = '0';
 
-  Future<AppPayInvoice> payInvoice(String boltString, int? amountMsat) async {
-    final response = await widget.provider
-        .get<AppApi>()
-        .payInvoice(invoice: boltString, msat: amountMsat);
-    return response;
+  Future<void> payInvoice(String boltString, int? amountMsat) async {
+    try {
+      AppPayInvoice response = await widget.provider
+          .get<AppApi>()
+          .payInvoice(invoice: boltString, msat: amountMsat);
+      transactionView(response.payResponse.paymentHash);
+    } catch (e) {
+      ///FIXME: This could be handled in a better way after this PR gets merged https://github.com/dart-lightning/lndart.clnapp/pull/122
+      var jsonString = e.toString().substring(e.toString().indexOf('{'));
+      ErrorDecoder decoder = ErrorDecoder.fromJSON(jsonDecode(jsonString));
+      GlobalComponent.showAppDialog(
+          context: context,
+          title: 'Failed to pay the invoice',
+          message: decoder.message,
+          closeMsg: 'Ok',
+          imageProvided: const AssetImage('assets/images/exclamation.png'));
+    }
+  }
+
+  Future<void> withdraw(String destination, int amount) async {
+    try {
+      AppWithdraw response = await widget.provider
+          .get<AppApi>()
+          .withdraw(destination: destination, mSatoshi: amount);
+      transactionView(response.tx);
+    } catch (e) {
+      ///FIXME: This could be handled in a better way after this PR gets merged https://github.com/dart-lightning/lndart.clnapp/pull/122
+      var jsonString = e.toString().substring(e.toString().indexOf('{'));
+      ErrorDecoder decoder = ErrorDecoder.fromJSON(jsonDecode(jsonString));
+      GlobalComponent.showAppDialog(
+          context: context,
+          title: 'Failed to pay to the given address',
+          message: decoder.message,
+          closeMsg: 'Ok',
+          imageProvided: const AssetImage('assets/images/exclamation.png'));
+    }
+  }
+
+  void transactionView(String transaction) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text('Payment successful',
+            style: Theme.of(context).textTheme.bodyLarge!.apply(
+                  fontSizeFactor: 1.6,
+                )),
+        content: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.25,
+            width: MediaQuery.of(context).size.width * 0.25,
+            child: Column(
+              children: [
+                Expanded(
+                  child: Text(
+                    transaction,
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                ),
+                IconButton(
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: transaction));
+                      showSnackBar('Copied to clipboard', context);
+                    },
+                    icon: const Icon(
+                      Icons.copy,
+                      size: 20,
+                    ))
+              ],
+            )),
+        actions: [
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        elevation: 0,
+      ),
       body: SafeArea(
         bottom: true,
         top: true,
@@ -40,11 +124,10 @@ class _NumberPadState extends State<NumberPad> {
               flex: 1,
               child: Text(
                 display,
-                textScaleFactor: 1.0,
-                style: TextStyle(
+                textScaleFactor: 1.5,
+                style: const TextStyle(
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ),
@@ -103,7 +186,11 @@ class _NumberPadState extends State<NumberPad> {
                   icon: Icons.send_outlined,
                   label: "Pay",
                   onPress: () async {
-                    payInvoice(widget.invoice, int.parse(display));
+                    if (widget.invoice != null) {
+                      payInvoice(widget.invoice!, int.parse(display));
+                    } else {
+                      withdraw(widget.btcAddress!, int.parse(display));
+                    }
                   }),
             ),
           ],
@@ -149,16 +236,14 @@ class _NumberPadState extends State<NumberPad> {
           child: icon != null
               ? Icon(
                   icon,
-                  color: Theme.of(context).colorScheme.primary,
                   size: 35,
                 )
               : Text(
                   value,
                   textScaleFactor: 1.0,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 35,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
         ),
