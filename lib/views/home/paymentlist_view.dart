@@ -2,9 +2,8 @@ import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:trash_component/components/expandable_card.dart';
-
-import '../../api/api.dart';
-import '../../model/app_model/list_invoices.dart';
+import 'package:clnapp/api/api.dart';
+import 'package:clnapp/model/app_model/list_invoices.dart';
 
 class PaymentListView extends StatefulWidget {
   final AppProvider provider;
@@ -44,6 +43,15 @@ class _PaymentListViewState extends State<PaymentListView> {
     return value.bolt11.toString();
   }
 
+  // FIXME: move this in a util function
+  String getTimeStamp(int timestamp) {
+    String date = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000)
+        .toString()
+        .split(' ')
+        .first;
+    return date;
+  }
+
   Widget _buildSpecificPaymentView(
       {required BuildContext context,
       required List<dynamic> items,
@@ -52,22 +60,16 @@ class _PaymentListViewState extends State<PaymentListView> {
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _text(topic: "Amount", value: items[index].amount),
               _text(topic: "Description", value: items[index].description),
               _text(topic: topic(items[index]), value: value(items[index])),
-              _text(topic: "Status", value: items[index].status),
             ],
           )
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _text(topic: "Bolt11", value: items[index].bolt11),
               _text(
-                  topic: "Payment Preimage",
-                  value: items[index].paymentPreimage),
-              _text(topic: "Created At", value: items[index].createdAt),
-              _text(topic: "status", value: items[index].status),
-              _text(topic: "payment Hash", value: items[index].paymentHash),
+                  topic: "Created At",
+                  value: getTimeStamp(int.parse(items[index].createdAt))),
               _text(topic: "Destination", value: items[index].destination),
               _text(topic: "Label", value: items[index].label),
             ],
@@ -101,103 +103,90 @@ class _PaymentListViewState extends State<PaymentListView> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          margin: const EdgeInsets.only(top: 20),
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height * 0.055,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-                MediaQuery.of(context).size.width * 0.08,
-                MediaQuery.of(context).size.height * 0.01,
-                0,
-                0),
-            child: const Text(
-              'Last transaction',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ),
-        FutureBuilder<List<dynamic>?>(
-            future: listPayments(),
-            builder: (context, AsyncSnapshot<List<dynamic>?> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
+    const red = Color.fromRGBO(255, 0, 57, 1);
+    const green = Color.fromRGBO(61, 176, 23, 1);
+    return FutureBuilder<List<dynamic>?>(
+        future: listPayments(),
+        builder: (context, AsyncSnapshot<List<dynamic>?> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Column(
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.05,
+                ),
+                const Center(
                   child: Text('Loading...'),
-                );
-              }
-              if (snapshot.hasError) {
-                LogManager.getInstance.error("${snapshot.error}");
-                LogManager.getInstance.error("${snapshot.stackTrace}");
-                String error = snapshot.error!.toString();
-                return Text(error);
-              } else if (snapshot.hasData) {
-                return ListView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      return ExpandableCard(
-                        expandedAlignment: Alignment.topLeft,
-                        expandableChild: _buildSpecificPaymentView(
-                            context: context,
-                            items: snapshot.data!,
-                            index: index),
-                        child: SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.1,
-                          width: MediaQuery.of(context).size.width,
-                          child: Row(
-                            children: [
-                              Container(
-                                height: 46,
-                                width: 46,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                ),
-                                alignment: Alignment.center,
-                                child: checkListIdentifier(
-                                        listTile: snapshot.data![index])
-                                    ? const Icon(
-                                        Icons.arrow_downward,
-                                        color: Colors.green,
-                                      )
-                                    : const Icon(
-                                        Icons.arrow_upward,
-                                        color: Colors.red,
-                                      ),
-                              ),
-                              Expanded(
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  child: checkListIdentifier(
-                                          listTile: snapshot.data![index])
-                                      ? Text(
-                                          " + ${snapshot.data![index].amount} msats",
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.green),
-                                        )
-                                      : Text(
-                                          " - ${snapshot.data![index].amountSent}",
-                                          style: const TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.red),
-                                        ),
-                                ),
-                              ),
-                            ],
+                ),
+              ],
+            );
+          }
+          if (snapshot.hasError) {
+            LogManager.getInstance.error("${snapshot.error}");
+            LogManager.getInstance.error("${snapshot.stackTrace}");
+            String error = snapshot.error!.toString();
+            return Text(error);
+          } else if (snapshot.hasData) {
+            return ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  return ExpandableCard(
+                    expandedAlignment: Alignment.topLeft,
+                    expandableChild: _buildSpecificPaymentView(
+                        context: context, items: snapshot.data!, index: index),
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.1,
+                      width: MediaQuery.of(context).size.width,
+                      child: Row(
+                        children: [
+                          Container(
+                            height: 46,
+                            width: 46,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: checkListIdentifier(
+                                    listTile: snapshot.data![index])
+                                ? const Icon(
+                                    Icons.arrow_downward,
+                                    color: green,
+                                  )
+                                : const Icon(
+                                    Icons.arrow_upward,
+                                    color: red,
+                                  ),
                           ),
-                        ),
-                      );
-                    });
-              }
-              return const Text('No payments found!');
-            })
-      ],
-    );
+                          Expanded(
+                            child: Container(
+                              alignment: Alignment.center,
+                              child: checkListIdentifier(
+                                      listTile: snapshot.data![index])
+                                  ? Text(
+                                      " + ${snapshot.data![index].amount} msats",
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          color: green),
+                                    )
+                                  : Text(
+                                      " - ${snapshot.data![index].amountSent}",
+                                      style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          color: red),
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                });
+          }
+          return const Text('No payments found!');
+        });
   }
 }

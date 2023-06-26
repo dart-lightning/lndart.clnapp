@@ -31,19 +31,15 @@ class _InfoViewState extends State<InfoView> {
             alignment: Alignment.centerLeft,
             child: Text(
               widget.getinfo.alias,
-              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
-          const Text(
-            "Available balance",
-            style: TextStyle(fontSize: 14),
-          ),
-          const SizedBox(
-            height: 18,
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.05,
           ),
           Text(
             "${widget.getinfo.totOffChainMsat} sats",
-            style: const TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
           ),
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.05,

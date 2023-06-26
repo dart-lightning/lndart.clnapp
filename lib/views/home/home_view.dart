@@ -109,7 +109,6 @@ class _HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("CLN App"),
         centerTitle: false,
         primary: true,
         elevation: 0,
