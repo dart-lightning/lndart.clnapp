@@ -45,11 +45,10 @@ class _RequestViewState extends State<RequestView> {
               flex: 1,
               child: Text(
                 display,
-                textScaleFactor: 1.0,
-                style: TextStyle(
+                textScaleFactor: 1.5,
+                style: const TextStyle(
                   fontSize: 40,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ),
@@ -216,21 +215,18 @@ class _RequestViewState extends State<RequestView> {
         alignment: Alignment.center,
         height: size.height * 0.12,
         width: size.width * 0.15,
-        decoration: BoxDecoration(border: Border.all(width: 0.025)),
         child: Center(
           child: icon != null
               ? Icon(
                   icon,
-                  color: Theme.of(context).colorScheme.primary,
                   size: 35,
                 )
               : Text(
                   value,
                   textScaleFactor: 1.0,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 35,
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
         ),
