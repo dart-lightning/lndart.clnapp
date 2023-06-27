@@ -5,6 +5,8 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/model/app_model/generate_invoice.dart';
 import 'package:clnapp/utils/app_provider.dart';
+import 'package:trash_component/components/global_components.dart';
+import 'package:clnapp/model/app_model/newaddr.dart';
 
 class RequestView extends StatefulWidget {
   final AppProvider provider;
@@ -17,15 +19,38 @@ class RequestView extends StatefulWidget {
 
 class _RequestViewState extends State<RequestView> {
   String display = '0';
+  String? btcAddress;
+  String? invoice;
 
-  Future<AppGenerateInvoice> generateInvoice() async {
+  Future<void> generateInvoice() async {
     String label = '${DateTime.now()}';
     String description =
         "This is a new description created at${DateTime.now()}";
     AppGenerateInvoice response = await widget.provider
         .get<AppApi>()
         .generateInvoice(label, description, amount: int.parse(display));
-    return response;
+    setState(() {
+      invoice = response.invoice.bolt11;
+    });
+  }
+
+  Future<void> newaddr() async {
+    AppNewAddr? response;
+    try {
+      response = await widget.provider.get<AppApi>().newAddr();
+    } catch (e) {
+      GlobalComponent.showAppDialog(
+        context: context,
+        title: 'Invalid Rune',
+        message:
+            'Please check if your rune has any restrictions. If yes then please change it to have no restrictions',
+        closeMsg: 'Ok',
+        imageProvided: const AssetImage('assets/images/exclamation.png'),
+      );
+    }
+    setState(() {
+      btcAddress = response!.bech32;
+    });
   }
 
   @override
@@ -107,11 +132,17 @@ class _RequestViewState extends State<RequestView> {
                   icon: Icons.send_outlined,
                   label: "Request",
                   onPress: () async {
-                    AppGenerateInvoice invoiceModel = await generateInvoice();
-                    if (context.mounted) {
-                      _showBottomDialog(
-                          context: context, invoice: invoiceModel.invoice);
+                    if (int.parse(display) == 0) {
+                      GlobalComponent.showAppDialog(
+                          context: context,
+                          title: 'invalid details',
+                          message: 'Please enter value > 0',
+                          closeMsg: 'Ok',
+                          imageProvided: const AssetImage(
+                              'assets/images/exclamation.png'));
+                      return;
                     }
+                    showDialogForRequest();
                   }),
             ),
             const Spacer(flex: 1),
@@ -123,7 +154,7 @@ class _RequestViewState extends State<RequestView> {
 
   // FIXME: put this generic component inside the trash package
   void _showBottomDialog(
-      {required BuildContext context, required AppInvoice invoice}) {
+      {required BuildContext context, required String identifier}) {
     showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
@@ -140,9 +171,9 @@ class _RequestViewState extends State<RequestView> {
                   Expanded(
                     child: Row(
                       children: [
-                        const Spacer(flex: 2),
+                        const Spacer(flex: 1),
                         Expanded(
-                            flex: 1,
+                            flex: 2,
                             child: Container(
                                 alignment: Alignment.topRight,
                                 padding: const EdgeInsets.all(20),
@@ -156,18 +187,46 @@ class _RequestViewState extends State<RequestView> {
                     ),
                   ),
                   Expanded(
+                    flex: 2,
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: Text(
+                        identifier == 'btc'
+                            ? 'Your BTC address'
+                            : 'Your lightning invoice',
+                        style: const TextStyle(fontSize: 30),
+                      ),
+                    ),
+                  ),
+                  Expanded(
                       flex: 2,
-                      child: QrImageView(
-                        data: invoice.bolt11,
-                        version: QrVersions.auto,
-                        backgroundColor: Colors.white,
+                      child: Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.all(20),
+                        child: Text(
+                          identifier == 'btc'
+                              ? 'Receive payments at this address'
+                              : 'Receive payments via this lightning invoice',
+                          style: const TextStyle(fontSize: 20),
+                        ),
                       )),
+                  Expanded(
+                      flex: 4,
+                      child: btcAddress == null && invoice == null
+                          ? const CircularProgressIndicator()
+                          : QrImageView(
+                              data: invoice ?? btcAddress!,
+                              version: QrVersions.auto,
+                              backgroundColor: Colors.white,
+                            )),
+                  const Spacer(flex: 1),
                   Expanded(
                       flex: 1,
                       child: IconButton(
                           onPressed: () {
-                            Clipboard.setData(
-                                ClipboardData(text: invoice.bolt11));
+                            String text =
+                                identifier == 'btc' ? btcAddress! : invoice!;
+                            Clipboard.setData(ClipboardData(text: text));
                             const snackBar =
                                 SnackBar(content: Text('Copied to clipboard!'));
                             ScaffoldMessenger.of(context)
@@ -177,10 +236,54 @@ class _RequestViewState extends State<RequestView> {
                             Icons.copy,
                             size: 20,
                           ))),
-                  const Spacer(flex: 2),
+                  const Spacer(flex: 1),
                 ],
               ));
         });
+  }
+
+  Future showDialogForRequest() {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Choose an option',
+            style: Theme.of(context).textTheme.bodyLarge!.apply(
+                  fontSizeFactor: 1.6,
+                )),
+        content: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.25,
+          width: MediaQuery.of(context).size.width * 0.25,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ListTile(
+                title: const Text('Btc address'),
+                onTap: () async {
+                  newaddr();
+                  _showBottomDialog(context: context, identifier: 'btc');
+                },
+              ),
+              ListTile(
+                title: const Text('Lightning invoice'),
+                onTap: () {
+                  generateInvoice();
+                  _showBottomDialog(context: context, identifier: 'invoice');
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              // LogManager.getInstance.debug(_selectedValue.toString());
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   Widget numberButton(Size size, String value, {IconData? icon}) {

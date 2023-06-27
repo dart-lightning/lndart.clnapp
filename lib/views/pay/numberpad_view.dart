@@ -5,10 +5,15 @@ import 'package:clnapp/api/api.dart';
 import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/model/app_model/pay_invoice.dart';
 
+import 'package:clnapp/model/app_model/withdraw.dart';
+
 class NumberPad extends StatefulWidget {
-  final String invoice;
+  final String? invoice;
   final AppProvider provider;
-  const NumberPad({Key? key, required this.provider, required this.invoice})
+  final String? btcAddress;
+
+  const NumberPad(
+      {Key? key, required this.provider, this.invoice, this.btcAddress})
       : super(key: key);
 
   @override
@@ -22,6 +27,13 @@ class _NumberPadState extends State<NumberPad> {
     final response = await widget.provider
         .get<AppApi>()
         .payInvoice(invoice: boltString, msat: amountMsat);
+    return response;
+  }
+
+  Future<AppWithdraw> withdraw(String destination, int amount) async {
+    final response = await widget.provider
+        .get<AppApi>()
+        .withdraw(destination: destination, satoshi: amount);
     return response;
   }
 
@@ -103,7 +115,11 @@ class _NumberPadState extends State<NumberPad> {
                   icon: Icons.send_outlined,
                   label: "Pay",
                   onPress: () async {
-                    payInvoice(widget.invoice, int.parse(display));
+                    if (widget.invoice != null) {
+                      payInvoice(widget.invoice!, int.parse(display));
+                    } else {
+                      withdraw(widget.btcAddress!, int.parse(display));
+                    }
                   }),
             ),
           ],

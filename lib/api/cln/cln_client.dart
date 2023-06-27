@@ -14,6 +14,7 @@ import 'package:clnapp/api/cln/request/listpeers_request.dart';
 import 'package:clnapp/api/cln/request/listsendpays_request.dart';
 import 'package:clnapp/api/cln/request/newaddr_request.dart';
 import 'package:clnapp/api/cln/request/pay_request.dart';
+import 'package:clnapp/api/cln/request/withdraw_request.dart';
 import 'package:clnapp/model/app_model/generate_invoice.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/model/app_model/list_funds.dart';
@@ -25,6 +26,7 @@ import 'package:clnapp/model/app_model/newaddr.dart';
 import 'package:clnapp/model/app_model/pay_invoice.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:clnapp/model/app_model/decode_invoice.dart';
+import 'package:clnapp/model/app_model/withdraw.dart';
 
 class CLNApi extends AppApi {
   ClientMode mode;
@@ -312,6 +314,39 @@ class CLNApi extends AppApi {
         method: "newaddr",
         params: params,
         onDecode: (jsonResponse) => AppNewAddr.fromJSON(
+            jsonResponse as Map<String, dynamic>,
+            snackCase: !mode.withCamelCase()));
+  }
+
+  @override
+  Future<AppWithdraw> withdraw(
+      {required String destination, required int satoshi}) {
+    dynamic params;
+    var msats = Int64(satoshi);
+    switch (mode) {
+      case ClientMode.grpc:
+        params = CLNWithdrawRequest(
+            grpcRequest: WithdrawRequest(
+                destination: destination,
+                satoshi: AmountOrAll(amount: Amount(msat: msats), all: false)));
+        break;
+      case ClientMode.unixSocket:
+        params = CLNWithdrawRequest(unixRequest: <String, dynamic>{
+          "destination": destination,
+          "satoshi": satoshi
+        });
+        break;
+      case ClientMode.lnlambda:
+        params = CLNWithdrawRequest(unixRequest: <String, dynamic>{
+          "destination": destination,
+          "satoshi": satoshi
+        });
+        break;
+    }
+    return client.call<CLNWithdrawRequest, AppWithdraw>(
+        method: "withdraw",
+        params: params,
+        onDecode: (jsonResponse) => AppWithdraw.fromJSON(
             jsonResponse as Map<String, dynamic>,
             snackCase: !mode.withCamelCase()));
   }

@@ -11,6 +11,7 @@ import 'package:clnapp/views/pay/numberpad_view.dart';
 import 'package:clnapp/views/pay/scanner_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:trash_component/components/global_components.dart';
 
 class PayView extends StatefulWidget {
   final AppProvider provider;
@@ -27,6 +28,7 @@ class _PayViewState extends State<PayView> {
   String? display;
   String? createdTime;
   String? expirationTime;
+  String? btcAddress;
 
   Future<AppPayInvoice> payInvoice(String boltString) async {
     final response =
@@ -127,8 +129,32 @@ class _PayViewState extends State<PayView> {
                 setState(() {
                   _invoiceController.text = data!.text!;
                 });
-                boltString = data!.text;
-                invoiceActions(data.text!);
+                if (data!.text!.startsWith('ln')) {
+                  /// This is a lightning invoice
+                  boltString = data.text;
+                  invoiceActions(boltString!);
+                } else if (data.text!.startsWith('tb1')) {
+                  /// This is a btc address
+                  btcAddress = data.text;
+                  if (context.mounted) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => NumberPad(
+                              provider: widget.provider,
+                              btcAddress: btcAddress,
+                            )));
+                  }
+                } else {
+                  /// Throwing error
+                  if (context.mounted) {
+                    GlobalComponent.showAppDialog(
+                        context: context,
+                        title: 'Invalid details',
+                        message: 'Please check the details you added',
+                        closeMsg: 'Ok',
+                        imageProvided:
+                            const AssetImage('assets/images/exclamation.png'));
+                  }
+                }
               }),
         ],
       ),
@@ -148,13 +174,27 @@ class _PayViewState extends State<PayView> {
                     icon: const ImageIcon(
                         AssetImage('assets/images/scanner.png')),
                     onPressed: () async {
-                      boltString =
+                      String str =
                           await Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => ScannerView(
                                     provider: widget.provider,
                                   )));
-                      LogManager.getInstance.debug("bolt string : $boltString");
-                      invoiceActions(boltString!);
+                      if (str.startsWith('lntb')) {
+                        /// Declare the boltString here
+                        boltString = str;
+                        invoiceActions(boltString!);
+                      } else {
+                        /// Declare the btc address here
+                        btcAddress = str;
+                        if (context.mounted) {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => NumberPad(
+                                    provider: widget.provider,
+                                    btcAddress: btcAddress,
+                                  )));
+                        }
+                      }
+                      LogManager.getInstance.debug(str);
                     },
                   ),
                 )
