@@ -17,6 +17,8 @@ class RequestView extends StatefulWidget {
   State<RequestView> createState() => _RequestViewState();
 }
 
+enum RadioButtonData { btcAddress, lightningInvoice }
+
 class _RequestViewState extends State<RequestView> {
   String display = '0';
   String? btcAddress;
@@ -154,7 +156,7 @@ class _RequestViewState extends State<RequestView> {
 
   // FIXME: put this generic component inside the trash package
   void _showBottomDialog(
-      {required BuildContext context, required String identifier}) {
+      {required BuildContext context, required RadioButtonData identifier}) {
     showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
@@ -191,7 +193,7 @@ class _RequestViewState extends State<RequestView> {
                     child: Container(
                       alignment: Alignment.center,
                       child: Text(
-                        identifier == 'btc'
+                        identifier == RadioButtonData.btcAddress
                             ? 'Your BTC address'
                             : 'Your lightning invoice',
                         style: const TextStyle(fontSize: 30),
@@ -204,7 +206,7 @@ class _RequestViewState extends State<RequestView> {
                         alignment: Alignment.center,
                         padding: const EdgeInsets.all(20),
                         child: Text(
-                          identifier == 'btc'
+                          identifier == RadioButtonData.btcAddress
                               ? 'Receive payments at this address'
                               : 'Receive payments via this lightning invoice',
                           style: const TextStyle(fontSize: 20),
@@ -225,7 +227,9 @@ class _RequestViewState extends State<RequestView> {
                       child: IconButton(
                           onPressed: () {
                             String text =
-                                identifier == 'btc' ? btcAddress! : invoice!;
+                                identifier == RadioButtonData.btcAddress
+                                    ? btcAddress!
+                                    : invoice!;
                             Clipboard.setData(ClipboardData(text: text));
                             const snackBar =
                                 SnackBar(content: Text('Copied to clipboard!'));
@@ -242,9 +246,11 @@ class _RequestViewState extends State<RequestView> {
         });
   }
 
-  Future showDialogForRequest() {
-    return showDialog(
+  void showDialogForRequest() {
+    RadioButtonData selectedValue = RadioButtonData.btcAddress;
+    showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: Text('Choose an option',
             style: Theme.of(context).textTheme.bodyLarge!.apply(
@@ -253,31 +259,65 @@ class _RequestViewState extends State<RequestView> {
         content: SizedBox(
           height: MediaQuery.of(context).size.height * 0.25,
           width: MediaQuery.of(context).size.width * 0.25,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ListTile(
-                title: const Text('Btc address'),
-                onTap: () async {
-                  newaddr();
-                  _showBottomDialog(context: context, identifier: 'btc');
-                },
-              ),
-              ListTile(
-                title: const Text('Lightning invoice'),
-                onTap: () {
-                  generateInvoice();
-                  _showBottomDialog(context: context, identifier: 'invoice');
-                },
-              ),
-            ],
+          child: StatefulBuilder(
+            builder:
+                (BuildContext context, void Function(void Function()) set) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Create a btc address'),
+                      Radio<RadioButtonData>(
+                        activeColor: Colors.pinkAccent,
+                        groupValue: selectedValue,
+                        onChanged: (RadioButtonData? value) async {
+                          set(() {
+                            selectedValue = value!;
+                          });
+                          await newaddr();
+                          if (context.mounted) {
+                            _showBottomDialog(
+                                context: context,
+                                identifier: RadioButtonData.btcAddress);
+                          }
+                        },
+                        value: RadioButtonData.btcAddress,
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Create an lightning invoice'),
+                      Radio<RadioButtonData>(
+                        activeColor: Colors.pinkAccent,
+                        groupValue: selectedValue,
+                        onChanged: (RadioButtonData? value) async {
+                          set(() {
+                            selectedValue = value!;
+                          });
+                          await generateInvoice();
+                          if (context.mounted) {
+                            _showBottomDialog(
+                                context: context,
+                                identifier: RadioButtonData.lightningInvoice);
+                          }
+                        },
+                        value: RadioButtonData.lightningInvoice,
+                      ),
+                    ],
+                  )
+                ],
+              );
+            },
           ),
         ),
         actions: [
           TextButton(
             child: const Text('Cancel'),
             onPressed: () {
-              // LogManager.getInstance.debug(_selectedValue.toString());
               Navigator.of(context).pop();
             },
           ),
