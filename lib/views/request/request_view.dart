@@ -247,7 +247,7 @@ class _RequestViewState extends State<RequestView> {
   }
 
   void showDialogForRequest() {
-    RadioButtonData selectedValue = RadioButtonData.btcAddress;
+    RadioButtonData? selectedValue;
     showDialog(
       context: context,
       barrierDismissible: false,
