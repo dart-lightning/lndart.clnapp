@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/components/bottomsheet.dart';
@@ -11,6 +9,7 @@ import 'package:clnapp/views/pay/numberpad_view.dart';
 import 'package:clnapp/views/pay/scanner_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:trash_component/utils/platform_utils.dart';
 
 class PayView extends StatefulWidget {
   final AppProvider provider;
@@ -141,7 +140,7 @@ class _PayViewState extends State<PayView> {
       appBar: AppBar(
         elevation: 0,
         actions: [
-          Platform.isAndroid || Platform.isIOS
+          PlatformUtils.isMobile
               ? Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: IconButton(
