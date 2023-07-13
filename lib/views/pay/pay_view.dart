@@ -1,12 +1,9 @@
 import 'dart:convert';
-
-import 'package:clightning_rpc/clightning_rpc.dart';
 import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/components/bottomsheet.dart';
 import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/model/app_model/decode_invoice.dart';
-import 'package:clnapp/model/app_model/pay_invoice.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:clnapp/utils/error_decoder.dart';
 import 'package:clnapp/views/pay/numberpad_view.dart';
@@ -33,26 +30,8 @@ class _PayViewState extends State<PayView> {
   String? expirationTime;
 
   Future<void> payInvoice(String boltString) async {
-    AppPayInvoice? response;
     try {
-      response =
-          await widget.provider.get<AppApi>().payInvoice(invoice: boltString);
-    } catch (e) {
-      late ErrorDecoder decoder;
-      var jsonString = e.toString().substring(e.toString().indexOf('{'));
-      if (e is Exception || e is LNClientException) {
-        decoder = ErrorDecoder.fromJSON(jsonDecode(jsonString));
-      }
-      if (context.mounted) {
-        GlobalComponent.showAppDialog(
-            context: context,
-            title: 'Payment failed',
-            message: decoder.message,
-            closeMsg: 'Ok',
-            imageProvided: const AssetImage('assets/images/exclamation.png'));
-      }
-    }
-    if (response != null) {
+      await widget.provider.get<AppApi>().payInvoice(invoice: boltString);
       if (context.mounted) {
         GlobalComponent.showAppDialog(
             context: context,
@@ -60,6 +39,18 @@ class _PayViewState extends State<PayView> {
             message: 'Payment successfully sent',
             closeMsg: 'Ok',
             imageProvided: const AssetImage('assets/images/Checkmark.png'));
+      }
+    } catch (e) {
+      /// FIXME: this should be manage in a better way
+      var jsonString = e.toString().substring(e.toString().indexOf('{'));
+      ErrorDecoder decoder = ErrorDecoder.fromJSON(jsonDecode(jsonString));
+      if (context.mounted) {
+        GlobalComponent.showAppDialog(
+            context: context,
+            title: 'Payment failed',
+            message: decoder.message,
+            closeMsg: 'Ok',
+            imageProvided: const AssetImage('assets/images/exclamation.png'));
       }
     }
   }
@@ -143,6 +134,15 @@ class _PayViewState extends State<PayView> {
               contentPadding: const EdgeInsets.all(30),
               labelText: 'Invoice/ btc address',
               hintText: 'Invoice/ btc address',
+              suffixIcon: IconButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    boltString = _invoiceController.text;
+                    if (_invoiceController.text.trim().isNotEmpty) {
+                      invoiceActions(_invoiceController.text.trim());
+                    }
+                  },
+                  icon: const Icon(Icons.send)),
             ),
           ),
           const SizedBox(
