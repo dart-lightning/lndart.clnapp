@@ -25,7 +25,10 @@ dependencies:
   recase: ^4.0.0
   file_picker: ^5.0.1
   shared_preferences: ^2.0.15
-  lnlambda: ^0.0.1-beta.6
+  lnlambda:
+    git:
+      url: https://github.com/dart-lightning/lndart.cln
+      path: packages/lnlambda
   json_annotation: ^4.5.0
   flutter_launcher_icons: ^0.10.0
   bolt11_decoder: ^1.0.2
@@ -47,3 +50,4 @@ flutter:
   assets:
     - assets/images/exclamation.png
     - assets/images/scanner.png
+    - assets/images/Checkmark.png
