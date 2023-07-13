@@ -7,7 +7,7 @@ class CLNBottomSheet {
     required BuildContext context,
     required String display,
     required AppProvider provider,
-    required Future Function(dynamic) onPress,
+    required Future<void> Function(dynamic) onPress,
     required String boltString,
     required dynamic invoice,
     required dynamic navigate,

@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:clightning_rpc/clightning_rpc.dart';
 import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/components/bottomsheet.dart';
@@ -5,10 +8,12 @@ import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/model/app_model/decode_invoice.dart';
 import 'package:clnapp/model/app_model/pay_invoice.dart';
 import 'package:clnapp/utils/app_provider.dart';
+import 'package:clnapp/utils/error_decoder.dart';
 import 'package:clnapp/views/pay/numberpad_view.dart';
 import 'package:clnapp/views/pay/scanner_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:trash_component/components/global_components.dart';
 import 'package:trash_component/utils/platform_utils.dart';
 
 class PayView extends StatefulWidget {
@@ -27,10 +32,36 @@ class _PayViewState extends State<PayView> {
   String? createdTime;
   String? expirationTime;
 
-  Future<AppPayInvoice> payInvoice(String boltString) async {
-    final response =
-        await widget.provider.get<AppApi>().payInvoice(invoice: boltString);
-    return response;
+  Future<void> payInvoice(String boltString) async {
+    AppPayInvoice? response;
+    try {
+      response =
+          await widget.provider.get<AppApi>().payInvoice(invoice: boltString);
+    } catch (e) {
+      late ErrorDecoder decoder;
+      var jsonString = e.toString().substring(e.toString().indexOf('{'));
+      if (e is Exception || e is LNClientException) {
+        decoder = ErrorDecoder.fromJSON(jsonDecode(jsonString));
+      }
+      if (context.mounted) {
+        GlobalComponent.showAppDialog(
+            context: context,
+            title: 'Payment failed',
+            message: decoder.message,
+            closeMsg: 'Ok',
+            imageProvided: const AssetImage('assets/images/exclamation.png'));
+      }
+    }
+    if (response != null) {
+      if (context.mounted) {
+        GlobalComponent.showAppDialog(
+            context: context,
+            title: 'Payment Successful',
+            message: 'Payment successfully sent',
+            closeMsg: 'Ok',
+            imageProvided: const AssetImage('assets/images/Checkmark.png'));
+      }
+    }
   }
 
   Future<AppDecodeInvoice> decodeInvoice(String invoice) async {
