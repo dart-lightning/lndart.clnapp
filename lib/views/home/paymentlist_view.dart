@@ -7,6 +7,7 @@ import 'package:clnapp/model/app_model/list_invoices.dart';
 
 class PaymentListView extends StatefulWidget {
   final AppProvider provider;
+
   const PaymentListView({Key? key, required this.provider}) : super(key: key);
 
   @override
@@ -101,10 +102,18 @@ class _PaymentListViewState extends State<PaymentListView> {
     return false;
   }
 
+  bool isScreenWidthLarge(double width) {
+    if (width > 600) {
+      return true;
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     const red = Color.fromRGBO(255, 0, 57, 1);
     const green = Color.fromRGBO(61, 176, 23, 1);
+    double size = MediaQuery.of(context).size.width;
     return FutureBuilder<List<dynamic>?>(
         future: listPayments(),
         builder: (context, AsyncSnapshot<List<dynamic>?> snapshot) {
@@ -131,56 +140,62 @@ class _PaymentListViewState extends State<PaymentListView> {
                 shrinkWrap: true,
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
-                  return ExpandableCard(
-                    expandedAlignment: Alignment.topLeft,
-                    expandableChild: _buildSpecificPaymentView(
-                        context: context, items: snapshot.data!, index: index),
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.1,
-                      width: MediaQuery.of(context).size.width,
-                      child: Row(
-                        children: [
-                          Container(
-                            height: 46,
-                            width: 46,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                            ),
-                            alignment: Alignment.center,
-                            child: checkListIdentifier(
-                                    listTile: snapshot.data![index])
-                                ? const Icon(
-                                    Icons.arrow_downward,
-                                    color: green,
-                                  )
-                                : const Icon(
-                                    Icons.arrow_upward,
-                                    color: red,
-                                  ),
-                          ),
-                          Expanded(
-                            child: Container(
+                  return Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: isScreenWidthLarge(size) ? 200 : 0),
+                    child: ExpandableCard(
+                      expandedAlignment: Alignment.topLeft,
+                      expandableChild: _buildSpecificPaymentView(
+                          context: context,
+                          items: snapshot.data!,
+                          index: index),
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.1,
+                        width: MediaQuery.of(context).size.width * 0.1,
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 46,
+                              width: 46,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                              ),
                               alignment: Alignment.center,
                               child: checkListIdentifier(
                                       listTile: snapshot.data![index])
-                                  ? Text(
-                                      " + ${snapshot.data![index].amount} msats",
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          color: green),
+                                  ? const Icon(
+                                      Icons.arrow_downward,
+                                      color: green,
                                     )
-                                  : Text(
-                                      " - ${snapshot.data![index].amountSent}",
-                                      style: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          color: red),
+                                  : const Icon(
+                                      Icons.arrow_upward,
+                                      color: red,
                                     ),
                             ),
-                          ),
-                        ],
+                            Expanded(
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: checkListIdentifier(
+                                        listTile: snapshot.data![index])
+                                    ? Text(
+                                        " + ${snapshot.data![index].amount} msats",
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                            color: green),
+                                      )
+                                    : Text(
+                                        " - ${snapshot.data![index].amountSent} msats",
+                                        style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                            color: red),
+                                      ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );
