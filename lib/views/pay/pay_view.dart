@@ -79,6 +79,29 @@ class _PayViewState extends State<PayView> {
     showBottomSheet(invoice: invoice);
   }
 
+  @override
+  void initState() {
+    ServicesBinding.instance.keyboard.addHandler(_onKey);
+    super.initState();
+  }
+
+  bool _onKey(KeyEvent event) {
+    final key = event.logicalKey.keyLabel;
+    if (event is KeyUpEvent && key == "Enter") {
+      LogManager.getInstance.debug("Found: $key");
+      invoiceFunction();
+      return true;
+    }
+    return false;
+  }
+
+  void invoiceFunction() {
+    boltString = _invoiceController.text.trim();
+    if (_invoiceController.text.trim().isNotEmpty) {
+      invoiceActions(boltString!);
+    }
+  }
+
   void showBottomSheet({required AppDecodeInvoice invoice}) {
     if (context.mounted) {
       CLNBottomSheet.bottomSheet(
@@ -100,6 +123,7 @@ class _PayViewState extends State<PayView> {
   @override
   void dispose() {
     super.dispose();
+    ServicesBinding.instance.keyboard.removeHandler(_onKey);
     boltString = '';
     _invoiceController.dispose();
   }
@@ -134,15 +158,6 @@ class _PayViewState extends State<PayView> {
               contentPadding: const EdgeInsets.all(30),
               labelText: 'Invoice/ btc address',
               hintText: 'Invoice/ btc address',
-              suffixIcon: IconButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    boltString = _invoiceController.text;
-                    if (_invoiceController.text.trim().isNotEmpty) {
-                      invoiceActions(_invoiceController.text.trim());
-                    }
-                  },
-                  icon: const Icon(Icons.send)),
             ),
           ),
           const SizedBox(
