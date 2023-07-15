@@ -82,7 +82,7 @@ class AppInvoice {
     var status = json.withKey("status", snackCase: snackCase);
 
     /// If the invoice is paid there is no key with "amount_msat" instead there is a key with "amount_recieved_msat"
-    if (status == "paid" && boltidentifier == "bolt12") {
+    if (status == "paid") {
       amount =
           json.withKey("amount_received_msat", snackCase: snackCase).toString();
     }
