@@ -10,8 +10,9 @@ import 'package:clnapp/views/pay/numberpad_view.dart';
 import 'package:clnapp/views/pay/scanner_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:trash_component/components/global_components.dart';
 import 'package:trash_component/utils/platform_utils.dart';
+
+import 'package:clnapp/utils/error.dart';
 
 class PayView extends StatefulWidget {
   final AppProvider provider;
@@ -33,25 +34,14 @@ class _PayViewState extends State<PayView> {
     try {
       await widget.provider.get<AppApi>().payInvoice(invoice: boltString);
       if (context.mounted) {
-        GlobalComponent.showAppDialog(
-            context: context,
-            title: 'Payment Successful',
-            message: 'Payment successfully sent',
-            closeMsg: 'Ok',
-            imageProvided: const AssetImage('assets/images/Checkmark.png'));
+        PopUp.showPopUp(
+            context, 'Payment Successful', 'Payment successfully sent', false);
       }
     } catch (e) {
       /// FIXME: this should be manage in a better way
       var jsonString = e.toString().substring(e.toString().indexOf('{'));
       ErrorDecoder decoder = ErrorDecoder.fromJSON(jsonDecode(jsonString));
-      if (context.mounted) {
-        GlobalComponent.showAppDialog(
-            context: context,
-            title: 'Payment failed',
-            message: decoder.message,
-            closeMsg: 'Ok',
-            imageProvided: const AssetImage('assets/images/exclamation.png'));
-      }
+      PopUp.showPopUp(context, 'Invalid Rune', decoder.message, true);
     }
   }
 
@@ -69,14 +59,23 @@ class _PayViewState extends State<PayView> {
   }
 
   void invoiceActions(String boltString) async {
-    AppDecodeInvoice invoice = await decodeInvoice(boltString);
+    late AppDecodeInvoice decodedInvoice;
+    try {
+      decodedInvoice = await decodeInvoice(boltString);
+    } catch (e) {
+      var jsonString = e.toString().substring(e.toString().indexOf('{'));
+      ErrorDecoder decoder = ErrorDecoder.fromJSON(jsonDecode(jsonString));
+      PopUp.showPopUp(
+          context, 'Failed to decode invoice', decoder.message, true);
+      return;
+    }
     setState(() {
-      display = invoice.invoice.amount.toString();
+      display = decodedInvoice.invoice.amount.toString();
     });
-    createdTime = getTimeStamp(invoice.invoice.createdTime);
-    expirationTime = getTimeStamp(
-        (invoice.invoice.createdTime + invoice.invoice.expirationTime));
-    showBottomSheet(invoice: invoice);
+    createdTime = getTimeStamp(decodedInvoice.invoice.createdTime);
+    expirationTime = getTimeStamp((decodedInvoice.invoice.createdTime +
+        decodedInvoice.invoice.expirationTime));
+    showBottomSheet(invoice: decodedInvoice);
   }
 
   @override
@@ -169,10 +168,13 @@ class _PayViewState extends State<PayView> {
               width: 200,
               onPress: () async {
                 ClipboardData? data = await Clipboard.getData('text/plain');
+                if (data == null) {
+                  return;
+                }
                 setState(() {
-                  _invoiceController.text = data!.text!;
+                  _invoiceController.text = data.text!;
                 });
-                boltString = data!.text;
+                boltString = data.text;
                 invoiceActions(data.text!);
               }),
         ],

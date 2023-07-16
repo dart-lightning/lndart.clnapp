@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'package:clnapp/api/api.dart';
+import 'package:clnapp/utils/error.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/model/app_model/generate_invoice.dart';
 import 'package:clnapp/utils/app_provider.dart';
+import 'package:clnapp/utils/error_decoder.dart';
 
 class RequestView extends StatefulWidget {
   final AppProvider provider;
@@ -18,13 +21,21 @@ class RequestView extends StatefulWidget {
 class _RequestViewState extends State<RequestView> {
   String display = '0';
 
-  Future<AppGenerateInvoice> generateInvoice() async {
+  Future<AppGenerateInvoice?> generateInvoice() async {
     String label = '${DateTime.now()}';
     String description =
-        "This is a new description created at${DateTime.now()}";
-    AppGenerateInvoice response = await widget.provider
-        .get<AppApi>()
-        .generateInvoice(label, description, amount: int.parse(display));
+        "This is a new description created at ${DateTime.now()}";
+    AppGenerateInvoice response;
+    try {
+      response = await widget.provider
+          .get<AppApi>()
+          .generateInvoice(label, description, amount: int.parse(display));
+    } catch (e) {
+      var jsonString = e.toString().substring(e.toString().indexOf('{'));
+      ErrorDecoder decoder = ErrorDecoder.fromJSON(jsonDecode(jsonString));
+      PopUp.showPopUp(context, 'Invalid Rune', decoder.message, true);
+      return null;
+    }
     return response;
   }
 
@@ -107,8 +118,8 @@ class _RequestViewState extends State<RequestView> {
                   icon: Icons.send_outlined,
                   label: "Request",
                   onPress: () async {
-                    AppGenerateInvoice invoiceModel = await generateInvoice();
-                    if (context.mounted) {
+                    AppGenerateInvoice? invoiceModel = await generateInvoice();
+                    if (invoiceModel != null && context.mounted) {
                       _showBottomDialog(
                           context: context, invoice: invoiceModel.invoice);
                     }
