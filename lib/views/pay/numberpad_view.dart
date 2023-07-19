@@ -50,7 +50,7 @@ class _NumberPadState extends State<NumberPad> {
       AppWithdraw response = await widget.provider
           .get<AppApi>()
           .withdraw(destination: destination, mSatoshi: amount);
-      transactionView(response.tx);
+      transactionView(response.txId);
     } catch (e) {
       ///FIXME: This could be handled in a better way after this PR gets merged https://github.com/dart-lightning/lndart.clnapp/pull/122
       var jsonString = e.toString().substring(e.toString().indexOf('{'));
