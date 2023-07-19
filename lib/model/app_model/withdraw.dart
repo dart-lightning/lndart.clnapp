@@ -2,14 +2,14 @@ import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/model/app_model/app_utils.dart';
 
 class AppWithdraw {
-  String tx;
+  String txId;
 
-  AppWithdraw({required this.tx});
+  AppWithdraw({required this.txId});
 
   factory AppWithdraw.fromJSON(Map<String, dynamic> json,
       {bool snackCase = false}) {
     LogManager.getInstance.debug("Response : $json");
-    var tx = json.withKey("tx", snackCase: snackCase)!;
-    return AppWithdraw(tx: tx);
+    var txId = json.withKey("txid", snackCase: snackCase)!;
+    return AppWithdraw(txId: txId);
   }
 }
