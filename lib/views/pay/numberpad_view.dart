@@ -1,13 +1,12 @@
-import 'dart:convert';
+import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/utils/app_provider.dart';
-import 'package:clnapp/utils/error_decoder.dart';
+import 'package:clnapp/utils/error.dart';
 import 'package:flutter/material.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/model/app_model/pay_invoice.dart';
 import 'package:clnapp/model/app_model/withdraw.dart';
 import 'package:flutter/services.dart';
-import 'package:trash_component/components/global_components.dart';
 import 'package:clnapp/utils/app_utils.dart';
 
 class NumberPad extends StatefulWidget {
@@ -32,16 +31,8 @@ class _NumberPadState extends State<NumberPad> {
           .get<AppApi>()
           .payInvoice(invoice: boltString, msat: amountMsat);
       transactionView(response.payResponse.paymentHash);
-    } catch (e) {
-      ///FIXME: This could be handled in a better way after this PR gets merged https://github.com/dart-lightning/lndart.clnapp/pull/122
-      var jsonString = e.toString().substring(e.toString().indexOf('{'));
-      ErrorDecoder decoder = ErrorDecoder.fromJSON(jsonDecode(jsonString));
-      GlobalComponent.showAppDialog(
-          context: context,
-          title: 'Failed to pay the invoice',
-          message: decoder.message,
-          closeMsg: 'Ok',
-          imageProvided: const AssetImage('assets/images/exclamation.png'));
+    } on LNClientException catch (e) {
+      PopUp.showPopUp(context, 'Failed to pay the invoice', e.message, true);
     }
   }
 
@@ -51,16 +42,9 @@ class _NumberPadState extends State<NumberPad> {
           .get<AppApi>()
           .withdraw(destination: destination, mSatoshi: amount);
       transactionView(response.txId);
-    } catch (e) {
-      ///FIXME: This could be handled in a better way after this PR gets merged https://github.com/dart-lightning/lndart.clnapp/pull/122
-      var jsonString = e.toString().substring(e.toString().indexOf('{'));
-      ErrorDecoder decoder = ErrorDecoder.fromJSON(jsonDecode(jsonString));
-      GlobalComponent.showAppDialog(
-          context: context,
-          title: 'Failed to pay to the given address',
-          message: decoder.message,
-          closeMsg: 'Ok',
-          imageProvided: const AssetImage('assets/images/exclamation.png'));
+    } on LNClientException catch (e) {
+      PopUp.showPopUp(
+          context, 'Failed to pay to the given address', e.message, true);
     }
   }
 

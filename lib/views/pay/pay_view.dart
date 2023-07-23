@@ -1,16 +1,14 @@
-import 'dart:convert';
 import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/components/bottomsheet.dart';
 import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/model/app_model/decode_invoice.dart';
 import 'package:clnapp/utils/app_provider.dart';
-import 'package:clnapp/utils/error_decoder.dart';
+import 'package:clnapp/utils/error.dart';
 import 'package:clnapp/views/pay/numberpad_view.dart';
 import 'package:clnapp/views/pay/scanner_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:trash_component/components/global_components.dart';
 import 'package:trash_component/utils/platform_utils.dart';
 import 'package:clnapp/utils/app_utils.dart';
 
@@ -35,29 +33,21 @@ class _PayViewState extends State<PayView> {
     try {
       await widget.provider.get<AppApi>().payInvoice(invoice: boltString);
       if (context.mounted) {
-        GlobalComponent.showAppDialog(
-            context: context,
-            title: 'Payment Successful',
-            message: 'Payment successfully sent',
-            closeMsg: 'Ok',
-            imageProvided: const AssetImage('assets/images/Checkmark.png'));
+        PopUp.showPopUp(
+            context, 'Payment Successful', 'Payment successfully sent', false);
       }
-    } catch (e) {
-      ///FIXME: This could be handled in a better way after this PR gets merged https://github.com/dart-lightning/lndart.clnapp/pull/122
-      var jsonString = e.toString().substring(e.toString().indexOf('{'));
-      ErrorDecoder decoder = ErrorDecoder.fromJSON(jsonDecode(jsonString));
-      GlobalComponent.showAppDialog(
-          context: context,
-          title: 'Payment failed',
-          message: decoder.message,
-          closeMsg: 'Ok',
-          imageProvided: const AssetImage('assets/images/exclamation.png'));
+    } on LNClientException catch (e) {
+      PopUp.showPopUp(context, 'Invalid Rune', e.message, true);
     }
   }
 
-  Future<AppDecodeInvoice> decodeInvoice(String invoice) async {
-    final response = await widget.provider.get<AppApi>().decodeInvoice(invoice);
-    return response;
+  Future<AppDecodeInvoice?> decodeInvoice(String invoice) async {
+    try {
+      return await widget.provider.get<AppApi>().decodeInvoice(invoice);
+    } on LNClientException catch (e) {
+      PopUp.showPopUp(context, 'Failed to decode invoice', e.message, true);
+      return null;
+    }
   }
 
   String getTimeStamp(int timestamp) {
@@ -69,14 +59,17 @@ class _PayViewState extends State<PayView> {
   }
 
   void invoiceActions(String boltString) async {
-    AppDecodeInvoice invoice = await decodeInvoice(boltString);
+    AppDecodeInvoice? decodedInvoice = await decodeInvoice(boltString);
+    if (decodedInvoice == null) {
+      return;
+    }
     setState(() {
-      display = invoice.invoice.amount.toString();
+      display = decodedInvoice.invoice.amount.toString();
     });
-    createdTime = getTimeStamp(invoice.invoice.createdTime);
-    expirationTime = getTimeStamp(
-        (invoice.invoice.createdTime + invoice.invoice.expirationTime));
-    showBottomSheet(invoice: invoice);
+    createdTime = getTimeStamp(decodedInvoice.invoice.createdTime);
+    expirationTime = getTimeStamp((decodedInvoice.invoice.createdTime +
+        decodedInvoice.invoice.expirationTime));
+    showBottomSheet(invoice: decodedInvoice);
   }
 
   @override
