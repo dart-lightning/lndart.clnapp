@@ -1,3 +1,4 @@
+import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,9 +6,9 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/model/app_model/generate_invoice.dart';
 import 'package:clnapp/utils/app_provider.dart';
-import 'package:trash_component/components/global_components.dart';
 import 'package:clnapp/model/app_model/newaddr.dart';
 import 'package:clnapp/utils/app_utils.dart';
+import 'package:clnapp/utils/error.dart';
 
 class RequestView extends StatefulWidget {
   final AppProvider provider;
@@ -28,7 +29,7 @@ class _RequestViewState extends State<RequestView> {
   Future<void> generateInvoice() async {
     String label = '${DateTime.now()}';
     String description =
-        "This is a new description created at${DateTime.now()}";
+        "This is a new description created at ${DateTime.now()}";
     try {
       AppGenerateInvoice response = await widget.provider
           .get<AppApi>()
@@ -36,15 +37,8 @@ class _RequestViewState extends State<RequestView> {
       setState(() {
         invoice = response.invoice.bolt11;
       });
-    } catch (e) {
-      ///FIXME: This could be handled in a better way after this PR gets merged https://github.com/dart-lightning/lndart.clnapp/pull/122
-      GlobalComponent.showAppDialog(
-        context: context,
-        title: 'Cannot generate invoice',
-        message: 'Unable to generate invoice. Please try again',
-        closeMsg: 'Ok',
-        imageProvided: const AssetImage('assets/images/exclamation.png'),
-      );
+    } on LNClientException catch (e) {
+      PopUp.showPopUp(context, 'Invalid Rune', e.message, true);
     }
   }
 
@@ -54,16 +48,8 @@ class _RequestViewState extends State<RequestView> {
       setState(() {
         btcAddress = response.bech32;
       });
-    } catch (e) {
-      ///FIXME: This could be handled in a better way after this PR gets merged https://github.com/dart-lightning/lndart.clnapp/pull/122
-      GlobalComponent.showAppDialog(
-        context: context,
-        title: 'Invalid Rune',
-        message:
-            'Please check if your rune has any restrictions. If yes then please change it to have no restrictions',
-        closeMsg: 'Ok',
-        imageProvided: const AssetImage('assets/images/exclamation.png'),
-      );
+    } on LNClientException catch (e) {
+      PopUp.showPopUp(context, 'Invalid Rune', e.message, true);
     }
     return;
   }
@@ -148,14 +134,8 @@ class _RequestViewState extends State<RequestView> {
                   label: "Request",
                   onPress: () async {
                     if (display == '0') {
-                      ///FIXME: This could be handled in a better way after this PR gets merged https://github.com/dart-lightning/lndart.clnapp/pull/122
-                      GlobalComponent.showAppDialog(
-                          context: context,
-                          title: 'invalid details',
-                          message: 'Please enter value > 0',
-                          closeMsg: 'Ok',
-                          imageProvided: const AssetImage(
-                              'assets/images/exclamation.png'));
+                      PopUp.showPopUp(context, 'Invalid amount',
+                          'Enter an amount > 0', true);
                       return;
                     }
                     showDialogForRequest();

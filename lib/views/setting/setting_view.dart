@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:clnapp/api/client_provider.dart';
 import 'package:clnapp/model/user_setting.dart';
 import 'package:clnapp/utils/app_provider.dart';
+import 'package:clnapp/utils/error.dart';
 import 'package:clnapp/utils/register_provider.dart';
 import 'package:clnapp/views/home/home_view.dart';
 import 'package:clnapp/views/setting/lnlambda_setting_view.dart';
@@ -10,8 +11,6 @@ import 'package:clnapp/views/setting/unix_setting_view.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:trash_component/components/global_components.dart';
-
 import 'grpc_setting_view.dart';
 
 class SettingView extends StatefulWidget {
@@ -105,14 +104,11 @@ class _SettingViewState extends State<SettingView> {
                                     )),
                             (Route<dynamic> route) => false);
                       } else {
-                        GlobalComponent.showAppDialog(
-                            context: context,
-                            title: 'Oops, An error occurred!',
-                            message:
-                                'Please fill all the fields given in the settings',
-                            closeMsg: 'Close',
-                            imageProvided: const AssetImage(
-                                'assets/images/exclamation.png'));
+                        PopUp.showPopUp(
+                            context,
+                            'Oops, An error occurred!',
+                            'Please fill all the fields given in the settings',
+                            true);
                       }
                     },
                     child: const Text("Save"),
