@@ -12,16 +12,8 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   cln_grpc: ^0.0.1-beta.3
-  cln_common:
-    git:
-      url: https://github.com/Harshit933/lndart.cln
-      path: packages/cln_common
-      ref: directory-fix
-  clightning_rpc:
-    git:
-      url: https://github.com/Harshit933/lndart.cln
-      path: packages/rpc
-      ref: directory-fix
+  cln_common: ^0.0.1-beta.3
+  clightning_rpc: ^0.0.2-beta.5
   trash_component:
     git:
       url: https://github.com/vincenzopalazzo/trash
@@ -33,11 +25,7 @@ dependencies:
   recase: ^4.0.0
   file_picker: ^5.0.1
   shared_preferences: ^2.0.15
-  lnlambda:
-    git:
-      url: https://github.com/Harshit933/lndart.cln
-      path: packages/lnlambda
-      ref: directory-fix
+  lnlambda: ^0.0.1-beta.7
   json_annotation: ^4.5.0
   flutter_launcher_icons: ^0.10.0
   bolt11_decoder: ^1.0.2
