@@ -26,7 +26,7 @@ class _RequestViewState extends State<RequestView> {
   String? btcAddress;
   String? invoice;
 
-  Future<void> generateInvoice() async {
+  Future<bool> generateInvoice() async {
     String label = '${DateTime.now()}';
     String description =
         "This is a new description created at ${DateTime.now()}";
@@ -37,21 +37,24 @@ class _RequestViewState extends State<RequestView> {
       setState(() {
         invoice = response.invoice.bolt11;
       });
+      return true;
     } on LNClientException catch (e) {
       PopUp.showPopUp(context, 'Invalid Rune', e.message, true);
+      return false;
     }
   }
 
-  Future<void> newaddr() async {
+  Future<bool> newaddr() async {
     try {
       AppNewAddr response = await widget.provider.get<AppApi>().newAddr();
       setState(() {
         btcAddress = response.bech32;
       });
+      return true;
     } on LNClientException catch (e) {
       PopUp.showPopUp(context, 'Invalid Rune', e.message, true);
+      return false;
     }
-    return;
   }
 
   @override
@@ -172,7 +175,7 @@ class _RequestViewState extends State<RequestView> {
                             child: Container(
                                 alignment: Alignment.topRight,
                                 child: IconButton(
-                                  padding: const EdgeInsets.all(25),
+                                    padding: const EdgeInsets.all(25),
                                     onPressed: () => Navigator.pop(context),
                                     icon: const Icon(
                                       Icons.close,
@@ -287,8 +290,8 @@ class _RequestViewState extends State<RequestView> {
                           set(() {
                             selectedValue = value!;
                           });
-                          await newaddr();
-                          if (context.mounted) {
+                          bool isValid = await newaddr();
+                          if (isValid && context.mounted) {
                             _showBottomDialog(
                                 context: context,
                                 identifier: RadioButtonData.btcAddress);
@@ -309,8 +312,8 @@ class _RequestViewState extends State<RequestView> {
                           set(() {
                             selectedValue = value!;
                           });
-                          await generateInvoice();
-                          if (context.mounted) {
+                          bool isValid = await generateInvoice();
+                          if (isValid && context.mounted) {
                             _showBottomDialog(
                                 context: context,
                                 identifier: RadioButtonData.lightningInvoice);
