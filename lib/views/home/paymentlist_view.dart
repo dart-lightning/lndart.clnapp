@@ -16,8 +16,11 @@ class PaymentListView extends StatefulWidget {
 
 class _PaymentListViewState extends State<PaymentListView> {
   Future<List<dynamic>?> listPayments() async {
+    /// For getting the invoices which are paid by the other nodes
     final invoicesList =
         await widget.provider.get<AppApi>().listInvoices(status: "paid");
+
+    /// For getting invoices which are paid by this nodes
     final paysList = await widget.provider.get<AppApi>().listSendPays();
 
     List list = [];

@@ -15,7 +15,7 @@ import 'package:clnapp/api/cln/request/listsendpays_request.dart';
 import 'package:clnapp/api/cln/request/newaddr_request.dart';
 import 'package:clnapp/api/cln/request/pay_request.dart';
 import 'package:clnapp/api/cln/request/withdraw_request.dart';
-import 'package:clnapp/model/app_model/generate_invoice.dart';
+import 'package:clnapp/model/app_model/generate_invoice.dart' as gen_invoice;
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/model/app_model/list_funds.dart';
 import 'package:clnapp/model/app_model/list_invoices.dart';
@@ -55,7 +55,16 @@ class CLNApi extends AppApi {
             jsonResponse as Map<String, dynamic>,
             snackCase: !mode.withCamelCase()));
     var listFunds = await this.listFunds();
+    var invoicesList = await listInvoices(status: "paid");
+
+    /// Adding the listfunds amounts
     appInfo.totOffChainMsat = listFunds?.totOffChainMsat ?? 0;
+
+    /// Adding the paid invoices to the list
+    for (AppInvoice invoice in invoicesList.invoice) {
+      int parse = int.parse(invoice.amount);
+      appInfo.totOffChainMsat += parse;
+    }
     return appInfo;
   }
 
@@ -205,7 +214,8 @@ class CLNApi extends AppApi {
   }
 
   @override
-  Future<AppGenerateInvoice> generateInvoice(String label, String description,
+  Future<gen_invoice.AppGenerateInvoice> generateInvoice(
+      String label, String description,
       {int? amount}) {
     dynamic params;
     switch (mode) {
@@ -234,12 +244,13 @@ class CLNApi extends AppApi {
         });
         break;
     }
-    return client.call<CLNGenerateInvoiceRequest, AppGenerateInvoice>(
-        method: "invoice",
-        params: params,
-        onDecode: (jsonResponse) => AppGenerateInvoice.fromJSON(
-            jsonResponse as Map<String, dynamic>,
-            snackCase: !mode.withCamelCase()));
+    return client
+        .call<CLNGenerateInvoiceRequest, gen_invoice.AppGenerateInvoice>(
+            method: "invoice",
+            params: params,
+            onDecode: (jsonResponse) => gen_invoice.AppGenerateInvoice.fromJSON(
+                jsonResponse as Map<String, dynamic>,
+                snackCase: !mode.withCamelCase()));
   }
 
   @override
