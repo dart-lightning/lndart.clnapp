@@ -167,13 +167,12 @@ class _RequestViewState extends State<RequestView> {
                   Expanded(
                     child: Row(
                       children: [
-                        const Spacer(flex: 1),
                         Expanded(
-                            flex: 2,
+                            flex: 3,
                             child: Container(
                                 alignment: Alignment.topRight,
-                                padding: const EdgeInsets.all(20),
                                 child: IconButton(
+                                  padding: const EdgeInsets.all(25),
                                     onPressed: () => Navigator.pop(context),
                                     icon: const Icon(
                                       Icons.close,
