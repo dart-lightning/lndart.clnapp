@@ -1,4 +1,5 @@
 import 'package:cln_common/cln_common.dart';
+import 'package:clnapp/model/app_model/bkpr_listincome.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:trash_component/components/expandable_card.dart';
@@ -7,29 +8,17 @@ import 'package:clnapp/model/app_model/list_invoices.dart';
 
 class PaymentListView extends StatefulWidget {
   final AppProvider provider;
+  final AppListIncome incomeList;
 
-  const PaymentListView({Key? key, required this.provider}) : super(key: key);
+  const PaymentListView(
+      {Key? key, required this.provider, required this.incomeList})
+      : super(key: key);
 
   @override
   State<PaymentListView> createState() => _PaymentListViewState();
 }
 
 class _PaymentListViewState extends State<PaymentListView> {
-  Future<List<dynamic>?> listPayments() async {
-    final invoicesList =
-        await widget.provider.get<AppApi>().listInvoices(status: "paid");
-    final paysList = await widget.provider.get<AppApi>().listSendPays();
-
-    List list = [];
-
-    list.addAll(invoicesList.invoice);
-
-    list.addAll(paysList.pays);
-
-    /// FIXME: sort the payments list
-    return list;
-  }
-
   String topic(AppInvoice topic) {
     if (topic.bolt11 == null) {
       return "bolt12";
@@ -61,18 +50,32 @@ class _PaymentListViewState extends State<PaymentListView> {
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _text(topic: "Description", value: items[index].description),
-              _text(topic: topic(items[index]), value: value(items[index])),
+              _text(
+                  topic: "Credit Msats",
+                  value: items[index].creditMsat.toString()),
+              _text(
+                  topic: "Debit Msats",
+                  value: items[index].debitMsat.toString()),
+              _text(
+                  topic: "Time stamp",
+                  value: items[index].timeStamp.toString()),
+              _text(
+                  topic: "Description",
+                  value: items[index].description ?? "No description provided"),
             ],
           )
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _text(
-                  topic: "Created At",
-                  value: getTimeStamp(int.parse(items[index].createdAt))),
-              _text(topic: "Destination", value: items[index].destination),
-              _text(topic: "Label", value: items[index].label),
+                  topic: "Credit Msats",
+                  value: items[index].creditMsat.toString()),
+              _text(
+                  topic: "Debit Msats",
+                  value: items[index].debitMsat.toString()),
+              _text(
+                  topic: "Time stamp",
+                  value: items[index].timeStamp.toString()),
             ],
           );
   }
@@ -95,8 +98,9 @@ class _PaymentListViewState extends State<PaymentListView> {
     );
   }
 
+  /// Returns true if funds are outgoing
   bool checkListIdentifier({var listTile}) {
-    if (listTile.identifier == "invoice") {
+    if (listTile.creditMsat == 0) {
       return true;
     }
     return false;
@@ -114,9 +118,9 @@ class _PaymentListViewState extends State<PaymentListView> {
     const red = Color.fromRGBO(255, 0, 57, 1);
     const green = Color.fromRGBO(61, 176, 23, 1);
     double size = MediaQuery.of(context).size.width;
-    return FutureBuilder<List<dynamic>?>(
-        future: listPayments(),
-        builder: (context, AsyncSnapshot<List<dynamic>?> snapshot) {
+    return FutureBuilder<AppListIncome>(
+        future: widget.provider.get<AppApi>().listincome(),
+        builder: (context, AsyncSnapshot<AppListIncome> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Column(
               children: [
@@ -138,7 +142,7 @@ class _PaymentListViewState extends State<PaymentListView> {
             return ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemCount: snapshot.data!.length,
+                itemCount: snapshot.data!.incomes.length,
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: EdgeInsets.symmetric(
@@ -147,7 +151,7 @@ class _PaymentListViewState extends State<PaymentListView> {
                       expandedAlignment: Alignment.topLeft,
                       expandableChild: _buildSpecificPaymentView(
                           context: context,
-                          items: snapshot.data!,
+                          items: snapshot.data!.incomes,
                           index: index),
                       child: SizedBox(
                         height: MediaQuery.of(context).size.height * 0.1,
@@ -162,35 +166,35 @@ class _PaymentListViewState extends State<PaymentListView> {
                               ),
                               alignment: Alignment.center,
                               child: checkListIdentifier(
-                                      listTile: snapshot.data![index])
+                                      listTile: snapshot.data!.incomes[index])
                                   ? const Icon(
-                                      Icons.arrow_downward,
-                                      color: green,
-                                    )
-                                  : const Icon(
                                       Icons.arrow_upward,
                                       color: red,
+                                    )
+                                  : const Icon(
+                                      Icons.arrow_downward,
+                                      color: green,
                                     ),
                             ),
                             Expanded(
                               child: Container(
                                 alignment: Alignment.center,
                                 child: checkListIdentifier(
-                                        listTile: snapshot.data![index])
+                                        listTile: snapshot.data!.incomes[index])
                                     ? Text(
-                                        " + ${snapshot.data![index].amount} msats",
+                                        " - ${snapshot.data!.incomes[index].debitMsat} msats",
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w500,
-                                            color: green),
+                                            color: red),
                                       )
                                     : Text(
-                                        " - ${snapshot.data![index].amountSent} msats",
+                                        " + ${snapshot.data!.incomes[index].creditMsat} msats",
                                         style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w500,
-                                            color: red),
+                                            color: green),
                                       ),
                               ),
                             ),

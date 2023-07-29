@@ -4,6 +4,7 @@ import 'package:cln_common/cln_common.dart';
 import 'package:cln_grpc/cln_grpc.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/api/client_provider.dart';
+import 'package:clnapp/api/cln/request/bkpr_listincome_request.dart';
 import 'package:clnapp/api/cln/request/decodeinvoice_request.dart';
 import 'package:clnapp/api/cln/request/generateinvoice_request.dart';
 import 'package:clnapp/api/cln/request/get_info_request.dart';
@@ -15,6 +16,7 @@ import 'package:clnapp/api/cln/request/listsendpays_request.dart';
 import 'package:clnapp/api/cln/request/newaddr_request.dart';
 import 'package:clnapp/api/cln/request/pay_request.dart';
 import 'package:clnapp/api/cln/request/withdraw_request.dart';
+import 'package:clnapp/model/app_model/bkpr_listincome.dart';
 import 'package:clnapp/model/app_model/generate_invoice.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/model/app_model/list_funds.dart';
@@ -54,8 +56,6 @@ class CLNApi extends AppApi {
         onDecode: (jsonResponse) => AppGetInfo.fromJSON(
             jsonResponse as Map<String, dynamic>,
             snackCase: !mode.withCamelCase()));
-    var listFunds = await this.listFunds();
-    appInfo.totOffChainMsat = listFunds?.totOffChainMsat ?? 0;
     return appInfo;
   }
 
@@ -347,6 +347,27 @@ class CLNApi extends AppApi {
         method: "withdraw",
         params: params,
         onDecode: (jsonResponse) => AppWithdraw.fromJSON(
+            jsonResponse as Map<String, dynamic>,
+            snackCase: !mode.withCamelCase()));
+  }
+
+  @override
+  Future<AppListIncome> listincome() {
+    dynamic params;
+    switch (mode) {
+      case ClientMode.grpc:
+        throw const FormatException("Not available for this client");
+      case ClientMode.unixSocket:
+        params = CLNListIncomeRequest(unixRequest: <String, dynamic>{});
+        break;
+      case ClientMode.lnlambda:
+        params = CLNListIncomeRequest(unixRequest: <String, dynamic>{});
+        break;
+    }
+    return client.call<CLNListIncomeRequest, AppListIncome>(
+        method: "bkpr-listincome",
+        params: params,
+        onDecode: (jsonResponse) => AppListIncome.fromJSON(
             jsonResponse as Map<String, dynamic>,
             snackCase: !mode.withCamelCase()));
   }

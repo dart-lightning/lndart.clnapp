@@ -10,6 +10,8 @@ import 'package:clnapp/model/app_model/list_peers.dart';
 import 'package:clnapp/model/app_model/newaddr.dart';
 import 'package:clnapp/model/app_model/withdraw.dart';
 
+import '../model/app_model/bkpr_listincome.dart';
+
 /// App API implementation, the class contains all the information
 /// to make a call to core lightning and return the correct type
 /// of useful of the UI.
@@ -55,4 +57,6 @@ abstract class AppApi {
 
   Future<AppWithdraw> withdraw(
       {required String destination, required int mSatoshi});
+
+  Future<AppListIncome> listincome();
 }
