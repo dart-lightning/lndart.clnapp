@@ -1,3 +1,4 @@
+import 'package:clnapp/model/app_model/bkpr_listincome.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:clnapp/views/request/request_view.dart';
@@ -8,8 +9,13 @@ import 'package:clnapp/views/pay/pay_view.dart';
 class InfoView extends StatefulWidget {
   final AppProvider provider;
   final AppGetInfo getinfo;
+  final AppListIncome income;
 
-  const InfoView({Key? key, required this.getinfo, required this.provider})
+  const InfoView(
+      {Key? key,
+      required this.getinfo,
+      required this.provider,
+      required this.income})
       : super(key: key);
 
   @override
@@ -37,7 +43,7 @@ class _InfoViewState extends State<InfoView> {
             height: MediaQuery.of(context).size.height * 0.05,
           ),
           Text(
-            "${widget.getinfo.totOffChainMsat} sats",
+            "${widget.income.balance} msats",
             style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
           ),
           SizedBox(
