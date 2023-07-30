@@ -9,8 +9,7 @@ import 'package:clnapp/model/app_model/decode_invoice.dart';
 import 'package:clnapp/model/app_model/list_peers.dart';
 import 'package:clnapp/model/app_model/newaddr.dart';
 import 'package:clnapp/model/app_model/withdraw.dart';
-
-import '../model/app_model/bkpr_listincome.dart';
+import 'package:clnapp/model/app_model/bkpr_listincome.dart';
 
 /// App API implementation, the class contains all the information
 /// to make a call to core lightning and return the correct type
