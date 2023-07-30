@@ -39,39 +39,52 @@ class ListIncome {
 
   final int timeStamp;
 
-  ListIncome({
-    required this.creditMsat,
-    required this.debitMsat,
-    required this.identifier,
-    this.description,
-    required this.timeStamp,
-  });
+  final String paymentForm;
+
+  final String txId;
+
+  ListIncome(
+      {required this.creditMsat,
+      required this.debitMsat,
+      required this.identifier,
+      this.description,
+      required this.timeStamp,
+      required this.paymentForm,
+      required this.txId});
 
   factory ListIncome.fromJSON(Map<String, dynamic> json,
       {bool snackCase = false}) {
     var creditMsat = json.withKey("credit_msat", snackCase: true);
     var debitMsat = json.withKey("debit_msat", snackCase: true);
     var tag = json.withKey("tag");
+    var timestamp = json.withKey("timestamp");
     if (tag == "invoice") {
       var description = json.withKey("description");
-      var timestamp = json.withKey("timestamp");
       var identifier = "invoice";
+      var paymentForm = "off-chain";
+      var txId = json.withKey("payment_id", snackCase: true);
       return ListIncome(
-        creditMsat: creditMsat,
-        debitMsat: debitMsat,
-        description: description,
-        identifier: identifier,
-        timeStamp: timestamp,
-      );
+          creditMsat: creditMsat,
+          debitMsat: debitMsat,
+          description: description,
+          identifier: identifier,
+          timeStamp: timestamp,
+          paymentForm: paymentForm,
+          txId: txId);
     } else {
-      var timestamp = json.withKey("timestamp");
       var identifier = "wallet";
+      var paymentForm = "On-chain";
+
+      /// If the payment is of the type deposit it will return an outpoint otherwise
+      /// it will return a txId.
+      var txId = json.withKey("txid") ?? json.withKey("outpoint");
       return ListIncome(
-        creditMsat: creditMsat,
-        debitMsat: debitMsat,
-        timeStamp: timestamp,
-        identifier: identifier,
-      );
+          creditMsat: creditMsat,
+          debitMsat: debitMsat,
+          timeStamp: timestamp,
+          identifier: identifier,
+          paymentForm: paymentForm,
+          txId: txId);
     }
   }
 }

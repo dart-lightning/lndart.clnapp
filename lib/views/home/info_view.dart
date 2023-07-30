@@ -22,7 +22,45 @@ class InfoView extends StatefulWidget {
   State<InfoView> createState() => _InfoViewState();
 }
 
+enum Conversion { sats, msats }
+
 class _InfoViewState extends State<InfoView> {
+  bool isSwitched = false;
+  Conversion _conversion = Conversion.sats;
+  late String amount;
+
+  @override
+  void initState() {
+    amount = "${widget.income.balance} msats";
+    super.initState();
+  }
+
+  /// When false return msats and when true return sats.
+  Widget toggleSwitch() {
+    return Switch(
+      activeColor: Colors.green,
+      inactiveTrackColor: Colors.blue,
+      value: isSwitched,
+      onChanged: (value) {
+        setState(() {
+          _conversion == Conversion.msats
+              ? _conversion = Conversion.sats
+              : _conversion = Conversion.msats;
+          setAmount();
+          isSwitched = value;
+        });
+      },
+    );
+  }
+
+  void setAmount() {
+    if (_conversion == Conversion.msats) {
+      amount = "${widget.income.balance / 1000} sats";
+    } else {
+      amount = "${widget.income.balance} msats";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -43,11 +81,12 @@ class _InfoViewState extends State<InfoView> {
             height: MediaQuery.of(context).size.height * 0.05,
           ),
           Text(
-            "${widget.income.balance} msats",
+            amount,
             style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
           ),
+          toggleSwitch(),
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.05,
+            height: MediaQuery.of(context).size.height * 0.03,
           ),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             MainCircleButton(

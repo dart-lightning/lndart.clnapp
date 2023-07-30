@@ -4,7 +4,6 @@ import 'package:clnapp/utils/app_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:trash_component/components/expandable_card.dart';
 import 'package:clnapp/api/api.dart';
-import 'package:clnapp/model/app_model/list_invoices.dart';
 
 class PaymentListView extends StatefulWidget {
   final AppProvider provider;
@@ -19,21 +18,7 @@ class PaymentListView extends StatefulWidget {
 }
 
 class _PaymentListViewState extends State<PaymentListView> {
-  String topic(AppInvoice topic) {
-    if (topic.bolt11 == null) {
-      return "bolt12";
-    }
-    return "bolt11";
-  }
-
-  String value(AppInvoice value) {
-    if (value.bolt11 == null) {
-      return value.bolt12.toString();
-    }
-    return value.bolt11.toString();
-  }
-
-  // FIXME: move this in a util function
+// FIXME: move this in a util function
   String getTimeStamp(int timestamp) {
     String date = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000)
         .toString()
@@ -51,31 +36,23 @@ class _PaymentListViewState extends State<PaymentListView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _text(
-                  topic: "Credit Msats",
-                  value: items[index].creditMsat.toString()),
-              _text(
-                  topic: "Debit Msats",
-                  value: items[index].debitMsat.toString()),
-              _text(
                   topic: "Time stamp",
-                  value: items[index].timeStamp.toString()),
+                  value: getTimeStamp(items[index].timeStamp)),
               _text(
                   topic: "Description",
                   value: items[index].description ?? "No description provided"),
+              _text(topic: "Payment Form", value: items[index].paymentForm),
+              _text(topic: "Transaction", value: items[index].txId),
             ],
           )
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _text(
-                  topic: "Credit Msats",
-                  value: items[index].creditMsat.toString()),
-              _text(
-                  topic: "Debit Msats",
-                  value: items[index].debitMsat.toString()),
-              _text(
                   topic: "Time stamp",
-                  value: items[index].timeStamp.toString()),
+                  value: getTimeStamp(items[index].timeStamp)),
+              _text(topic: "Payment Form", value: items[index].paymentForm),
+              _text(topic: "Transaction", value: items[index].txId),
             ],
           );
   }
