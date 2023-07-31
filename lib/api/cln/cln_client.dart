@@ -9,10 +9,8 @@ import 'package:clnapp/api/cln/request/decodeinvoice_request.dart';
 import 'package:clnapp/api/cln/request/generateinvoice_request.dart';
 import 'package:clnapp/api/cln/request/get_info_request.dart';
 import 'package:clnapp/api/cln/request/list_funds_request.dart';
-import 'package:clnapp/api/cln/request/list_invoices_request.dart';
 import 'package:clnapp/api/cln/request/list_transaction_request.dart';
 import 'package:clnapp/api/cln/request/listpeers_request.dart';
-import 'package:clnapp/api/cln/request/listsendpays_request.dart';
 import 'package:clnapp/api/cln/request/newaddr_request.dart';
 import 'package:clnapp/api/cln/request/pay_request.dart';
 import 'package:clnapp/api/cln/request/withdraw_request.dart';
@@ -20,9 +18,7 @@ import 'package:clnapp/model/app_model/bkpr_listincome.dart';
 import 'package:clnapp/model/app_model/generate_invoice.dart';
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/model/app_model/list_funds.dart';
-import 'package:clnapp/model/app_model/list_invoices.dart';
 import 'package:clnapp/model/app_model/list_peers.dart';
-import 'package:clnapp/model/app_model/list_send_pays.dart';
 import 'package:clnapp/model/app_model/list_transaction.dart';
 import 'package:clnapp/model/app_model/newaddr.dart';
 import 'package:clnapp/model/app_model/pay_invoice.dart';
@@ -107,30 +103,6 @@ class CLNApi extends AppApi {
   }
 
   @override
-  Future<AppListInvoices> listInvoices({String? status}) {
-    dynamic params;
-    switch (mode) {
-      case ClientMode.grpc:
-        params = CLNListInvoicesRequest(grpcRequest: ListinvoicesRequest());
-        break;
-      case ClientMode.unixSocket:
-        params = CLNListInvoicesRequest(unixRequest: <String, dynamic>{});
-        break;
-      case ClientMode.lnlambda:
-        params = CLNListInvoicesRequest(unixRequest: <String, dynamic>{});
-        break;
-    }
-    return client.call<CLNListInvoicesRequest, AppListInvoices>(
-        method: "listinvoices",
-        params: params,
-        onDecode: (jsonResponse) => AppListInvoices.fromJSON(
-            jsonResponse as Map<String, dynamic>,
-            snackCase: !mode.withCamelCase(),
-            isObject: mode.hashMsatAsObj(),
-            status: status));
-  }
-
-  @override
   Future<AppPayInvoice> payInvoice({required String invoice, int? msat}) async {
     dynamic params;
     switch (mode) {
@@ -175,33 +147,6 @@ class CLNApi extends AppApi {
         onDecode: (jsonResponse) => AppPayInvoice.fromJSON(
             jsonResponse as Map<String, dynamic>,
             snackCase: mode == ClientMode.unixSocket));
-  }
-
-  @override
-  Future<AppListSendPays> listSendPays() {
-    /// Defining the map for the pays pays which are completed
-    Map<String, String> map = {"status": "complete"};
-    dynamic params;
-    switch (mode) {
-      case ClientMode.grpc:
-        params = CLNListSendPayRequest(
-            grpcRequest: ListsendpaysPayments(
-                status:
-                    ListsendpaysPayments_ListsendpaysPaymentsStatus.COMPLETE));
-        break;
-      case ClientMode.unixSocket:
-        params = CLNListSendPayRequest(unixRequest: map);
-        break;
-      case ClientMode.lnlambda:
-        params = CLNListSendPayRequest(unixRequest: map);
-        break;
-    }
-    return client.call<CLNListSendPayRequest, AppListSendPays>(
-        method: "listsendpays",
-        params: params,
-        onDecode: (jsonResponse) => AppListSendPays.fromJSON(
-            jsonResponse as Map<String, dynamic>,
-            snackCase: !mode.withCamelCase()));
   }
 
   @override
