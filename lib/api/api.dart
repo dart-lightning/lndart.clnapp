@@ -1,9 +1,7 @@
 import 'package:clnapp/model/app_model/get_info.dart';
 import 'package:clnapp/model/app_model/list_funds.dart';
-import 'package:clnapp/model/app_model/list_invoices.dart';
 import 'package:clnapp/model/app_model/list_transaction.dart';
 import 'package:clnapp/model/app_model/pay_invoice.dart';
-import 'package:clnapp/model/app_model/list_send_pays.dart';
 import 'package:clnapp/model/app_model/generate_invoice.dart';
 import 'package:clnapp/model/app_model/decode_invoice.dart';
 import 'package:clnapp/model/app_model/list_peers.dart';
@@ -32,14 +30,8 @@ abstract class AppApi {
   /// Return the list of funds from lightning node.
   Future<AppListFunds?> listFunds();
 
-  /// Return the list of invoices from lightning node.
-  Future<AppListInvoices> listInvoices({String? status});
-
   /// Return the pay response from lightning node.
   Future<AppPayInvoice> payInvoice({required String invoice, int? msat});
-
-  /// Return the list of payments that succeeded
-  Future<AppListSendPays> listSendPays();
 
   /// Return a bolt 11/12 invoice
   Future<AppGenerateInvoice> generateInvoice(String label, String description,
