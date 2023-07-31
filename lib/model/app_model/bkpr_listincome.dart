@@ -62,7 +62,8 @@ class ListIncome {
       var description = json.withKey("description");
       var identifier = "invoice";
       var paymentForm = "off-chain";
-      var txId = json.withKey("payment_id", snackCase: true);
+      var txId =
+          json.withKey("payment_id", snackCase: true) ?? "Payment Id not found";
       return ListIncome(
           creditMsat: creditMsat,
           debitMsat: debitMsat,
@@ -77,7 +78,9 @@ class ListIncome {
 
       /// If the payment is of the type deposit it will return an outpoint otherwise
       /// it will return a txId.
-      var txId = json.withKey("txid") ?? json.withKey("outpoint");
+      var txId = json.withKey("txid") ??
+          json.withKey("outpoint") ??
+          "Transaction Id not found";
       return ListIncome(
           creditMsat: creditMsat,
           debitMsat: debitMsat,
