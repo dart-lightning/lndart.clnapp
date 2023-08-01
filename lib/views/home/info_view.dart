@@ -5,6 +5,7 @@ import 'package:clnapp/views/request/request_view.dart';
 import 'package:flutter/material.dart';
 import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/views/pay/pay_view.dart';
+import 'package:trash_component/utils/platform_utils.dart';
 
 class InfoView extends StatefulWidget {
   final AppProvider provider;
@@ -37,29 +38,40 @@ class _InfoViewState extends State<InfoView> {
 
   Widget dropDownMenu() {
     return SizedBox(
-      width: 150,
+      width: 200,
+      height: 50,
       child: DropdownButtonFormField<String>(
+          dropdownColor: const Color.fromRGBO(98, 114, 164, 100),
+          iconSize: 0,
           isExpanded: true,
           decoration: InputDecoration(
+            filled: true,
+            fillColor: const Color.fromRGBO(98, 114, 164, 100),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
-              borderSide: const BorderSide(width: 3),
+              borderRadius: BorderRadius.circular(30),
+              borderSide: const BorderSide(
+                  width: 3, color: Color.fromRGBO(98, 114, 164, 100)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(30),
               borderSide: const BorderSide(
-                width: 3.0,
-              ),
+                  width: 3, color: Color.fromRGBO(98, 114, 164, 100)),
+            ),
+            suffixIcon: const ImageIcon(
+              AssetImage("assets/images/downbutton.png"),
+              size: 24,
             ),
           ),
           value: selectedItem,
+          style: TextStyle(
+              fontSize: PlatformUtils.isMobile ? 10 : 18, color: Colors.white),
           items: currency
               .map((item) => DropdownMenuItem<String>(
                     alignment: Alignment.center,
                     value: item,
                     child: Center(
                         child: Text(
-                      item,
+                      item.toUpperCase(),
                     )),
                   ))
               .toList(),
@@ -100,7 +112,7 @@ class _InfoViewState extends State<InfoView> {
             style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
-          dropDownMenu(),
+          Center(child: dropDownMenu()),
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.03,
           ),
