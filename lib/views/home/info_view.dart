@@ -25,9 +25,9 @@ class InfoView extends StatefulWidget {
 enum Conversion { sats, msats }
 
 class _InfoViewState extends State<InfoView> {
-  bool isSwitched = false;
-  Conversion _conversion = Conversion.sats;
   late String amount;
+  List<String> currency = ["MSats", "Sats"];
+  String? selectedItem = "MSats";
 
   @override
   void initState() {
@@ -35,30 +35,45 @@ class _InfoViewState extends State<InfoView> {
     super.initState();
   }
 
-  /// When false return msats and when true return sats.
-  Widget toggleSwitch() {
-    return Switch(
-      activeColor: Colors.green,
-      inactiveTrackColor: Colors.blue,
-      value: isSwitched,
-      onChanged: (value) {
-        setState(() {
-          _conversion == Conversion.msats
-              ? _conversion = Conversion.sats
-              : _conversion = Conversion.msats;
-          setAmount();
-          isSwitched = value;
-        });
-      },
+  Widget dropDownMenu() {
+    return SizedBox(
+      width: 150,
+      child: DropdownButtonFormField<String>(
+          isExpanded: true,
+          decoration: InputDecoration(
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: const BorderSide(width: 3),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: const BorderSide(
+                width: 3.0,
+              ),
+            ),
+          ),
+          value: selectedItem,
+          items: currency
+              .map((item) => DropdownMenuItem<String>(
+                    alignment: Alignment.center,
+                    value: item,
+                    child: Center(
+                        child: Text(
+                      item,
+                    )),
+                  ))
+              .toList(),
+          onChanged: (String? value) {
+            setState(() {
+              selectedItem = value;
+            });
+            if (value == "MSats") {
+              amount = "${widget.income.balance} msats";
+            } else {
+              amount = "${widget.income.balance / 1000} sats";
+            }
+          }),
     );
-  }
-
-  void setAmount() {
-    if (_conversion == Conversion.msats) {
-      amount = "${widget.income.balance / 1000} sats";
-    } else {
-      amount = "${widget.income.balance} msats";
-    }
   }
 
   @override
@@ -84,7 +99,8 @@ class _InfoViewState extends State<InfoView> {
             amount,
             style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
           ),
-          toggleSwitch(),
+          const SizedBox(height: 20),
+          dropDownMenu(),
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.03,
           ),
