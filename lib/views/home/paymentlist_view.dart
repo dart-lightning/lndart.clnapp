@@ -27,6 +27,16 @@ class _PaymentListViewState extends State<PaymentListView> {
     return date;
   }
 
+  Future<AppListIncome> listIncome() async {
+    AppListIncome list = await widget.provider.get<AppApi>().listincome();
+
+    /// Sorting the list in decreasing order of time
+    list.incomes.sort((a, b) => a.timeStamp.compareTo(b.timeStamp));
+    List<ListIncome> newList = list.incomes.reversed.toList();
+    list.incomes = newList;
+    return list;
+  }
+
   Widget _buildSpecificPaymentView(
       {required BuildContext context,
       required List<dynamic> items,
@@ -96,7 +106,7 @@ class _PaymentListViewState extends State<PaymentListView> {
     const green = Color.fromRGBO(61, 176, 23, 1);
     double size = MediaQuery.of(context).size.width;
     return FutureBuilder<AppListIncome>(
-        future: widget.provider.get<AppApi>().listincome(),
+        future: listIncome(),
         builder: (context, AsyncSnapshot<AppListIncome> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Column(
