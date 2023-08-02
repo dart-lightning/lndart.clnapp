@@ -14,16 +14,14 @@ class AppListIncome {
     var incomeEvents =
         json.withKey("income_events", snackCase: snackCase) as List;
     List<ListIncome> outputList = [];
-    if (incomeEvents.isNotEmpty) {
-      for (var income in incomeEvents) {
-        ListIncome temp = ListIncome.fromJSON(income);
-
-        /// FIXME : Can we do tempbalance = (2 * tempbalance - debit + credit) / 2
-        tempBalance += temp.creditMsat;
-        tempBalance -= temp.debitMsat;
-        outputList.add(temp);
-      }
+    for (var income in incomeEvents) {
+      LogManager.getInstance.debug("Logging for info ${income.toString()}");
+      ListIncome temp = ListIncome.fromJSON(income);
+      tempBalance += temp.creditMsat;
+      tempBalance -= temp.debitMsat;
+      outputList.add(temp);
     }
+    outputList.sort((a, b) => b.timeStamp.compareTo(a.timeStamp));
     return AppListIncome(balance: tempBalance, incomes: outputList);
   }
 }
@@ -39,9 +37,9 @@ class ListIncome {
 
   final int timeStamp;
 
-  final String paymentForm;
+  final String paymentType;
 
-  final String txId;
+  final String account;
 
   ListIncome(
       {required this.creditMsat,
@@ -49,45 +47,37 @@ class ListIncome {
       required this.identifier,
       this.description,
       required this.timeStamp,
-      required this.paymentForm,
-      required this.txId});
+      required this.paymentType,
+      required this.account});
 
   factory ListIncome.fromJSON(Map<String, dynamic> json,
-      {bool snackCase = false}) {
-    var creditMsat = json.withKey("credit_msat", snackCase: true);
-    var debitMsat = json.withKey("debit_msat", snackCase: true);
-    var tag = json.withKey("tag");
-    var timestamp = json.withKey("timestamp");
+      {bool snackCase = true}) {
+    var creditMsat = json.withKey("credit_msat", snackCase: snackCase);
+    var debitMsat = json.withKey("debit_msat", snackCase: snackCase);
+    var tag = json.withKey("tag", snackCase: snackCase);
+    var timestamp = json.withKey("timestamp", snackCase: snackCase);
+    var account = json.withKey("account", snackCase: snackCase);
     if (tag == "invoice") {
-      var description = json.withKey("description");
+      var description = json.withKey("description", snackCase: snackCase);
       var identifier = "invoice";
-      var paymentForm = "off-chain";
-      var txId =
-          json.withKey("payment_id", snackCase: true) ?? "Payment Id not found";
+      var paymentForm = json.withKey("tag");
       return ListIncome(
           creditMsat: creditMsat,
           debitMsat: debitMsat,
           description: description,
           identifier: identifier,
           timeStamp: timestamp,
-          paymentForm: paymentForm,
-          txId: txId);
-    } else {
-      var identifier = "wallet";
-      var paymentForm = "On-chain";
-
-      /// If the payment is of the type deposit it will return an outpoint otherwise
-      /// it will return a txId.
-      var txId = json.withKey("txid") ??
-          json.withKey("outpoint") ??
-          "Transaction Id not found";
-      return ListIncome(
-          creditMsat: creditMsat,
-          debitMsat: debitMsat,
-          timeStamp: timestamp,
-          identifier: identifier,
-          paymentForm: paymentForm,
-          txId: txId);
+          paymentType: paymentForm,
+          account: account);
     }
+    var identifier = "non-invoice";
+    var paymentForm = json.withKey("tag");
+    return ListIncome(
+        creditMsat: creditMsat,
+        debitMsat: debitMsat,
+        timeStamp: timestamp,
+        identifier: identifier,
+        paymentType: paymentForm,
+        account: account);
   }
 }

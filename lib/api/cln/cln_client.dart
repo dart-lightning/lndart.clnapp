@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cln_common/cln_common.dart';
 import 'package:cln_grpc/cln_grpc.dart';
 import 'package:clnapp/api/api.dart';
@@ -25,6 +24,7 @@ import 'package:clnapp/model/app_model/pay_invoice.dart';
 import 'package:fixnum/fixnum.dart';
 import 'package:clnapp/model/app_model/decode_invoice.dart';
 import 'package:clnapp/model/app_model/withdraw.dart';
+import 'package:clnapp/model/app_model/appinfo_with_income.dart';
 
 class CLNApi extends AppApi {
   ClientMode mode;
@@ -315,5 +315,12 @@ class CLNApi extends AppApi {
         onDecode: (jsonResponse) => AppListIncome.fromJSON(
             jsonResponse as Map<String, dynamic>,
             snackCase: !mode.withCamelCase()));
+  }
+
+  @override
+  Future<AppInfoWithIncome> getInfoWithIncome() async {
+    AppGetInfo info = await getInfo();
+    var listIncome = await listincome();
+    return AppInfoWithIncome(listIncome, info);
   }
 }

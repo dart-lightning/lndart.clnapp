@@ -8,6 +8,7 @@ import 'package:clnapp/model/app_model/list_peers.dart';
 import 'package:clnapp/model/app_model/newaddr.dart';
 import 'package:clnapp/model/app_model/withdraw.dart';
 import 'package:clnapp/model/app_model/bkpr_listincome.dart';
+import 'package:clnapp/model/app_model/appinfo_with_income.dart';
 
 /// App API implementation, the class contains all the information
 /// to make a call to core lightning and return the correct type
@@ -50,4 +51,7 @@ abstract class AppApi {
       {required String destination, required int mSatoshi});
 
   Future<AppListIncome> listincome();
+
+  /// Gets the information for getinfo as well as list income
+  Future<AppInfoWithIncome> getInfoWithIncome();
 }

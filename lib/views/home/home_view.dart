@@ -1,5 +1,6 @@
 import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/api/api.dart';
+import 'package:clnapp/model/app_model/appinfo_with_income.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:clnapp/utils/error.dart';
 import 'package:clnapp/views/app_view.dart';
@@ -28,11 +29,8 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _buildMainView({required BuildContext context}) {
     return FutureBuilder(
-        future: Future.wait([
-          widget.provider.get<AppApi>().getInfo(),
-          widget.provider.get<AppApi>().listincome()
-        ]),
-        builder: (context, AsyncSnapshot<dynamic> snapshot) {
+        future: widget.provider.get<AppApi>().getInfoWithIncome(),
+        builder: (context, AsyncSnapshot<AppInfoWithIncome> snapshot) {
           String? error;
           if (snapshot.connectionState == ConnectionState.waiting) {
             /// This case can occur in the interval when the node is fetching
@@ -50,7 +48,7 @@ class _HomeViewState extends State<HomeView> {
           } else if (snapshot.hasData) {
             /// This is the case when the node is up and the provided parameters are
             /// correct.
-            var getInfo = snapshot.data[0];
+            var getInfo = snapshot.data!.info;
             return SingleChildScrollView(
                 physics: const ScrollPhysics(),
                 child: Column(children: <Widget>[
@@ -58,13 +56,13 @@ class _HomeViewState extends State<HomeView> {
                   InfoView(
                     getinfo: getInfo,
                     provider: widget.provider,
-                    income: snapshot.data[1],
+                    income: snapshot.data!.listIncome,
                   ),
 
                   /// For the all the transaction of the node.
                   PaymentListView(
                     provider: widget.provider,
-                    incomeList: snapshot.data[1],
+                    incomeList: snapshot.data!.listIncome,
                   ),
                 ]));
           }
