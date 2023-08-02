@@ -5,7 +5,6 @@ import 'package:clnapp/views/request/request_view.dart';
 import 'package:flutter/material.dart';
 import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/views/pay/pay_view.dart';
-import 'package:trash_component/utils/platform_utils.dart';
 
 class InfoView extends StatefulWidget {
   final AppProvider provider;
@@ -36,12 +35,13 @@ class _InfoViewState extends State<InfoView> {
     super.initState();
   }
 
-  Widget dropDownMenu() {
+  Widget dropDownMenu(Size size) {
     return SizedBox(
       width: 200,
-      height: 50,
+      height: 60,
       child: DropdownButtonFormField<String>(
-          dropdownColor: const Color.fromRGBO(98, 114, 164, 100),
+          borderRadius: BorderRadius.circular(30),
+          dropdownColor: Theme.of(context).primaryColor,
           iconSize: 0,
           isExpanded: true,
           decoration: InputDecoration(
@@ -49,13 +49,13 @@ class _InfoViewState extends State<InfoView> {
             fillColor: const Color.fromRGBO(98, 114, 164, 100),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                  width: 3, color: Color.fromRGBO(98, 114, 164, 100)),
+              borderSide:
+                  BorderSide(width: 3, color: Theme.of(context).primaryColor),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(30),
-              borderSide: const BorderSide(
-                  width: 3, color: Color.fromRGBO(98, 114, 164, 100)),
+              borderSide: BorderSide(
+                  width: 3, color: Theme.of(context).primaryColorLight),
             ),
             suffixIcon: const ImageIcon(
               AssetImage("assets/images/downbutton.png"),
@@ -63,8 +63,7 @@ class _InfoViewState extends State<InfoView> {
             ),
           ),
           value: selectedItem,
-          style: TextStyle(
-              fontSize: PlatformUtils.isMobile ? 10 : 18, color: Colors.white),
+          style: Theme.of(context).textTheme.bodySmall,
           items: currency
               .map((item) => DropdownMenuItem<String>(
                     alignment: Alignment.center,
@@ -82,7 +81,7 @@ class _InfoViewState extends State<InfoView> {
             if (value == "MSats") {
               amount = "${widget.income.balance} msats";
             } else {
-              amount = "${widget.income.balance / 1000} sats";
+              amount = "${widget.income.balance ~/ 1000} sats";
             }
           }),
     );
@@ -90,6 +89,7 @@ class _InfoViewState extends State<InfoView> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Container(
         padding:
             EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.05),
@@ -105,16 +105,16 @@ class _InfoViewState extends State<InfoView> {
             ),
           ),
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.05,
+            height: MediaQuery.of(context).size.height * 0.03,
           ),
           Text(
             amount,
             style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 20),
-          Center(child: dropDownMenu()),
+          Center(child: dropDownMenu(size)),
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.03,
+            height: MediaQuery.of(context).size.height * 0.05,
           ),
           Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             MainCircleButton(
