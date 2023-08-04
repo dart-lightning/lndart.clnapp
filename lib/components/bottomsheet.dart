@@ -1,6 +1,6 @@
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:flutter/material.dart';
-import 'buttons.dart';
+import 'package:trash_component/components/button.dart';
 
 class CLNBottomSheet {
   static void bottomSheet({
