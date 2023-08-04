@@ -1,7 +1,6 @@
 import 'package:cln_common/cln_common.dart';
 import 'package:clnapp/api/api.dart';
 import 'package:clnapp/components/bottomsheet.dart';
-import 'package:clnapp/components/buttons.dart';
 import 'package:clnapp/model/app_model/decode_invoice.dart';
 import 'package:clnapp/utils/app_provider.dart';
 import 'package:clnapp/utils/error.dart';
@@ -9,6 +8,7 @@ import 'package:clnapp/views/pay/numberpad_view.dart';
 import 'package:clnapp/views/pay/scanner_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:trash_component/components/button.dart';
 import 'package:trash_component/utils/platform_utils.dart';
 import 'package:clnapp/utils/app_utils.dart';
 
