@@ -91,18 +91,19 @@ class _SettingViewState extends State<SettingView> {
                 children: [
                   ElevatedButton(
                     onPressed: () async {
-                      if (setting.isValid()) {
+                      if (setting.isValid() && context.mounted) {
                         await saveSettings(setting: setting);
                         await ManagerAPIProvider.registerClientFromSetting(
                             setting, widget.provider);
                         // https://stackoverflow.com/questions/68871880/do-not-use-buildcontexts-across-async-gaps
-                        if (!mounted) return;
-                        Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (context) => HomeView(
-                                      provider: widget.provider,
-                                    )),
-                            (Route<dynamic> route) => false);
+                        if (context.mounted) {
+                          Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (context) => HomeView(
+                                        provider: widget.provider,
+                                      )),
+                              (Route<dynamic> route) => false);
+                        }
                       } else {
                         PopUp.showPopUp(
                             context,

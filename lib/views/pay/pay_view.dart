@@ -32,7 +32,7 @@ class _PayViewState extends State<PayView> {
   Future<void> payInvoice(String boltString) async {
     try {
       await widget.provider.get<AppApi>().payInvoice(invoice: boltString);
-      if (context.mounted) {
+      if (mounted) {
         PopUp.showPopUp(
             context, 'Payment Successful', 'Payment successfully sent', false);
       }
