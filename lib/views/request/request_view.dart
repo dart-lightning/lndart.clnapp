@@ -363,7 +363,7 @@ class _RequestViewState extends State<RequestView> {
                 )
               : Text(
                   value,
-                  textScaleFactor: 1.0,
+                  textScaler: const TextScaler.linear(1.0),
                   style: const TextStyle(
                     fontSize: 35,
                     fontWeight: FontWeight.bold,
