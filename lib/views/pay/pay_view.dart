@@ -37,7 +37,9 @@ class _PayViewState extends State<PayView> {
             context, 'Payment Successful', 'Payment successfully sent', false);
       }
     } on LNClientException catch (e) {
-      PopUp.showPopUp(context, 'Invalid Rune', e.message, true);
+      if (mounted) {
+        PopUp.showPopUp(context, 'Invalid Rune', e.message, true);
+      }
     }
   }
 

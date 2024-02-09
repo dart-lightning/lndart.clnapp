@@ -32,7 +32,9 @@ class _NumberPadState extends State<NumberPad> {
           .payInvoice(invoice: boltString, msat: amountMsat);
       transactionView(response.payResponse.paymentHash);
     } on LNClientException catch (e) {
-      PopUp.showPopUp(context, 'Failed to pay the invoice', e.message, true);
+      if (mounted) {
+        PopUp.showPopUp(context, 'Failed to pay the invoice', e.message, true);
+      }
     }
   }
 
@@ -43,8 +45,14 @@ class _NumberPadState extends State<NumberPad> {
           .withdraw(destination: destination, mSatoshi: amount);
       transactionView(response.txId);
     } on LNClientException catch (e) {
-      PopUp.showPopUp(
-          context, 'Failed to pay to the given address', e.message, true);
+      if (mounted) {
+        PopUp.showPopUp(
+          context,
+          'Failed to pay to the given address',
+          e.message,
+          true,
+        );
+      }
     }
   }
 

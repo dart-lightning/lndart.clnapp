@@ -39,7 +39,9 @@ class _RequestViewState extends State<RequestView> {
       });
       return true;
     } on LNClientException catch (e) {
-      PopUp.showPopUp(context, 'Invalid Rune', e.message, true);
+      if (mounted) {
+        PopUp.showPopUp(context, 'Invalid Rune', e.message, true);
+      }
       return false;
     }
   }
@@ -57,7 +59,9 @@ class _RequestViewState extends State<RequestView> {
       });
       return true;
     } on LNClientException catch (e) {
-      PopUp.showPopUp(context, 'Invalid Rune', e.message, true);
+      if (mounted) {
+        PopUp.showPopUp(context, 'Invalid Rune', e.message, true);
+      }
       return false;
     }
   }
@@ -70,7 +74,9 @@ class _RequestViewState extends State<RequestView> {
       });
       return true;
     } on LNClientException catch (e) {
-      PopUp.showPopUp(context, 'Invalid Rune', e.message, true);
+      if (mounted) {
+        PopUp.showPopUp(context, 'Invalid Rune', e.message, true);
+      }
       return false;
     }
   }
