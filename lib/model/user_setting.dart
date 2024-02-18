@@ -17,7 +17,7 @@ class Setting {
       this.host,
       this.path,
       this.nodeId,
-      this.lambdaServer,
+      this.lambdaServer = "https://lnlambda.lnmetrics.info",
       this.rune}) {
     clientMode = ClientProvider.getClientByDefPlatform().first;
   }

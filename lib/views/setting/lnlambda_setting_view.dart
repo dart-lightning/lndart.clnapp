@@ -41,7 +41,7 @@ class _LnlambdaSettingViewState extends State<LnlambdaSettingView> {
           ),
           const Text("Lambda Server"),
           TextFormField(
-            controller: TextEditingController(text: setting.lambdaServer ?? ''),
+            controller: TextEditingController(text: setting.lambdaServer),
             onChanged: (text) {
               setting.lambdaServer = text;
             },
