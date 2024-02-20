@@ -9,6 +9,7 @@ class Setting {
   String? host;
   String? path;
   String? nodeId;
+  bool? customLambdaServer;
   String? lambdaServer;
   String? rune;
 
@@ -17,7 +18,8 @@ class Setting {
       this.host,
       this.path,
       this.nodeId,
-      this.lambdaServer = "https://lnlambda.lnmetrics.info",
+      this.customLambdaServer,
+      this.lambdaServer,
       this.rune}) {
     clientMode = ClientProvider.getClientByDefPlatform().first;
   }
@@ -56,6 +58,7 @@ class Setting {
             'nodeId': nodeId,
             'host': host,
             'rune': rune,
+            'customLambdaServer': customLambdaServer,
             'lambdaServer': lambdaServer,
           };
         }
@@ -73,6 +76,7 @@ class Setting {
         return path != null;
       case ClientMode.lnlambda:
         return nodeId != null &&
+            customLambdaServer != null &&
             lambdaServer != null &&
             rune != null &&
             host != null;
