@@ -41,11 +41,8 @@ class _LnlambdaSettingViewState extends State<LnlambdaSettingView> {
           ),
           const Text("Lambda Server"),
           DropdownButtonFormField(
-            value: setting.customLambdaServer == null
-                ? null
-                : setting.customLambdaServer == true
-                    ? 'custom'
-                    : setting.lambdaServer,
+            value:
+                setting.customLambdaServer! ? 'custom' : setting.lambdaServer,
             items: const [
               DropdownMenuItem(
                 value: 'https://lnlambda.lnmetrics.info',
