@@ -11,6 +11,7 @@ Setting _$SettingFromJson(Map<String, dynamic> json) => Setting(
       host: json['host'] as String?,
       path: json['path'] as String?,
       nodeId: json['nodeId'] as String?,
+      customLambdaServer: json['customLambdaServer'] as bool?,
       lambdaServer: json['lambdaServer'] as String?,
       rune: json['rune'] as String?,
     );
@@ -28,6 +29,7 @@ Map<String, dynamic> _$SettingToJson(Setting instance) {
   writeNotNull('host', instance.host);
   writeNotNull('path', instance.path);
   writeNotNull('nodeId', instance.nodeId);
+  writeNotNull('customLambdaServer', instance.customLambdaServer);
   writeNotNull('lambdaServer', instance.lambdaServer);
   writeNotNull('rune', instance.rune);
   return val;

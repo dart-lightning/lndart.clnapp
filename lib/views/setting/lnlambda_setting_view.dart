@@ -40,16 +40,45 @@ class _LnlambdaSettingViewState extends State<LnlambdaSettingView> {
             ),
           ),
           const Text("Lambda Server"),
-          TextFormField(
-            controller: TextEditingController(text: setting.lambdaServer ?? ''),
-            onChanged: (text) {
-              setting.lambdaServer = text;
+          DropdownButtonFormField(
+            value:
+                setting.customLambdaServer! ? 'custom' : setting.lambdaServer,
+            items: const [
+              DropdownMenuItem(
+                value: 'https://lnlambda.lnmetrics.info',
+                child: Text("https://lnlambda.lnmetrics.info"),
+              ),
+              DropdownMenuItem(
+                value: 'custom',
+                child: Text("Enter lambda server url manually"),
+              ),
+            ],
+            onChanged: (value) {
+              setState(() {
+                if (value == 'custom') {
+                  setting.customLambdaServer = true;
+                } else {
+                  setting.customLambdaServer = false;
+                  setting.lambdaServer = value as String;
+                }
+              });
             },
-            decoration: const InputDecoration(
-              label: Text("lnlambda server url"),
-              border: OutlineInputBorder(),
-            ),
           ),
+          () {
+            if (setting.customLambdaServer == true) {
+              return TextFormField(
+                controller: TextEditingController(text: setting.lambdaServer),
+                onChanged: (text) {
+                  setting.lambdaServer = text;
+                },
+                decoration: const InputDecoration(
+                  label: Text("lnlambda server url"),
+                  border: OutlineInputBorder(),
+                ),
+              );
+            }
+            return const SizedBox();
+          }(),
           const Text("Rune"),
           TextFormField(
             controller: TextEditingController(text: setting.rune ?? ''),
