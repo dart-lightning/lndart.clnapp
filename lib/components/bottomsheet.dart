@@ -57,7 +57,6 @@ class CLNBottomSheet {
                       },
                       child: Text(
                         '$display msats',
-                        textScaler: const TextScaler.linear(1.0),
                         style: TextStyle(
                           fontSize: 40,
                           fontWeight: FontWeight.bold,
